@@ -106,7 +106,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
               Back
             </Hov>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: '#FF8A80' }}>Pizza · 8 recipes</span>
+              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: '#FF8A80' }}>Pizza · {PIZZAS.length} recipes</span>
               <h1 style={{ margin: 0, fontWeight: 900, fontSize: 'clamp(52px,7.4vw,104px)', lineHeight: 0.9, letterSpacing: '-.055em' }}>
                 Meat
                 <br />
@@ -115,7 +115,6 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
               <p style={{ margin: 0, maxWidth: 520, fontSize: 'clamp(16px,1.4vw,18px)', lineHeight: 1.5, color: '#DADADD', textWrap: 'pretty' }}>Pepperoni, ham, bacon, sausage and chicken on our wood-fired crust.</p>
             </div>
           </div>
-          <a href="https://unsplash.com/@tamasp" target="_blank" rel="noreferrer" style={{ position: 'absolute', right: 20, top: 16, fontSize: 11, color: 'rgba(255,255,255,.55)', textDecoration: 'none' }}>Photo: Tamas Pap / Unsplash</a>
         </div>
       </section>
 

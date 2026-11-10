@@ -117,7 +117,6 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
                 </Hov>
               </div>
             </div>
-            <a href="https://unsplash.com/@briewilly" target="_blank" rel="noreferrer" style={{ position: 'absolute', right: 22, top: 18, fontSize: 11, color: 'rgba(255,255,255,.7)', textDecoration: 'none' }}>Photo: Chad Montano / Unsplash</a>
           </div>
 
           {/* Pickup combo tile */}
@@ -182,7 +181,6 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
               <span style={{ fontSize: ph ? 13 : 14, color: 'rgba(255,255,255,.88)' }}>Rosé, Alfredo, tomato</span>
             </span>
             <span style={ph ? ARROW_DOT_SM : ARROW_DOT}><IconArrow /></span>
-            <span style={{ position: 'absolute', left: ph ? 14 : 24, right: ph ? 64 : undefined, bottom: ph ? 12 : 16, fontSize: ph ? 9 : 11, lineHeight: 1.3, color: 'rgba(255,255,255,.75)', textShadow: '0 1px 2px rgba(0,0,0,.5)' }}>Photo: Dllu, Wikimedia Commons, CC BY-SA 4.0</span>
           </Hov>
         </div>
       </section>
@@ -273,7 +271,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
                 hover={{ transform: 'translateY(-6px)', boxShadow: '0 26px 50px rgba(26,20,20,.22)' }}
               >
                 <div style={{ position: 'absolute', inset: 0 }}>
-                  <Photo src={d.img} alt={d.name + ' combo'} credit={c.credit} creditHref={c.creditHref} creditTop={ph} style={{ bottom: 'auto', height: '100%' }} />
+                  <Photo src={d.img} alt={d.name + ' combo'} credit={c.credit} creditHref={c.creditHref} style={{ bottom: 'auto', height: '100%' }} />
                 </div>
                 <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(0deg,rgba(18,10,8,.94) 0%,rgba(18,10,8,.72) 34%,rgba(18,10,8,0) 66%)' }} />
                 <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: ph ? 8 : 14, padding: ph ? 12 : 22 }}>

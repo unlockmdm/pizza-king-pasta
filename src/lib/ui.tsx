@@ -60,7 +60,7 @@ function splitBorder(style: CSSProperties): CSSProperties {
  * `Photo` replaces the prototype's `<image-slot>`.
  * Fills its positioned parent (position:absolute; inset:0). If `src` is empty it renders an
  * empty neutral box, as the design asks ("leave an empty image box rather than a misleading picture").
- * `credit` shows the small attribution chip bottom-left (required for Unsplash / CC photos).
+ * `credit`/`creditHref` are kept for reference only; they are not drawn on the image.
  */
 export function Photo({
   src,
@@ -73,7 +73,6 @@ export function Photo({
   style,
   imgStyle,
   eager,
-  creditTop,
 }: {
   src?: string;
   alt?: string;
@@ -109,37 +108,7 @@ export function Photo({
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: fit, objectPosition: position, display: 'block', ...imgStyle }}
         />
       ) : null}
-      {src && credit ? (
-        <span
-          style={{
-            position: 'absolute',
-            left: shape === 'circle' ? '50%' : 6,
-            transform: shape === 'circle' ? 'translateX(-50%)' : undefined,
-            bottom: creditTop ? undefined : shape === 'circle' ? '16%' : 6,
-            top: creditTop ? 6 : undefined,
-            maxWidth: 'calc(100% - 12px)',
-            padding: '3px 7px',
-            borderRadius: 5,
-            background: 'rgba(0,0,0,.55)',
-            color: '#fff',
-            font: '10px/1.2 system-ui,-apple-system,sans-serif',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            backdropFilter: 'blur(6px)',
-            WebkitBackdropFilter: 'blur(6px)',
-            zIndex: 1,
-          }}
-        >
-          {creditHref ? (
-            <a href={creditHref} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} style={{ color: 'inherit', textDecoration: 'none' }}>
-              {credit}
-            </a>
-          ) : (
-            credit
-          )}
-        </span>
-      ) : null}
+      {/* No credit overlay on photos (owner request). Licence-required credits live in the footer. */}
     </span>
   );
 }
