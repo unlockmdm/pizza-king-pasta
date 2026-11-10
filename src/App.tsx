@@ -324,6 +324,7 @@ export default function App() {
         onMode={setMode}
         onBrowse={() => { setCartOpen(false); goSection('bestsellers')(); }}
         onPlaced={() => { setCart([]); setCartOpen(false); }}
+        when={when}
       />
     </>
   );

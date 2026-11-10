@@ -30,9 +30,20 @@ src/
 public/assets/         logo, pizza base, topping cut-outs, dips, pops, menu photos
 ```
 
+## Square checkout (pickup orders)
+
+Pickup orders are charged through Square. The browser uses Square's Web Payments SDK (card form and Google Pay; Apple Pay once the shop's domain is verified). A small server function, `api/pay.ts` → `server/square.ts`, creates a PICKUP order in Square and charges it, so orders show up in the shop's Square Order Manager. Declined payments cancel their order automatically. Delivery is handed off to DoorDash and Uber Eats.
+
+- **Local:** put the keys in `.env.local` (never committed):
+  `VITE_SQUARE_APP_ID`, `VITE_SQUARE_LOCATION_ID`, `SQUARE_ACCESS_TOKEN`, `SQUARE_ENV` (`sandbox` or `production`).
+  `npm run dev` serves `/api/pay` from the Vite dev server.
+- **Hosting:** deploy to Vercel (it runs `api/pay.ts` automatically) and add the same four variables in the Vercel project settings.
+- **GitHub Pages** has no server, so that build has no Square keys and stays a demo checkout that charges nothing.
+- Test mode card: `4111 1111 1111 1111`, any future date, CVV `111`, ZIP `94103`.
+
 ## Before going live
 
-- **Square:** catalog sync, Orders API, the Web Payments SDK (to replace the mock card form), location hours, and pickup/delivery fulfilment. This needs a small server for the Square access token.
+- **Square:** switch the keys to production, verify the domain for Apple Pay, and re-price lines on the server from the Square catalog (see the TODO in `server/square.ts`).
 - **Photography:** replace the stock photos (Unsplash and Wikimedia, credited on screen) with the shop's own photos.
 - **Confirm with the owner:** the $4.99 delivery fee, 13% HST, tip presets, delivery radius, pop prices, the hot drink price ($3.10) and the extra-dip rule.
 - **Content:** write the Terms and Privacy pages.

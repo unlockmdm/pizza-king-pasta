@@ -1,15 +1,15 @@
 // Port of design_handoff_pizza_king_website/prototype/CartCheckout.dc.html
 // Floating cart bar, cart drawer, checkout and the order-placed confirmation.
-import { useEffect, useState, type ChangeEvent, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 import type { CartCheckoutProps, CartLine, Mode } from '../lib/types';
-import { DELIVERY_FEE, HST, SHOP } from '../lib/catalog';
+import { HST, SHOP } from '../lib/catalog';
+import { CARD_STYLE, loadSquare, newKey, slotToIso, SQUARE_ENABLED, SQUARE_SANDBOX, submitPayment, type SqCard, type SqPaymentRequest, type SqWallet } from '../lib/square';
 import { money } from '../lib/format';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
 import './CartCheckout.css';
 
 // ---------- Data (from the prototype) ----------
-const FEE = DELIVERY_FEE;
 
 /** [img, size, background-size] thumbnail guessed from the item name. */
 type Thumb = [string, string, string];
@@ -47,6 +47,7 @@ type Form = Record<FieldKey, string>;
 const EMPTY_FORM: Form = { name: '', phone: '', email: '', street: '', unit: '', note: '', card: '', exp: '', cvc: '', zip: '' };
 
 interface Done {
+  receiptUrl?: string;
   no: string;
   when: string;
   where: string;
@@ -113,6 +114,15 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const [tried, setTried] = useState(false);
   const [triedX, setTriedX] = useState(false);
   const [done, setDone] = useState<Done | null>(null);
+  // Square (live checkout) state
+  const [busy, setBusy] = useState(false);
+  const [payErr, setPayErr] = useState('');
+  const [sqReady, setSqReady] = useState(false);
+  const [sqLoadErr, setSqLoadErr] = useState('');
+  const [wallets, setWallets] = useState({ gpay: false, apple: false });
+  const sq = useRef<{ card?: SqCard; gpay?: SqWallet; apple?: SqWallet; req?: SqPaymentRequest }>({});
+  const payKey = useRef(newKey());
+  const totalRef = useRef('0.00');
 
   // Prototype componentDidUpdate: re-opening the cart always starts at the drawer.
   useEffect(() => {
@@ -127,9 +137,11 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const pickup = mode === 'pickup';
   const count = lines.reduce((a, l) => a + l.qty, 0);
   const sub = lines.reduce((a, l) => a + l.qty * l.unit, 0);
-  const fee = pickup ? 0 : FEE;
+  // Delivery goes through DoorDash / Uber Eats, so this checkout only ever charges pickup orders.
+  const fee = 0;
   const tax = (sub + fee) * HST;
-  const tipAmt = pickup ? 0 : (sub * tip) / 100;
+  const tipAmt = 0;
+  void tip; void setTip;
   const grand = sub + fee + tax + tipAmt;
 
   const set = (k: FieldKey) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -142,7 +154,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
     name: !f.name.trim(),
     phone: f.phone.replace(/\D/g, '').length < 10,
     street: !pickup && !f.street.trim(),
-    card: pay === 'card' && (digits.length < 15 || !/\d{2}\s*\/\s*\d{2}/.test(f.exp) || f.cvc.replace(/\D/g, '').length < 3),
+    card: pay === 'card' && !SQUARE_ENABLED && (digits.length < 15 || !/\d{2}\s*\/\s*\d{2}/.test(f.exp) || f.cvc.replace(/\D/g, '').length < 3),
   };
   const show = (k: keyof typeof errs) => tried && errs[k];
   const err = {
@@ -160,9 +172,109 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const countText = count + (count === 1 ? ' item' : ' items');
   const setMode = (m: Mode) => p.onMode(m);
   // Owner rule: no wait-time estimates. Timing is ASAP (or scheduled from the start sheet).
-  const doneWhen = 'As soon as possible';
+  const doneWhen = p.when && p.when !== 'asap' ? p.when : 'As soon as possible';
   const where = pickup ? SHOP.street : f.street + (f.unit ? ', ' + f.unit : '');
   const firstName = f.name.split(' ')[0];
+
+  // ---- Square Web Payments SDK (card + wallets), mounted while the pickup checkout is open ----
+  const totalStr = (Math.round(grand * 100) / 100).toFixed(2);
+  totalRef.current = totalStr;
+  const sqActive = SQUARE_ENABLED && !!p.open && step === 'checkout' && pickup;
+  useEffect(() => {
+    if (!sqActive) return;
+    let cancelled = false;
+    const st = sq.current;
+    (async () => {
+      try {
+        const payments = await loadSquare();
+        if (cancelled) return;
+        const card = await payments.card({ style: CARD_STYLE });
+        if (cancelled) { void card.destroy(); return; }
+        await card.attach('#sq-card');
+        st.card = card;
+        setSqReady(true);
+        const req = payments.paymentRequest({ countryCode: 'CA', currencyCode: 'CAD', total: { amount: totalRef.current, label: SHOP.name } });
+        st.req = req;
+        try {
+          const g = await payments.googlePay(req);
+          if (cancelled) { void g.destroy(); return; }
+          await g.attach?.('#sq-gpay', { buttonColor: 'white', buttonSizeMode: 'fill', buttonType: 'long' });
+          st.gpay = g;
+          setWallets((x) => ({ ...x, gpay: true }));
+        } catch { /* Google Pay not available on this device */ }
+        try {
+          const a = await payments.applePay(req);
+          if (cancelled) { void a.destroy(); return; }
+          st.apple = a;
+          setWallets((x) => ({ ...x, apple: true }));
+        } catch { /* Apple Pay needs Safari + a verified domain */ }
+      } catch (e) {
+        if (!cancelled) setSqLoadErr((e as Error).message || 'Card payments are unavailable right now.');
+      }
+    })();
+    return () => {
+      cancelled = true;
+      void st.card?.destroy();
+      void st.gpay?.destroy();
+      void st.apple?.destroy();
+      sq.current = {};
+      setSqReady(false);
+      setWallets({ gpay: false, apple: false });
+    };
+  }, [sqActive]);
+  useEffect(() => { sq.current.req?.update({ total: { amount: totalStr, label: SHOP.name } }); }, [totalStr]);
+
+  const charge = async (method: 'card' | 'gpay' | 'apple') => {
+    if (busy || !count) return;
+    if (errs.name || errs.phone || errs.email) {
+      setTried(true);
+      if (method !== 'card') setTriedX(true);
+      return;
+    }
+    const st = sq.current;
+    const src = method === 'card' ? st.card : method === 'gpay' ? st.gpay : st.apple;
+    if (!src) return;
+    setBusy(true);
+    setPayErr('');
+    try {
+      const [given, ...rest] = f.name.trim().split(/\s+/);
+      const verification = {
+        amount: totalStr, currencyCode: 'CAD', intent: 'CHARGE', customerInitiated: true, sellerKeyedIn: false,
+        billingContact: { givenName: given, familyName: rest.join(' '), email: f.email.trim(), phone: f.phone.trim(), countryCode: 'CA' },
+      };
+      const t = method === 'card' ? await (src as SqCard).tokenize(verification) : await src.tokenize();
+      if (t.status !== 'OK' || !t.token) {
+        if (method === 'card') setPayErr('Check your card details.');
+        setBusy(false);
+        return;
+      }
+      const r = await submitPayment({
+        sourceId: t.token,
+        idempotencyKey: payKey.current,
+        lines: lines.map((l) => ({ name: l.name, summary: l.summary, unit: l.unit, qty: l.qty })),
+        customer: { name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim() },
+        note: f.note.trim() || undefined,
+        pickupAt: slotToIso(p.when),
+        expectedTotal: Math.round(grand * 100),
+      });
+      payKey.current = newKey();
+      if (!r.ok) {
+        setPayErr(r.message || 'Payment didn\u2019t go through. Please try again.');
+        setBusy(false);
+        return;
+      }
+      const via = method === 'gpay' ? ' · Google Pay' : method === 'apple' ? ' · Apple Pay' : '';
+      setDone({ no: 'Order #' + String(r.orderNumber || '').toUpperCase(), when: doneWhen, where, total: money((r.total ?? Math.round(grand * 100)) / 100) + via, pickup, name: firstName, receiptUrl: r.receiptUrl || undefined });
+      setStep('cart');
+      setTried(false);
+      setTriedX(false);
+      setBusy(false);
+      p.onPlaced();
+    } catch {
+      setPayErr('Payment didn\u2019t go through. Please try again.');
+      setBusy(false);
+    }
+  };
 
   const express = (method: string) => {
     if (!count) return;
@@ -178,7 +290,8 @@ export default function CartCheckout(p: CartCheckoutProps) {
     p.onPlaced();
   };
   const place = () => {
-    if (count === 0) return;
+    if (count === 0 || !pickup) return;
+    if (SQUARE_ENABLED) { void charge('card'); return; }
     if (Object.values(errs).some(Boolean)) {
       setTried(true);
       return;
@@ -208,7 +321,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
 
   const modeCards: { id: Mode; label: string; sub: string }[] = [
     { id: 'pickup', label: 'Pickup', sub: 'Ready as soon as possible' },
-    { id: 'delivery', label: 'Delivery', sub: money(FEE) + ' · Our own drivers' },
+    { id: 'delivery', label: 'Delivery', sub: 'DoorDash or Uber Eats' },
   ];
   const pays: { id: Pay; short: string }[] = [
     { id: 'card', short: 'Card' },
@@ -517,7 +630,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
               <section>
                 <h2 style={h2}>Pickup or delivery</h2>
                 <div style={card}>
-                  <div role="radiogroup" aria-label="Order type" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div role="radiogroup" aria-label="Order type" style={{ display: 'grid', gridTemplateColumns: w < 480 ? 'minmax(0,1fr)' : 'repeat(2,minmax(0,1fr))', gap: 10 }}>
                     {modeCards.map((m) => {
                       const on = mode === m.id;
                       return (
@@ -596,19 +709,23 @@ export default function CartCheckout(p: CartCheckoutProps) {
                       </span>
                     </div>
                   ) : (
-                    <>
-                      <Field label="Address" bg={fieldBg}>
-                        <input value={f.street} onChange={set('street')} autoComplete="street-address" placeholder="Street address" style={fieldInput} />
-                      </Field>
-                      <Field label="Unit" bg={fieldBg}>
-                        <input value={f.unit} onChange={set('unit')} placeholder="Apt, suite or buzzer (optional)" style={fieldInput} />
-                      </Field>
-                    </>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '6px 6px 4px' }}>
+                      <span style={{ fontSize: 15, lineHeight: 1.5, color: '#636366' }}>Delivery is handled by DoorDash and Uber Eats. You{'\u2019'}ll finish your order in their app.</span>
+                      <div style={{ display: 'grid', gridTemplateColumns: twoCols, gap: 10 }}>
+                        <Hov as="a" href={SHOP.doordash} target="_blank" rel="noreferrer" style={{ height: 54, borderRadius: 16, background: '#1A1414', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 15, textDecoration: 'none' }} hover={{ background: '#D7192D', color: '#fff' }}>
+                          Order delivery on DoorDash
+                        </Hov>
+                        <Hov as="a" href={SHOP.ubereats} target="_blank" rel="noreferrer" style={{ height: 54, borderRadius: 16, background: '#fff', color: '#1A1414', boxShadow: 'inset 0 0 0 1.5px #1A1414', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 15, textDecoration: 'none' }} hover={{ background: '#F2F2F5', color: '#1A1414' }}>
+                          Order delivery on Uber Eats
+                        </Hov>
+                      </div>
+                    </div>
                   )}
                 </div>
                 {err.street ? <span style={errText}>Enter a delivery address.</span> : null}
               </section>
 
+              {pickup ? (<>
               {/* Contact */}
               <section>
                 <h2 style={h2}>Contact</h2>
@@ -652,6 +769,44 @@ export default function CartCheckout(p: CartCheckoutProps) {
               <section>
                 <h2 style={h2}>Payment</h2>
                 <div style={{ ...card, padding: 18, gap: 16 }}>
+                  {SQUARE_ENABLED ? (
+                    <>
+                      {SQUARE_SANDBOX ? (
+                        <span style={{ fontSize: 13, fontWeight: 700, color: '#8A5A00', background: '#FFF4D6', borderRadius: 12, padding: '10px 12px', lineHeight: 1.4 }}>
+                          Test mode: card 4111 1111 1111 1111, any future date, CVV 111, ZIP 94103. No real money is charged.
+                        </span>
+                      ) : null}
+                      <div style={{ display: 'grid', gridTemplateColumns: wallets.apple && wallets.gpay ? twoCols : '1fr', gap: 10 }}>
+                        {wallets.apple ? (
+                          <button onClick={() => void charge('apple')} disabled={busy} aria-label="Pay with Apple Pay" style={{ height: 56, border: 0, borderRadius: 14, background: '#000', color: '#fff', fontFamily: "-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif", fontWeight: 600, fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                            <svg width="18" height="22" viewBox="0 0 22 26" fill="currentColor" aria-hidden="true"><path d="M17.9 13.8c0-3 2.5-4.5 2.6-4.6-1.4-2.1-3.6-2.3-4.4-2.4-1.9-.2-3.6 1.1-4.6 1.1-.9 0-2.4-1.1-3.9-1-2 0-3.9 1.2-5 3-2.1 3.7-.5 9.1 1.5 12.1 1 1.5 2.2 3.1 3.8 3 1.5-.1 2.1-1 3.9-1s2.4 1 3.9 1c1.6 0 2.7-1.5 3.7-3 1.2-1.7 1.6-3.3 1.7-3.4-.1 0-3.2-1.2-3.2-4.8zM14.9 4.9c.8-1 1.4-2.4 1.3-3.8-1.2.1-2.7.8-3.5 1.8-.8.9-1.5 2.3-1.3 3.7 1.3.1 2.7-.7 3.5-1.7z" /></svg>
+                            <span>Pay</span>
+                          </button>
+                        ) : null}
+                        {/* Square renders the official Google Pay button into this box. */}
+                        <div id="sq-gpay" onClick={() => void charge('gpay')} style={{ height: wallets.gpay ? 52 : 0, overflow: wallets.gpay ? 'visible' : 'hidden' }} />
+                      </div>
+                      {err.express ? <span style={{ fontSize: 13, fontWeight: 700, color: '#C11425', marginTop: -6 }}>Fill in your details above first.</span> : null}
+                      {wallets.apple || wallets.gpay ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 13, fontWeight: 700, color: '#818184' }}>
+                          <span style={{ flex: 1, height: 1, background: '#E8E8EB' }} />
+                          or pay with card
+                          <span style={{ flex: 1, height: 1, background: '#E8E8EB' }} />
+                        </div>
+                      ) : null}
+                      {/* Square's secure card fields (an iframe): card numbers never touch our code or server. */}
+                      <div id="sq-card" style={{ minHeight: sqReady ? undefined : 90 }} />
+                      {!sqReady && !sqLoadErr ? <span style={{ fontSize: 13, color: '#818184', marginTop: -70, paddingLeft: 4 }}>Loading secure card form…</span> : null}
+                      {sqLoadErr ? <span style={{ fontSize: 13, fontWeight: 700, color: '#C11425' }}>{sqLoadErr}</span> : null}
+                      {payErr ? <span role="alert" style={{ fontSize: 14, fontWeight: 700, color: '#C11425', background: '#FDECEE', borderRadius: 12, padding: '10px 12px' }}>{payErr}</span> : null}
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#818184' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+                        Encrypted and processed by Square. We never see or store your card.
+                      </span>
+                    </>
+                  ) : (
+                  <>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#636366', background: '#F2F2F5', borderRadius: 12, padding: '10px 12px' }}>Demo checkout: no card is charged.</span>
                   <div style={{ display: 'grid', gridTemplateColumns: twoCols, gap: 10 }}>
                     <Hov
                       as="button"
@@ -785,6 +940,8 @@ export default function CartCheckout(p: CartCheckoutProps) {
                       </span>
                     </div>
                   ) : null}
+                  </>
+                  )}
                   {!pickup ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 4 }}>
                       <span style={{ fontSize: 15, fontWeight: 700 }}>Tip your driver</span>
@@ -818,6 +975,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
                   ) : null}
                 </div>
               </section>
+              </>) : null}
             </div>
 
             {/* Receipt */}
@@ -851,12 +1009,6 @@ export default function CartCheckout(p: CartCheckoutProps) {
                   <span>Subtotal</span>
                   <span style={{ color: '#1A1414', fontWeight: 700 }}>{money(sub)}</span>
                 </div>
-                {!pickup ? (
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Delivery</span>
-                    <span style={{ color: '#1A1414', fontWeight: 700 }}>{money(FEE)}</span>
-                  </div>
-                ) : null}
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>HST (13%)</span>
                   <span style={{ color: '#1A1414', fontWeight: 700 }}>{money(tax)}</span>
@@ -873,26 +1025,30 @@ export default function CartCheckout(p: CartCheckoutProps) {
                   <span style={{ fontWeight: 900, fontSize: 30, letterSpacing: '-.045em' }}>{money(grand)}</span>
                 </div>
               </div>
-              {wide ? (
+              {wide && pickup ? (
                 <Hov
                   as="button"
                   onClick={place}
-                  style={{ height: 58, border: 0, borderRadius: 18, background: '#D7192D', color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 17, cursor: 'pointer', transition: 'background .2s' }}
-                  hover={{ background: '#BF1222' }}
+                  disabled={busy}
+                  aria-busy={busy}
+                  style={{ height: 58, border: 0, borderRadius: 18, background: busy ? '#8E8E93' : '#D7192D', color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 17, cursor: busy ? 'progress' : 'pointer', transition: 'background .2s' }}
+                  hover={busy ? undefined : { background: '#BF1222' }}
                 >
-                  Place order
+                  {busy ? 'Processing payment…' : 'Place order'}
                 </Hov>
               ) : null}
             </aside>
           </div>
 
-          {!wide ? (
+          {!wide && pickup ? (
             <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, padding: '12px 16px calc(12px + env(safe-area-inset-bottom))', background: pageBgA, backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}>
               <button
                 onClick={place}
-                style={{ width: '100%', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', border: 0, borderRadius: 18, background: '#D7192D', color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 17, cursor: 'pointer' }}
+                disabled={busy}
+                aria-busy={busy}
+                style={{ width: '100%', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', border: 0, borderRadius: 18, background: busy ? '#8E8E93' : '#D7192D', color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 17, cursor: busy ? 'progress' : 'pointer' }}
               >
-                <span>Place order</span>
+                <span>{busy ? 'Processing payment…' : 'Place order'}</span>
                 <span style={{ fontWeight: 900 }}>{money(grand)}</span>
               </button>
             </div>
@@ -933,6 +1089,9 @@ export default function CartCheckout(p: CartCheckoutProps) {
                 <span style={{ fontWeight: 800 }}>{done.total}</span>
               </div>
             </div>
+            {done.receiptUrl ? (
+              <a href={done.receiptUrl} target="_blank" rel="noreferrer" style={{ fontWeight: 800, fontSize: 15, color: '#D7192D', textDecoration: 'none' }}>View your receipt</a>
+            ) : null}
             <button
               onClick={() => setDone(null)}
               style={{ width: '100%', height: 56, border: 0, borderRadius: 999, background: '#1A1414', color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}

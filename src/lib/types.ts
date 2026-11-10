@@ -156,4 +156,6 @@ export interface CartCheckoutProps {
   onBrowse: () => void;
   /** Order placed: shell clears the cart. */
   onPlaced: () => void;
+  /** Pickup time from the start sheet: 'asap' or a slot label like "7:30 PM". */
+  when?: string;
 }

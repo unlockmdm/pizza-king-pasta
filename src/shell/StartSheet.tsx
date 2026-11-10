@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { SHOP } from '../lib/catalog';
 import { useLockBody } from '../lib/hooks';
-import { Hov, IconArrow, IconCheck, IconClose, IconPin, Photo } from '../lib/ui';
+import { Hov, IconArrow, IconCheck, IconClose, Photo } from '../lib/ui';
 import type { Mode } from '../lib/types';
 
 /** Next six half-hour slots (prototype `timeSlots`). When closed, starts at 11:00 AM. */
@@ -104,29 +104,19 @@ export default function StartSheet({
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <span style={LABEL}>Deliver to</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, border: '1.5px solid ' + (addrErr ? '#D7192D' : '#E3E3E6'), borderRadius: 14, padding: '0 16px', height: 54, background: '#fff', transition: 'border-color .15s' }}>
-                <IconPin color="#636366" />
-                <input
-                  value={addr}
-                  onChange={(e) => setAddr(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') onConfirm(); }}
-                  placeholder="Street address or postal code"
-                  aria-label="Delivery address"
-                  autoComplete="street-address"
-                  style={{ flex: 1, minWidth: 0, border: 0, outline: 'none', background: 'transparent', fontFamily: 'inherit', fontSize: 16, color: '#1A1414', height: '100%' }}
-                />
-              </div>
-              {addrErr ? (
-                <span role="alert" style={{ fontSize: 13, color: '#B5121F', fontWeight: 600 }}>{addrErr}</span>
-              ) : (
-                <span style={{ fontSize: 13, color: '#636366' }}>Delivered by our own drivers.</span>
-              )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <span style={{ fontSize: 15, lineHeight: 1.5, color: '#636366' }}>Delivery is handled by DoorDash and Uber Eats. You{'\u2019'}ll finish your order in their app.</span>
+              <Hov as="a" href={SHOP.doordash} target="_blank" rel="noreferrer" style={{ height: 54, borderRadius: 14, background: '#1A1414', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontWeight: 700, fontSize: 16, textDecoration: 'none' }} hover={{ background: '#D7192D', color: '#fff' }}>
+                Order delivery on DoorDash <IconArrow size={16} stroke={2.6} />
+              </Hov>
+              <Hov as="a" href={SHOP.ubereats} target="_blank" rel="noreferrer" style={{ height: 54, borderRadius: 14, background: '#fff', color: '#1A1414', boxShadow: 'inset 0 0 0 1.5px #1A1414', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontWeight: 700, fontSize: 16, textDecoration: 'none' }} hover={{ background: '#F2F2F5', color: '#1A1414' }}>
+                Order delivery on Uber Eats <IconArrow size={16} stroke={2.6} />
+              </Hov>
             </div>
           )}
 
           {/* When */}
+          {isPickup ? (<>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <span style={LABEL}>When</span>
             <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid #E4E4E7', borderRadius: 16, overflow: 'hidden' }}>
@@ -155,9 +145,10 @@ export default function StartSheet({
           </div>
 
           <Hov as="button" onClick={onConfirm} style={{ marginTop: 'auto', border: 0, background: '#D7192D', color: '#fff', borderRadius: 14, height: 54, fontWeight: 700, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'background .15s' }} hover={{ background: '#B5121F' }}>
-            {isPickup ? 'Start pickup order' : 'Start delivery order'}
+            Start pickup order
             <IconArrow size={18} stroke={2.6} />
           </Hov>
+          </>) : null}
         </div>
 
         <Hov as="button" onClick={onClose} aria-label="Close" style={{ position: 'absolute', right: 16, top: 16, width: 44, height: 44, borderRadius: '50%', border: 0, background: wide ? '#EFEFF2' : '#fff', color: '#1A1414', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,.08)' }} hover={{ background: '#E3E3E6' }}>
