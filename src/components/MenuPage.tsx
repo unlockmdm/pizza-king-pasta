@@ -320,7 +320,9 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
   };
 
   // ----- renderVals -----
-  const walkCols = w >= 1040 ? 'repeat(4,minmax(0,1fr))' : w >= 600 ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)';
+  const ph = w < 600; // phone: two-column compact cards
+  const walkCols = w >= 1040 ? 'repeat(4,minmax(0,1fr))' : 'repeat(2,minmax(0,1fr))';
+  const clamp2 = { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as const;
 
   const byo: BuilderItem = { id: 'byo', name: 'Build Your Own', tops: [], included: 4, img: PIZZA_IMG };
   const pizzaRows: Tile[] = [
@@ -396,14 +398,14 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
         <h1 style={{ margin: 0, padding: 'clamp(36px,5vw,64px) 0 0', fontWeight: 900, fontSize: 'clamp(44px,6vw,72px)', lineHeight: 1, letterSpacing: '-.045em' }}>Menu</h1>
 
         <section id="walkin" style={{ paddingTop: 32, scrollMarginTop: 124 }}>
-          <div style={{ background: '#1A1414', color: '#fff', borderRadius: 28, padding: 'clamp(24px,4vw,40px)', display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-              <h2 style={{ margin: 0, fontWeight: 900, fontSize: 'clamp(28px,3vw,36px)', letterSpacing: '-.035em' }}>Walk-in specials</h2>
+          <div style={{ background: '#1A1414', color: '#fff', borderRadius: ph ? 24 : 28, padding: ph ? '20px 12px 12px' : 'clamp(24px,4vw,40px)', display: 'flex', flexDirection: 'column', gap: ph ? 16 : 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: ph ? 10 : 14, flexWrap: 'wrap', padding: ph ? '0 8px' : 0 }}>
+              <h2 style={{ margin: 0, fontWeight: 900, fontSize: ph ? 24 : 'clamp(28px,3vw,36px)', letterSpacing: '-.035em' }}>Walk-in specials</h2>
               <span style={{ height: 26, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 999, background: '#D7192D', fontWeight: 800, fontSize: 12, letterSpacing: '.06em', whiteSpace: 'nowrap', textTransform: 'uppercase' }}>Pickup only</span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: walkCols, gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: walkCols, gap: ph ? 8 : 12 }}>
               {WALKINS.map(([key, name, price, desc, deal], i) => (
-                <div key={key} style={{ background: '#2A2020', borderRadius: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.06)' }}>
+                <div key={key} style={{ background: '#2A2020', borderRadius: ph ? 16 : 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.06)' }}>
                   {/* z-index:0 + isolation keeps the price tag's z-index:20 inside this scene, under the sticky bar. */}
                   <span role="img" aria-label={SCENE_ALT[i]} style={{ position: 'relative', zIndex: 0, isolation: 'isolate', aspectRatio: '16/10', overflow: 'hidden', background: 'radial-gradient(110% 90% at 50% 38%,#4A3833 0%,#2E2321 58%,#211918 100%)' }}>
                     {SCENES[i].map((L, li) => (
@@ -418,18 +420,18 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
                         ))}
                       </span>
                     ))}
-                    <span style={{ position: 'absolute', zIndex: 20, left: 12, bottom: 12, height: 38, padding: '0 14px', borderRadius: 999, background: '#D7192D', color: '#fff', fontWeight: 900, fontSize: 19, letterSpacing: '-.02em', display: 'flex', alignItems: 'center', boxShadow: '0 6px 16px rgba(0,0,0,.25)' }}>{money(price)}</span>
+                    <span style={{ position: 'absolute', zIndex: 20, left: ph ? 8 : 12, bottom: ph ? 8 : 12, height: ph ? 28 : 38, padding: ph ? '0 10px' : '0 14px', borderRadius: 999, background: '#D7192D', color: '#fff', fontWeight: 900, fontSize: ph ? 14 : 19, letterSpacing: '-.02em', display: 'flex', alignItems: 'center', boxShadow: '0 6px 16px rgba(0,0,0,.25)' }}>{money(price)}</span>
                   </span>
-                  <span style={{ padding: '18px 20px 20px', display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-                    <span style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-                      <span style={{ fontWeight: 800, fontSize: 18 }}>{name}</span>
-                      <span style={{ fontSize: 14, lineHeight: 1.45, color: '#CFC6C0' }}>{desc}</span>
+                  <span style={{ padding: ph ? '10px 10px 10px' : '18px 20px 20px', display: 'flex', flexDirection: 'column', gap: ph ? 10 : 16, flex: 1 }}>
+                    <span style={{ display: 'flex', flexDirection: 'column', gap: ph ? 3 : 4, flex: 1 }}>
+                      <span style={{ fontWeight: 800, fontSize: ph ? 14 : 18, lineHeight: 1.2 }}>{name}</span>
+                      <span style={{ fontSize: ph ? 12 : 14, lineHeight: 1.4, color: '#CFC6C0', ...(ph ? clamp2 : {}) }}>{desc}</span>
                     </span>
                     <Hov
                       as="button"
                       type="button"
                       onClick={() => onDeal(deal)}
-                      style={{ height: 46, border: 0, borderRadius: 14, background: '#fff', color: '#1A1414', fontWeight: 800, fontSize: 15, cursor: 'pointer', transition: 'background .15s,color .15s' }}
+                      style={{ height: ph ? 40 : 46, border: 0, borderRadius: ph ? 12 : 14, background: '#fff', color: '#1A1414', fontWeight: 800, fontSize: ph ? 14 : 15, cursor: 'pointer', transition: 'background .15s,color .15s' }}
                       hover={{ background: '#D7192D', color: '#fff' }}
                     >
                       Customize
@@ -442,19 +444,20 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
         </section>
 
         {sections.map((sec) => (
-          <section key={sec.id} id={sec.id} style={{ paddingTop: 72, display: 'flex', flexDirection: 'column', gap: 20, scrollMarginTop: 124 }}>
+          <section key={sec.id} id={sec.id} style={{ paddingTop: ph ? 48 : 72, display: 'flex', flexDirection: 'column', gap: ph ? 14 : 20, scrollMarginTop: 124 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <span style={{ width: 44, height: 6, borderRadius: 3, background: sec.theme.accent }} />
               <h2 style={{ margin: 0, fontWeight: 900, fontSize: 'clamp(30px,3.4vw,42px)', letterSpacing: '-.04em' }}>{sec.title}</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,250px),1fr))', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: ph ? 'repeat(2,minmax(0,1fr))' : 'repeat(auto-fill,minmax(min(100%,250px),1fr))', gap: ph ? 10 : 16 }}>
               {sec.rows.map((r) => (
                 <Hov
                   key={r.key}
                   as="button"
                   type="button"
                   onClick={r.act}
-                  style={{ display: 'flex', flexDirection: 'column', border: 0, padding: 0, borderRadius: 24, overflow: 'hidden', background: '#fff', boxShadow: '0 0 0 1px #E9E9EC', textAlign: 'left', color: '#1A1414', cursor: 'pointer', transition: 'box-shadow .3s,transform .3s' }}
+                  aria-label={r.cta + ' ' + r.name + ', ' + r.priceText}
+                  style={{ display: 'flex', flexDirection: 'column', border: 0, padding: 0, borderRadius: ph ? 18 : 24, overflow: 'hidden', background: '#fff', boxShadow: '0 0 0 1px #E9E9EC', textAlign: 'left', color: '#1A1414', cursor: 'pointer', transition: 'box-shadow .3s,transform .3s' }}
                   hover={{ transform: 'translateY(-4px)', boxShadow: '0 0 0 1px #DFDFE2,0 22px 44px rgba(26,20,20,.14)' }}
                 >
                   <span style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#F2F2F5' }}>
@@ -462,17 +465,23 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
                       <Photo src={r.img} />
                     ) : (
                       <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at 28% 22%,rgba(255,255,255,.32),rgba(255,255,255,0) 58%),' + sec.theme.accent }}>
-                        <span style={{ fontWeight: 900, fontSize: 'clamp(56px,6vw,84px)', letterSpacing: '-.06em', color: '#fff', textShadow: '0 8px 24px rgba(0,0,0,.18)' }}>{r.name.charAt(0)}</span>
+                        <span style={{ fontWeight: 900, fontSize: ph ? 44 : 'clamp(56px,6vw,84px)', letterSpacing: '-.06em', color: '#fff', textShadow: '0 8px 24px rgba(0,0,0,.18)' }}>{r.name.charAt(0)}</span>
                       </span>
                     )}
                     <span style={{ position: 'absolute', left: 12, top: 12, display: 'flex', gap: 6 }}>{r.veg ? <VegMark /> : null}</span>
                   </span>
-                  <span style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '16px 18px 18px', flex: 1 }}>
-                    <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-.01em' }}>{r.name}</span>
-                    <span style={{ fontSize: 14, lineHeight: 1.45, color: '#636366', flex: 1 }}>{r.desc}</span>
-                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingTop: 12 }}>
-                      <span style={{ fontWeight: 800, fontSize: 15 }}>{r.priceText}</span>
-                      <span style={{ height: 42, padding: '0 16px', borderRadius: 999, background: sec.theme.btnBg, color: sec.theme.btnFg, fontWeight: 800, fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>{r.cta}</span>
+                  <span style={{ display: 'flex', flexDirection: 'column', gap: ph ? 3 : 6, padding: ph ? '10px 10px 10px 12px' : '16px 18px 18px', flex: 1 }}>
+                    <span style={{ fontWeight: 800, fontSize: ph ? 15 : 18, lineHeight: 1.2, letterSpacing: '-.01em' }}>{r.name}</span>
+                    <span style={{ fontSize: ph ? 12.5 : 14, lineHeight: 1.4, color: '#636366', flex: 1, ...(ph ? clamp2 : {}) }}>{r.desc}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: ph ? 6 : 10, paddingTop: ph ? 8 : 12 }}>
+                      <span style={{ fontWeight: 800, fontSize: ph ? 13.5 : 15, minWidth: 0 }}>{r.priceText}</span>
+                      {ph ? (
+                        <span aria-hidden="true" style={{ width: 36, height: 36, flex: 'none', borderRadius: '50%', background: sec.theme.btnBg, color: sec.theme.btnFg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+                        </span>
+                      ) : (
+                        <span style={{ height: 42, padding: '0 16px', borderRadius: 999, background: sec.theme.btnBg, color: sec.theme.btnFg, fontWeight: 800, fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>{r.cta}</span>
+                      )}
                     </span>
                   </span>
                 </Hov>

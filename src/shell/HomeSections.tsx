@@ -8,6 +8,7 @@ const SECTION: CSSProperties = { maxWidth: 1320, margin: '0 auto', padding: 'cla
 const H2: CSSProperties = { margin: 0, fontWeight: 900, fontSize: 'clamp(34px,4vw,52px)', lineHeight: 1, letterSpacing: '-.04em' };
 const LEAD: CSSProperties = { fontSize: 17, color: '#636366' };
 const ARROW_DOT: CSSProperties = { position: 'absolute', right: 18, bottom: 18, width: 48, height: 48, borderRadius: '50%', background: '#fff', color: '#1A1414', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const ARROW_DOT_SM: CSSProperties = { ...ARROW_DOT, right: 12, bottom: 12, width: 40, height: 40 };
 const PRODUCT_SHADOW = 'drop-shadow(0 8px 10px rgba(70,0,10,.35)) drop-shadow(0 2px 3px rgba(70,0,10,.35))';
 
 /** Build Your Own tile: topping cut-outs drop onto the pizza in a sunflower spiral, cycling every 2.6s. */
@@ -60,24 +61,25 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
     return () => clearInterval(t);
   }, []);
 
-  const desk = w >= 1000, tab = w >= 600;
-  const bentoCols = desk ? '1.55fr 1fr 1fr' : tab ? '1fr 1fr' : '1fr';
-  const bentoRows = desk ? 'minmax(0,1fr) minmax(0,1fr)' : tab ? '560px 320px 300px' : '540px 330px 290px 290px';
-  const bentoAreas = desk ? '"hero deal deal" "hero byo pasta"' : tab ? '"hero hero" "deal deal" "byo pasta"' : '"hero" "deal" "byo" "pasta"';
+  const desk = w >= 1000, tab = w >= 600, ph = !tab;
+  const clamp2 = { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as const;
+  const bentoCols = desk ? '1.55fr 1fr 1fr' : '1fr 1fr';
+  const bentoRows = desk ? 'minmax(0,1fr) minmax(0,1fr)' : tab ? '560px 320px 300px' : '480px 250px 220px';
+  const bentoAreas = desk ? '"hero deal deal" "hero byo pasta"' : '"hero hero" "deal deal" "byo pasta"';
   const bentoH = desk ? 'clamp(640px,calc(100vh - 110px),800px)' : 'auto';
   const bentoFont = desk ? 'clamp(64px,6.8vw,96px)' : tab ? '84px' : '15vw';
   const tileCols = desk ? 'repeat(4,minmax(0,1fr))' : 'repeat(2,minmax(0,1fr))';
-  const specialCols = w >= 1100 ? 'repeat(4,minmax(0,1fr))' : w >= 620 ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)';
-  const dealCols = w >= 1100 ? 'repeat(4,minmax(0,1fr))' : w >= 560 ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)';
+  const specialCols = w >= 1100 ? 'repeat(4,minmax(0,1fr))' : 'repeat(2,minmax(0,1fr))';
+  const dealCols = w >= 1100 ? 'repeat(4,minmax(0,1fr))' : 'repeat(2,minmax(0,1fr))';
   const ovenCols = w >= 960 ? 'minmax(0,1fr) minmax(0,1fr)' : 'minmax(0,1fr)';
 
   return (
     <main id="top">
       {/* ---------- Hero bento ---------- */}
       <section style={{ maxWidth: 1320, margin: '0 auto', padding: '16px clamp(16px,3vw,32px) 0' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: bentoCols, gridTemplateRows: bentoRows, gridTemplateAreas: bentoAreas, gap: 14, height: bentoH }}>
+        <div style={{ display: 'grid', gridTemplateColumns: bentoCols, gridTemplateRows: bentoRows, gridTemplateAreas: bentoAreas, gap: ph ? 10 : 14, height: bentoH }}>
           {/* Hero tile */}
-          <div style={{ gridArea: 'hero', position: 'relative', minHeight: 0, borderRadius: 36, overflow: 'hidden', color: '#fff', background: '#1A1414' }}>
+          <div style={{ gridArea: 'hero', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, overflow: 'hidden', color: '#fff', background: '#1A1414' }}>
             <img src={U('1565299624946-b28f40a0ae38', 1800).replace('q=72', 'q=75')} alt="Wood-fired pizza" {...{ fetchpriority: "high" }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: 'pkZoom 18s ease-in-out infinite alternate' }} />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(14,8,8,.9),rgba(14,8,8,.1) 62%)' }} />
             <Hov
@@ -119,7 +121,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
           </div>
 
           {/* Pickup combo tile */}
-          <Hov style={{ gridArea: 'deal', position: 'relative', minHeight: 0, borderRadius: 36, background: '#D7192D', color: '#fff', overflow: 'hidden', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
+          <Hov style={{ gridArea: 'deal', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, background: '#D7192D', color: '#fff', overflow: 'hidden', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
             <div style={{ position: 'absolute', right: -60, top: -90, width: 330, height: 330, filter: 'drop-shadow(0 24px 40px rgba(0,0,0,.35))' }}>
               <img src="assets/pizza-base.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 40s linear infinite' }} />
             </div>
@@ -133,12 +135,12 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
               <img src="assets/combo/pk-garlic-dip.png" alt="" style={{ position: 'absolute', left: 0, bottom: 8, width: 84, filter: PRODUCT_SHADOW }} />
               <img src="assets/combo/pk-garlic-dip.png" alt="" style={{ position: 'absolute', right: 0, bottom: 6, width: 84, filter: PRODUCT_SHADOW }} />
             </div>
-            <div style={{ position: 'absolute', inset: 0, padding: '26px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'linear-gradient(90deg,rgba(215,25,45,.92) 0%,rgba(215,25,45,.6) 34%,rgba(215,25,45,0) 52%)' }}>
+            <div style={{ position: 'absolute', inset: 0, padding: ph ? '22px 22px' : '26px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'linear-gradient(90deg,rgba(215,25,45,.92) 0%,rgba(215,25,45,.6) 34%,rgba(215,25,45,0) 52%)' }}>
               <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase' }}>Pickup combo</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 300 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: ph ? 12 : 16, maxWidth: 300 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <span style={{ fontWeight: 900, fontSize: 46, lineHeight: 0.9, letterSpacing: '-.05em' }}>Two Large<br />$35.99</span>
-                  <span style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.4 }}>2 large pizzas, 4 toppings each,<br />2 dips and 2 pops</span>
+                  <span style={{ fontWeight: 900, fontSize: ph ? 38 : 46, lineHeight: 0.9, letterSpacing: '-.05em' }}>Two Large<br />$35.99</span>
+                  <span style={{ fontSize: ph ? 14 : 15, fontWeight: 600, lineHeight: 1.4 }}>2 large pizzas, 4 toppings each,<br />2 dips and 2 pops</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <Hov
@@ -156,29 +158,31 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
           </Hov>
 
           {/* Build your own tile */}
-          <Hov as="button" onClick={h.onByo} style={{ gridArea: 'byo', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: 36, overflow: 'hidden', background: '#1A1414', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
-            <span style={{ position: 'absolute', left: '50%', top: 120, width: 360, height: 360, marginLeft: -180, animation: 'pkSpin 60s linear infinite' }}>
-              <img src="assets/pizza-base.png" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} />
-              <ByoToppings si={byoSi} />
+          <Hov as="button" onClick={h.onByo} aria-label="Build your own pizza, any 4 toppings" style={{ gridArea: 'byo', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: ph ? 24 : 36, overflow: 'hidden', background: '#1A1414', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
+            <span style={{ position: 'absolute', left: '50%', top: ph ? 78 : 120, width: 360, height: 360, marginLeft: -180, transform: ph ? 'scale(.62)' : undefined, transformOrigin: '50% 0' }}>
+              <span style={{ position: 'absolute', inset: 0, animation: 'pkSpin 60s linear infinite' }}>
+                <img src="assets/pizza-base.png" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} />
+                <ByoToppings si={byoSi} />
+              </span>
             </span>
-            <span style={{ position: 'absolute', left: 24, right: 24, top: 22, display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span style={{ fontWeight: 900, fontSize: 24, letterSpacing: '-.03em', whiteSpace: 'nowrap' }}>Build your own</span>
-              <span style={{ fontSize: 14, color: 'rgba(255,255,255,.7)' }}>Any 4 toppings</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#fff', opacity: 0.92, marginTop: 6, minHeight: 18 }}>{BYO_SETS[byoSi].map((x) => x[0]).join(' · ')}</span>
+            <span style={{ position: 'absolute', left: ph ? 16 : 24, right: ph ? 16 : 24, top: ph ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{ fontWeight: 900, fontSize: ph ? 19 : 24, lineHeight: 1.1, letterSpacing: '-.03em', whiteSpace: ph ? 'normal' : 'nowrap' }}>Build your own</span>
+              <span style={{ fontSize: ph ? 13 : 14, color: 'rgba(255,255,255,.7)' }}>Any 4 toppings</span>
+              {ph ? null : <span style={{ fontSize: 13, fontWeight: 700, color: '#fff', opacity: 0.92, marginTop: 6, minHeight: 18 }}>{BYO_SETS[byoSi].map((x) => x[0]).join(' · ')}</span>}
             </span>
-            <span style={ARROW_DOT}><IconArrow /></span>
+            <span style={ph ? ARROW_DOT_SM : ARROW_DOT}><IconArrow /></span>
           </Hov>
 
           {/* Fresh pasta tile */}
-          <Hov as="button" onClick={h.onPasta} style={{ gridArea: 'pasta', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: 36, overflow: 'hidden', background: '#F2F2F5', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
+          <Hov as="button" onClick={h.onPasta} aria-label="Fresh pasta: rosé, Alfredo, tomato" style={{ gridArea: 'pasta', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: ph ? 24 : 36, overflow: 'hidden', background: '#F2F2F5', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
             <img src="assets/menu/pasta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: 'pkZoom 16s ease-in-out -4s infinite alternate' }} />
             <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(14,8,8,.55),rgba(14,8,8,0) 45%)' }} />
-            <span style={{ position: 'absolute', left: 24, right: 24, top: 22, display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span style={{ fontWeight: 900, fontSize: 24, letterSpacing: '-.03em', whiteSpace: 'nowrap' }}>Fresh pasta</span>
-              <span style={{ fontSize: 14, color: 'rgba(255,255,255,.88)' }}>Rosé, Alfredo, tomato</span>
+            <span style={{ position: 'absolute', left: ph ? 16 : 24, right: ph ? 16 : 24, top: ph ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{ fontWeight: 900, fontSize: ph ? 19 : 24, lineHeight: 1.1, letterSpacing: '-.03em', whiteSpace: 'nowrap' }}>Fresh pasta</span>
+              <span style={{ fontSize: ph ? 13 : 14, color: 'rgba(255,255,255,.88)' }}>Rosé, Alfredo, tomato</span>
             </span>
-            <span style={ARROW_DOT}><IconArrow /></span>
-            <span style={{ position: 'absolute', left: 24, bottom: 16, fontSize: 11, color: 'rgba(255,255,255,.75)' }}>Photo: Dllu, Wikimedia Commons, CC BY-SA 4.0</span>
+            <span style={ph ? ARROW_DOT_SM : ARROW_DOT}><IconArrow /></span>
+            <span style={{ position: 'absolute', left: ph ? 14 : 24, right: ph ? 64 : undefined, bottom: ph ? 12 : 16, fontSize: ph ? 9 : 11, lineHeight: 1.3, color: 'rgba(255,255,255,.75)', textShadow: '0 1px 2px rgba(0,0,0,.5)' }}>Photo: Dllu, Wikimedia Commons, CC BY-SA 4.0</span>
           </Hov>
         </div>
       </section>
@@ -217,7 +221,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
             <span style={LEAD}>Our most-ordered pizzas. Choose size, crust and oven when you add one.</span>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: specialCols, gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: specialCols, gap: ph ? 10 : 16 }}>
           {SPECIALS.map((p) => {
             const c = creditOf(p);
             const meta = [p.veg ? 'Vegetarian' : null, p.tag || null].filter(Boolean).join(' · ');
@@ -226,21 +230,21 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
                 key={p.id}
                 as="article"
                 onClick={() => h.onSpecial(p.id)}
-                style={{ cursor: 'pointer', background: '#fff', borderRadius: 28, padding: 10, display: 'flex', flexDirection: 'column', boxShadow: '0 0 0 1px rgba(26,20,20,.06),0 12px 32px rgba(26,20,20,.06)', transition: 'transform .25s ease,box-shadow .25s ease' }}
+                style={{ cursor: 'pointer', background: '#fff', borderRadius: ph ? 20 : 28, padding: ph ? 6 : 10, display: 'flex', flexDirection: 'column', boxShadow: '0 0 0 1px rgba(26,20,20,.06),0 12px 32px rgba(26,20,20,.06)', transition: 'transform .25s ease,box-shadow .25s ease' }}
                 hover={{ transform: 'translateY(-4px)', boxShadow: '0 0 0 1px rgba(26,20,20,.06),0 26px 50px rgba(26,20,20,.13)' }}
               >
-                <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 20, overflow: 'hidden', background: '#F0F0F3' }}>
+                <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: ph ? 15 : 20, overflow: 'hidden', background: '#F0F0F3' }}>
                   <Photo src={p.img} alt={p.name + ' pizza'} credit={c.credit} creditHref={c.creditHref} />
                 </div>
-                <div style={{ padding: '16px 8px 6px', display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-                    {meta && <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.07em', textTransform: 'uppercase', color: p.veg ? '#12663A' : '#C11425' }}>{meta}</span>}
-                    <span style={{ fontWeight: 900, fontSize: 21, letterSpacing: '-.025em' }}>{p.name}</span>
-                    <span style={{ fontSize: 15, lineHeight: 1.45, color: '#636366' }}>{p.desc}</span>
+                <div style={{ padding: ph ? '10px 4px 2px 6px' : '16px 8px 6px', display: 'flex', flexDirection: 'column', gap: ph ? 8 : 14, flex: 1 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: ph ? 3 : 6, flex: 1 }}>
+                    {meta && <span style={{ fontSize: ph ? 10.5 : 12, fontWeight: 800, letterSpacing: '.07em', textTransform: 'uppercase', color: p.veg ? '#12663A' : '#C11425' }}>{meta}</span>}
+                    <span style={{ fontWeight: 900, fontSize: ph ? 16 : 21, lineHeight: ph ? 1.15 : undefined, letterSpacing: '-.025em' }}>{p.name}</span>
+                    <span style={{ fontSize: ph ? 12.5 : 15, lineHeight: ph ? 1.4 : 1.45, color: '#636366', ...(ph ? clamp2 : {}) }}>{p.desc}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                    <span style={{ fontSize: 16, fontWeight: 700 }}>From {money(SIZE_PRICES.S)}</span>
-                    <Hov as="button" aria-label={'Customize ' + p.name} style={{ width: 44, height: 44, border: 0, borderRadius: '50%', background: '#1A1414', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background .2s' }} hover={{ background: '#D7192D' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: ph ? 6 : 12 }}>
+                    <span style={{ fontSize: ph ? 13.5 : 16, fontWeight: 700 }}>From {money(SIZE_PRICES.S)}</span>
+                    <Hov as="button" aria-label={'Customize ' + p.name} style={{ width: ph ? 36 : 44, height: ph ? 36 : 44, flex: 'none', border: 0, borderRadius: '50%', background: '#1A1414', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background .2s' }} hover={{ background: '#D7192D' }}>
                       <IconPlus />
                     </Hov>
                   </div>
@@ -257,7 +261,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
           <h2 style={H2}>Pickup combos</h2>
           <span style={LEAD}>Walk-in combo prices, available on online pickup orders.</span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: dealCols, gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: dealCols, gap: ph ? 10 : 16 }}>
           {DEALS.map((d) => {
             const c = creditOf(d);
             return (
@@ -265,25 +269,25 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
                 key={d.id}
                 as="article"
                 onClick={() => h.onDeal(d.id)}
-                style={{ position: 'relative', aspectRatio: '4/5', borderRadius: 28, overflow: 'hidden', background: '#1A1210', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', cursor: 'pointer', transition: 'transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s' }}
+                style={{ position: 'relative', aspectRatio: ph ? '3/4' : '4/5', borderRadius: ph ? 20 : 28, overflow: 'hidden', background: '#1A1210', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', cursor: 'pointer', transition: 'transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s' }}
                 hover={{ transform: 'translateY(-6px)', boxShadow: '0 26px 50px rgba(26,20,20,.22)' }}
               >
                 <div style={{ position: 'absolute', inset: 0 }}>
-                  <Photo src={d.img} alt={d.name + ' combo'} credit={c.credit} creditHref={c.creditHref} style={{ bottom: 'auto', height: '100%' }} />
+                  <Photo src={d.img} alt={d.name + ' combo'} credit={c.credit} creditHref={c.creditHref} creditTop={ph} style={{ bottom: 'auto', height: '100%' }} />
                 </div>
                 <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(0deg,rgba(18,10,8,.94) 0%,rgba(18,10,8,.72) 34%,rgba(18,10,8,0) 66%)' }} />
-                <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 14, padding: 22 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <span style={{ fontWeight: 900, fontSize: 26, lineHeight: 1, letterSpacing: '-.03em' }}>{d.name}</span>
-                    <span style={{ fontSize: 14, lineHeight: 1.45, color: '#DADADD', textWrap: 'pretty' } as CSSProperties}>{d.desc}</span>
+                <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: ph ? 8 : 14, padding: ph ? 12 : 22 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: ph ? 4 : 6 }}>
+                    <span style={{ fontWeight: 900, fontSize: ph ? 18 : 26, lineHeight: 1, letterSpacing: '-.03em' }}>{d.name}</span>
+                    <span style={{ fontSize: ph ? 12 : 14, lineHeight: ph ? 1.35 : 1.45, color: '#DADADD', textWrap: 'pretty', ...(ph ? clamp2 : {}) } as CSSProperties}>{d.desc}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                    <span style={{ fontWeight: 900, fontSize: 38, lineHeight: 1, letterSpacing: '-.045em' }}>{money(d.price)}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: ph ? 6 : 12 }}>
+                    <span style={{ fontWeight: 900, fontSize: ph ? 24 : 38, lineHeight: 1, letterSpacing: '-.045em' }}>{money(d.price)}</span>
                     <Hov
                       as="button"
                       onClick={(e: MouseEvent) => { e.stopPropagation(); h.onDeal(d.id); }}
                       aria-label={'Customize ' + d.name + ' combo'}
-                      style={{ width: 52, height: 52, flex: 'none', border: 0, borderRadius: '50%', background: '#fff', color: '#1A1414', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .2s,color .2s,transform .2s' }}
+                      style={{ width: ph ? 38 : 52, height: ph ? 38 : 52, flex: 'none', border: 0, borderRadius: '50%', background: '#fff', color: '#1A1414', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .2s,color .2s,transform .2s' }}
                       hover={{ background: '#D7192D', color: '#fff', transform: 'scale(1.06)' }}
                     >
                       <IconPlus stroke={3} />
@@ -298,22 +302,22 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
 
       {/* ---------- Wood oven ---------- */}
       <section id="oven" style={{ ...SECTION, display: 'block' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: ovenCols, background: '#1A1414', color: '#fff', borderRadius: 32, overflow: 'hidden' }}>
-          <div style={{ position: 'relative', minHeight: 420 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: ovenCols, background: '#1A1414', color: '#fff', borderRadius: ph ? 28 : 32, overflow: 'hidden' }}>
+          <div style={{ position: 'relative', minHeight: ph ? 200 : 420 }}>
             <Photo src={U('1651981075280-9a9e01acbff0', 1400)} alt="Wood-fired pizza oven" credit="Photo by Daniel on Unsplash" creditHref="https://unsplash.com/@unsplashbydan" />
           </div>
-          <div style={{ padding: 'clamp(32px,5vw,64px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 28 }}>
+          <div style={{ padding: ph ? '26px 20px 20px' : 'clamp(32px,5vw,64px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: ph ? 20 : 28 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#FF7A85' }}>Our ovens</span>
               <h2 style={{ margin: 0, fontWeight: 900, fontSize: 'clamp(36px,4.4vw,60px)', lineHeight: 0.98, letterSpacing: '-.04em', textWrap: 'balance' } as CSSProperties}>Wood-fired or conventional, on every pizza.</h2>
-              <p style={{ margin: 0, fontSize: 18, lineHeight: 1.55, color: '#CFC6C0', maxWidth: 460 }}>Pick the wood-fired oven or the conventional oven when you order. Same price either way.</p>
+              <p style={{ margin: 0, fontSize: ph ? 16 : 18, lineHeight: 1.55, color: '#CFC6C0', maxWidth: 460 }}>Pick the wood-fired oven or the conventional oven when you order. Same price either way.</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12 }}>
-              <div style={{ background: '#D7192D', borderRadius: 22, padding: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: ph ? 'repeat(2,minmax(0,1fr))' : 'repeat(auto-fit,minmax(200px,1fr))', gap: ph ? 8 : 12 }}>
+              <div style={{ background: '#D7192D', borderRadius: ph ? 18 : 22, padding: ph ? 14 : 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <span style={{ fontWeight: 900, fontSize: 20, letterSpacing: '-.02em' }}>Wood-fired</span>
                 <span style={{ fontSize: 15, lineHeight: 1.45, color: '#fff' }}>Smoky, blistered, charred crust. Our default.</span>
               </div>
-              <div style={{ background: '#2C2424', borderRadius: 22, padding: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ background: '#2C2424', borderRadius: ph ? 18 : 22, padding: ph ? 14 : 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <span style={{ fontWeight: 900, fontSize: 20, letterSpacing: '-.02em' }}>Conventional</span>
                 <span style={{ fontSize: 15, lineHeight: 1.45, color: '#CFC6C0' }}>Even bake, softer crust. The classic.</span>
               </div>
@@ -327,7 +331,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
         <div style={{ display: 'grid', gridTemplateColumns: ovenCols, gap: 16 }}>
           <div style={{ background: '#F2F2F5', borderRadius: 32, padding: 'clamp(28px,4vw,56px)', display: 'flex', flexDirection: 'column', gap: 32 }}>
             <h2 style={H2}>Hours &amp; location</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: ph ? 'repeat(2,minmax(0,1fr))' : 'repeat(auto-fit,minmax(200px,1fr))', gap: ph ? 20 : 24 }}>
               <InfoBlock label="Address"><span>{SHOP.street}<br />{SHOP.cityLine}</span></InfoBlock>
               <InfoBlock label="Hours"><span>{SHOP.hoursDays}<br />{SHOP.hoursText}</span></InfoBlock>
               <InfoBlock label="Phone"><a href={SHOP.phoneHref} style={{ fontSize: 17, fontWeight: 600, color: '#1A1414', textDecoration: 'none' }}>{SHOP.phoneText}</a></InfoBlock>
@@ -337,7 +341,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
               <Hov as="a" href={SHOP.phoneHref} style={{ background: '#fff', color: '#1A1414', borderRadius: 999, padding: '15px 24px', fontWeight: 800, fontSize: 15, textDecoration: 'none', boxShadow: '0 0 0 1px rgba(26,20,20,.12)' }} hover={{ color: '#D7192D' }}>Call the shop</Hov>
             </div>
           </div>
-          <div style={{ position: 'relative', borderRadius: 32, overflow: 'hidden', minHeight: 380, background: '#2A1E1A' }}>
+          <div style={{ position: 'relative', borderRadius: 32, overflow: 'hidden', minHeight: 380, background: '#2A1E1A', display: ph ? 'none' : undefined }}>
             <Photo src={U('1555072956-7758afb20e8f', 1400)} alt="" credit="Photo by Pinar Kucuk on Unsplash" creditHref="https://unsplash.com/@pinarimsi" />
           </div>
         </div>

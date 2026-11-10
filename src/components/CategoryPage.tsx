@@ -227,6 +227,7 @@ type Sel = Record<string, Record<string, string>>;
 
 function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
   const w = useWidth();
+  const ph = w < 600; // phone: two-column compact cards
   const [filter, setFilter] = useState('all');
   const [sel, setSel] = useState<Sel>({});
   const [added, setAdded] = useState<string | null>(null);
@@ -293,10 +294,10 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
   return (
     <div style={S.root}>
       <section style={S.heroSection}>
-        <div style={S.hero}>
+        <div style={ph ? { ...S.hero, minHeight: 300, borderRadius: 28 } : S.hero}>
           <Photo src={hero.img} alt="" credit="Photo on Unsplash" creditHref="https://unsplash.com" eager />
           <div style={S.heroShade} />
-          <div style={S.heroBody}>
+          <div style={ph ? { ...S.heroBody, gap: 28 } : S.heroBody}>
             <Hov as="button" type="button" onClick={ev(onBack)} style={S.back} hover={S.backHover}>
               <IconBack size={16} stroke={2.8} />
               Back
@@ -338,15 +339,15 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
           </Hov>
         </div>
 
-        <div style={S.grid}>
+        <div style={ph ? { ...S.grid, gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: 10 } : S.grid}>
           {shown.map((it) => {
             const b = build(it);
             return (
-              <Hov as="article" key={it.id} onClick={b.openOrAdd} style={S.card} hover={S.cardHover}>
+              <Hov as="article" key={it.id} onClick={b.openOrAdd} style={ph ? { ...S.card, borderRadius: 18 } : S.card} hover={S.cardHover}>
                 {/* Items without a real photo keep an empty image box on purpose (owner rule). */}
                 <div style={S.cardMedia}>
                   <Photo src={b.img} alt={it.name} credit={b.credit} creditHref="https://unsplash.com" />
-                  <div style={S.badges}>
+                  <div style={ph ? { ...S.badges, left: 8, top: 8, transform: 'scale(.85)', transformOrigin: 'left top' } : S.badges}>
                     {it.tag ? <span style={S.tag}>{it.tag}</span> : null}
                     {it.veg ? (
                       <span style={S.veg}>
@@ -356,22 +357,22 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
                     ) : null}
                   </div>
                 </div>
-                <div style={S.cardBody}>
-                  <div style={S.cardHead}>
-                    <span style={S.cardName}>{it.name}</span>
-                    {it.desc ? <span style={S.cardDesc}>{it.desc}</span> : null}
+                <div style={ph ? { ...S.cardBody, gap: 8, padding: '10px 10px 10px 12px' } : S.cardBody}>
+                  <div style={ph ? { ...S.cardHead, gap: 3 } : S.cardHead}>
+                    <span style={ph ? { ...S.cardName, fontSize: 15, letterSpacing: '-.02em', lineHeight: 1.2 } : S.cardName}>{it.name}</span>
+                    {it.desc ? <span style={ph ? { ...S.cardDesc, fontSize: 12.5, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } : S.cardDesc}>{it.desc}</span> : null}
                   </div>
                   <div style={S.cardFoot}>
                     <div style={S.priceCol}>
-                      <span style={S.price}>{b.priceText}</span>
-                      <span style={S.sub}>{b.hasOpts ? 'Tap to customize' : ''}</span>
+                      <span style={ph ? { ...S.price, fontSize: 16, letterSpacing: '-.02em' } : S.price}>{b.priceText}</span>
+                      {ph ? null : <span style={S.sub}>{b.hasOpts ? 'Tap to customize' : ''}</span>}
                     </div>
                     <Hov
                       as="button"
                       type="button"
                       aria-label={b.addAria}
                       onClick={(e: MouseEvent) => { e.stopPropagation(); b.openOrAdd(); }}
-                      style={{ ...S.addBtn, background: b.justAdded ? '#1E8A4C' : '#D7192D' }}
+                      style={{ ...S.addBtn, ...(ph ? { width: 36, height: 36 } : {}), background: b.justAdded ? '#1E8A4C' : '#D7192D' }}
                       hover={S.addBtnHover}
                     >
                       {b.justAdded ? <IconCheck size={18} stroke={3.2} /> : <IconPlus size={18} stroke={3} />}

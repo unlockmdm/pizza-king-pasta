@@ -62,6 +62,7 @@ export function Photo({
   style,
   imgStyle,
   eager,
+  creditTop,
 }: {
   src?: string;
   alt?: string;
@@ -73,6 +74,8 @@ export function Photo({
   style?: CSSProperties;
   imgStyle?: CSSProperties;
   eager?: boolean;
+  /** Put the credit chip top-left instead of bottom-left (for cards with text over the bottom of the photo). */
+  creditTop?: boolean;
 }) {
   return (
     <span
@@ -101,7 +104,8 @@ export function Photo({
             position: 'absolute',
             left: shape === 'circle' ? '50%' : 6,
             transform: shape === 'circle' ? 'translateX(-50%)' : undefined,
-            bottom: shape === 'circle' ? '16%' : 6,
+            bottom: creditTop ? undefined : shape === 'circle' ? '16%' : 6,
+            top: creditTop ? 6 : undefined,
             maxWidth: 'calc(100% - 12px)',
             padding: '3px 7px',
             borderRadius: 5,
