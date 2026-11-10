@@ -5,3 +5,8 @@ dist
 # Design handoff + research notes stay local (the handoff includes third-party reference screenshots)
 design_handoff_pizza_king_website/
 research/
+
+# Secrets: never commit
+.env
+.env.*
+!.env.example
