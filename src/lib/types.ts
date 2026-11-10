@@ -47,6 +47,8 @@ export interface BuilderItem {
   img?: string;
   credit?: string;
   creditHref?: string;
+  /** Size prices for this pizza, if they differ from the standard SIZE_PRICES (from Square). */
+  prices?: SizePrices;
   [extra: string]: unknown;
 }
 
@@ -66,6 +68,8 @@ export type PizzaConfig = {
   bake: string;
   sauce: string;
   cheese: string;
+  /** Spice level (Square: Pizza Spice Level). */
+  spice?: string;
   doneness: string;
   cut: string;
   notes: string;

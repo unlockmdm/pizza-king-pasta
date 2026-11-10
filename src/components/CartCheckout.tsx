@@ -33,8 +33,8 @@ interface Upsell {
   summary: string;
 }
 const UPSELLS: Upsell[] = [
-  { key: 'fruit-juice', name: 'Fresh juice', unit: 6.8, img: 'assets/menu/juice-mix.png', summary: 'Large' },
-  { key: 'gelato-cone', name: 'Gelato cone', unit: 5.99, img: 'assets/menu/gelato.jpg', summary: 'Vanilla' },
+  { key: 'fruit-juice', name: 'Fresh juice', unit: 6.81, img: 'assets/menu/juice-mix.png', summary: 'Large' },
+  { key: 'gelato-cone', name: 'Gelato cone', unit: 6, img: 'assets/menu/gelato.jpg', summary: 'Vanilla' },
 ];
 
 const TIP_PRESETS = [0, 10, 15, 18] as const;

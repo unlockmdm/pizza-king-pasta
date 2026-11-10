@@ -15,7 +15,23 @@ export const SHOP = {
   mapsEmbed: 'https://www.google.com/maps?q=511+Ray+Lawson+Blvd,+Brampton,+ON+L6Y+0N2&z=15&output=embed',
 } as const;
 
-export const SIZE_PRICES: SizePrices = { S: 11.99, M: 14.6, L: 16.5, XL: 22.8 };
+// Prices below match the shop's Square catalog (checked Nov 10, 2026). Square is the source of truth.
+/** Build Your Own / Custom Pizza and the classic specials. */
+export const SIZE_PRICES: SizePrices = { S: 12.0, M: 14.6, L: 16.5, XL: 22.8 };
+const DESI: SizePrices = { S: 13.0, M: 15.5, L: 17.3, XL: 23.8 };
+const CLASSIC_XL_2250: SizePrices = { S: 12.0, M: 14.6, L: 16.5, XL: 22.5 };
+/** Per-pizza size prices where they differ from SIZE_PRICES. */
+export const PIZZA_PRICES: Record<string, SizePrices> = {
+  'butter-chicken': DESI,
+  'shahi-paneer': DESI,
+  'chicken-shawarma': DESI,
+  'tandoori-fish': DESI,
+  pepperoni: { S: 12.0, M: 15.5, L: 17.3, XL: 23.8 },
+  bismark: CLASSIC_XL_2250,
+  'non-veg': CLASSIC_XL_2250,
+  'sea-food': CLASSIC_XL_2250,
+};
+export const pricesFor = (id: string): SizePrices => PIZZA_PRICES[id] || SIZE_PRICES;
 export const SIZE_NAMES: Record<SizeKey, string> = { S: 'Small', M: 'Medium', L: 'Large', XL: 'X-Large' };
 
 export const HST = 0.13;

@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import type { BuilderItem, MeatFavouritesProps, NewLine, SizeKey } from '../lib/types';
 import { Hov, Photo } from '../lib/ui';
-import { SIZE_NAMES, SIZE_PRICES, U, creditOf } from '../lib/catalog';
+import { SIZE_NAMES, SIZE_PRICES, U, creditOf, pricesFor } from '../lib/catalog';
 import { money } from '../lib/format';
 import { useWidth } from '../lib/hooks';
 
@@ -31,6 +31,7 @@ const PIZZAS: MeatPizza[] = [
   { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green pepper, onion', tops: ['tandoori-chicken', 'green-peppers', 'red-onions'], pic: '1604382354936-07c5d9983bd3', by: 'Shourav Sheikh', h: 'shouravsheikh', chicken: true },
   { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, onions', tops: ['shawarma-chicken', 'hot-peppers', 'red-onions'], pic: '1590947132387-155cc02f3212', by: 'Vit Ch', h: 'v_uk_europe', chicken: true, tag: 'Spicy' },
   { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', tops: ['grilled-chicken', 'sausage', 'hot-salami', 'ham'], pic: '1593560708920-61dd98c46a4e', by: 'Saundarya Srinivasan', h: 'saundiii', chicken: true, cured: true },
+  { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', tops: ['pepperoni'], pic: '1611915365928-565c527a0590', by: 'Tamas Pap', h: 'tamasp', cured: true },
   { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushroom, bacon', tops: ['pepperoni', 'mushrooms', 'bacon'], pic: '1565299624946-b28f40a0ae38', by: 'Chad Montano', h: 'briewilly', cured: true },
   { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', tops: ['pineapple', 'bacon', 'ham'], pic: '1594007654729-407eedc4be65', by: 'Saahil Khatkhate', h: 'saahilkhatkhate', cured: true },
   { id: 'bismark', name: 'Bismark', desc: 'Sun dried tomatoes, grilled chicken, sausage', tops: ['sun-dried', 'grilled-chicken', 'sausage'], pic: '1655673654158-9f7285b7d1ea', by: 'RUSU CIPRIAN', h: 'tehnosign', chicken: true, cured: true },
@@ -67,7 +68,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
       key: [p.id, size, 'regular', 'house'].join('-'),
       name: SIZE_NAMES[size] + ' ' + p.name,
       summary: 'Regular crust · house toppings',
-      unit: SIZE_PRICES[size],
+      unit: pricesFor(p.id)[size],
     };
     onAdd(line, 1);
     window.clearTimeout(timer.current);
@@ -76,7 +77,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
   };
 
   const customize = (p: MeatPizza) => {
-    const item: BuilderItem = { id: p.id, name: p.name, desc: p.desc, tops: p.tops, img: U(p.pic, 1000), ...creditOf(p) };
+    const item: BuilderItem = { id: p.id, name: p.name, desc: p.desc, tops: p.tops, img: U(p.pic, 1000), prices: pricesFor(p.id), ...creditOf(p) };
     onCustomize(item);
   };
 
@@ -169,7 +170,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
                   <br />
                   Your way.
                 </span>
-                <span style={{ fontSize: 14, lineHeight: 1.45, color: '#EDEDF0' }}>Pick any 4 toppings, from $11.99.</span>
+                <span style={{ fontSize: 14, lineHeight: 1.45, color: '#EDEDF0' }}>Pick any 4 toppings, from {money(SIZE_PRICES.S)}.</span>
               </div>
               <Hov
                 as="button"
@@ -223,7 +224,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
                           type="button"
                           role="radio"
                           aria-checked={on}
-                          aria-label={SIZE_NAMES[k] + ', ' + money(SIZE_PRICES[k])}
+                          aria-label={SIZE_NAMES[k] + ', ' + money(pricesFor(p.id)[k])}
                           onClick={() => setSizes((st) => ({ ...st, [p.id]: k }))}
                           style={{ height: ph ? 34 : 40, padding: 0, border: 0, borderRadius: 999, background: on ? '#fff' : 'transparent', color: on ? '#1A1414' : '#818184', boxShadow: on ? '0 2px 8px rgba(26,20,20,.12)' : 'none', fontFamily: 'inherit', fontWeight: 800, fontSize: 13, cursor: 'pointer', transition: 'background .2s,color .2s' }}
                         >
@@ -234,7 +235,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-                      <span style={{ fontWeight: 900, fontSize: ph ? 17 : 26, letterSpacing: ph ? '-.02em' : '-.04em', lineHeight: 1 }}>{money(SIZE_PRICES[size])}</span>
+                      <span style={{ fontWeight: 900, fontSize: ph ? 17 : 26, letterSpacing: ph ? '-.02em' : '-.04em', lineHeight: 1 }}>{money(pricesFor(p.id)[size])}</span>
                       <span style={{ fontSize: ph ? 11 : 12, fontWeight: 600, color: '#818184' }}>{SIZE_NAMES[size]}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -251,7 +252,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
                         as="button"
                         type="button"
                         onClick={() => add(p, size)}
-                        aria-label={'Add ' + SIZE_NAMES[size] + ' ' + p.name + ', ' + money(SIZE_PRICES[size])}
+                        aria-label={'Add ' + SIZE_NAMES[size] + ' ' + p.name + ', ' + money(pricesFor(p.id)[size])}
                         style={{ width: ph ? 38 : 48, height: ph ? 38 : 48, flex: 'none', border: 0, borderRadius: '50%', background: justAdded ? '#1E8A4C' : '#D7192D', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .2s,transform .2s' }}
                         hover={{ transform: 'scale(1.06)' }}
                       >

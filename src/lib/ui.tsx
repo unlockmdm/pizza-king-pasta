@@ -27,11 +27,14 @@ export function Hov<T extends ElementType = 'div'>(props: HovProps<T>) {
     onPointerLeave?: (e: PointerEvent) => void;
   };
   const [on, setOn] = useState(false);
+  // React warns when a `border` shorthand and a `borderColor` hover swap on re-render,
+  // so split the shorthand into longhands whenever the hover touches the border colour.
+  const base = hover?.borderColor && typeof style?.border === 'string' ? splitBorder(style) : style;
   return createElement(
     as || 'div',
     {
       ...rest,
-      style: on && hover ? { ...style, ...hover } : style,
+      style: on && hover ? { ...base, ...hover } : base,
       onPointerEnter: (e: PointerEvent) => {
         if (e.pointerType === 'mouse') setOn(true);
         onPointerEnter?.(e);
@@ -43,6 +46,14 @@ export function Hov<T extends ElementType = 'div'>(props: HovProps<T>) {
     },
     children,
   );
+}
+
+/** '1.5px solid #E6E6E9' → { borderWidth, borderStyle, borderColor }. */
+function splitBorder(style: CSSProperties): CSSProperties {
+  const { border, ...rest } = style;
+  const [width = '0', bstyle = 'solid', ...color] = String(border).trim().split(/\s+/);
+  if (width === '0' || width === 'none') return { ...rest, borderWidth: 0, borderStyle: 'solid', borderColor: 'transparent' };
+  return { ...rest, borderWidth: width, borderStyle: bstyle as CSSProperties['borderStyle'], borderColor: color.join(' ') || 'currentColor' };
 }
 
 /**

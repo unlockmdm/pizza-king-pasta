@@ -9,7 +9,7 @@ import { useEscape, useLockBody } from '../lib/hooks';
 import PizzaBuilder from './PizzaBuilder';
 
 // ---------- Spec data (from the prototype; these arrays are the spec) ----------
-const EXTRA_DIP = 1.49;
+const EXTRA_DIP = 1.33; // Square: dipping sauce $1.33
 const MAX_DIPS = 8;
 
 type DipId = 'garlic' | 'ranch' | 'chipotle' | 'jalapeno-cheddar' | 'marinara';
@@ -35,8 +35,8 @@ const POP_IMG: Record<PopName, string> = {
 type SideId = 'sugarcane' | 'corn';
 /** [id, name, img, worth, desc] */
 const SIDES: [SideId, string, string, string, string][] = [
-  ['sugarcane', 'Sugarcane juice', 'assets/menu/juice-mix.png', '$6.80', 'Fresh pressed, ice cold'],
-  ['corn', 'Wood-oven corn', 'assets/ingredients/corn.jpg', '$4.99', 'Sweet corn from the wood oven'],
+  ['sugarcane', 'Sugarcane juice', 'assets/menu/juice-mix.png', '$6.81', 'Fresh pressed, ice cold'],
+  ['corn', 'Wood-oven corn', 'assets/ingredients/corn.jpg', '$5.00', 'Sweet corn from the wood oven'],
 ];
 
 interface Spec {
@@ -279,7 +279,7 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
     };
   });
 
-  // Extra dips beyond the included count cost $1.49 each, up to 8 dips in total (README "4. Combo builder").
+  // Extra dips beyond the included count cost $1.33 each, up to 8 dips in total (README "4. Combo builder").
   const dipItems = step(dips, setDips, MAX_DIPS, DIPS.map(([id, n]) => [id, n, 'assets/dips/' + id + '.png']));
   const dipNote = sp.dips + ' included. Extra dips ' + money(EXTRA_DIP) + ' each, up to ' + MAX_DIPS + '.';
   const popItems = step(pops, setPops, sp.pops, POPS.map((n) => [n, n, 'assets/pops/' + POP_IMG[n]]));
@@ -320,6 +320,7 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
     if (cfg.crustName && cfg.crustName !== 'Regular') bits.push(cfg.crustName.toLowerCase() + ' crust');
     if (cfg.sauceName && cfg.sauceName !== 'Regular') bits.push(cfg.sauceName.toLowerCase() + ' sauce');
     if (cfg.cheeseName && cfg.cheeseName !== 'Regular') bits.push(cfg.cheeseName === 'None' ? 'no cheese' : cfg.cheeseName.toLowerCase() + ' cheese');
+    if (cfg.spice && cfg.spice !== 'No spice') bits.push(cfg.spice.toLowerCase());
     if (cfg.notes && cfg.notes.trim()) bits.push('Note: ' + cfg.notes.trim());
     if (solo) {
       const ex = Math.max(0, cfg.extra || 0);

@@ -34,8 +34,8 @@ interface Base {
 }
 const BASES: readonly Base[] = [
   { id: 'classic', name: 'Classic', tint: '#F6F0E4', ings: [['ginger', 34, 44, 46, -12], ['coriander', 68, 58, 44, 18]], desc: 'Ginger and parsley', p: { rose: 12.5, alfredo: 13 } },
-  { id: 'veggie', name: 'Veggie', veg: true, tint: '#EAF3E6', ings: [['broccoli', 30, 36, 36, -10], ['mushrooms', 70, 34, 34, 14], ['green-peppers', 34, 70, 36, 8], ['red-onions', 70, 70, 34, -16]], desc: 'Green pepper, onion, broccoli, mushroom', p: { rose: 12.5, tomato: 12.5, alfredo: 13.5 } },
-  { id: 'chicken', name: 'Chicken', tint: '#F7ECE4', ings: [['tandoori-chicken', 46, 48, 52, -6], ['green-peppers', 78, 30, 30, 20], ['red-onions', 78, 72, 30, -12]], desc: 'Green pepper, onion, chicken', p: { rose: 14, tomato: 14, alfredo: 15 } },
+  { id: 'veggie', name: 'Veggie', veg: true, tint: '#EAF3E6', ings: [['broccoli', 30, 36, 36, -10], ['mushrooms', 70, 34, 34, 14], ['green-peppers', 34, 70, 36, 8], ['red-onions', 70, 70, 34, -16]], desc: 'Green pepper, onion, broccoli, mushroom', p: { rose: 13.27, tomato: 12.5, alfredo: 13.72 } },
+  { id: 'chicken', name: 'Chicken', tint: '#F7ECE4', ings: [['tandoori-chicken', 46, 48, 52, -6], ['green-peppers', 78, 30, 30, 20], ['red-onions', 78, 72, 30, -12]], desc: 'Green pepper, onion, chicken', p: { rose: 14.6, tomato: 14, alfredo: 15.04 } },
 ];
 
 /** Bowl photo per `${base}-${sauce}`; falls back to the sauce photo. */
@@ -47,9 +47,12 @@ const PHOTO: Partial<Record<`${BaseId}-${SauceId}`, string>> = {
 };
 
 type MomoId = 'veg' | 'nonveg';
+/** Spice level, same options as the shop's Square "Pasta Spice Level" list. */
+const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
+
 const MOMOS: readonly (readonly [id: MomoId, name: string, price: number])[] = [
-  ['veg', 'Veggie', 8.99],
-  ['nonveg', 'Non-veggie', 10.99],
+  ['veg', 'Veggie', 9],
+  ['nonveg', 'Non-veggie', 11],
 ];
 
 const HERO_IMG = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?fm=jpg&q=72&w=1200&auto=format&fit=crop';
@@ -151,6 +154,7 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
   const [sauceId, setSauce] = useState<SauceId>('rose');
   const [baseId, setBase] = useState<BaseId>('classic');
   const [qty, setQty] = useState(1);
+  const [spice, setSpice] = useState(SPICES[0]);
   const [added, setAdded] = useState(false);
   const [addedM, setAddedM] = useState<MomoId | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>();
@@ -178,7 +182,7 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
     setBase((cur) => (BASES.find((b) => b.id === cur)?.p[id] != null ? cur : 'veggie'));
   };
   const add = () => {
-    onAdd?.({ key: 'pasta-' + baseId + '-' + sauceId, name: title, summary: base.desc, unit: price }, qty);
+    onAdd?.({ key: 'pasta-' + baseId + '-' + sauceId + '-' + spice, name: title, summary: base.desc + ' · ' + spice, unit: price }, qty);
     flash(() => { setAdded(true); setQty(1); });
   };
   const addMomo = () => {
@@ -319,6 +323,22 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
             <div style={S.bowlHead}>
               <span style={S.bowlTitle}>{title}</span>
               <span style={S.bowlDesc}>{base.desc + ' · ' + sauce[2] + '. Prices before tax.'}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#9C928C' }}>Spice level</span>
+              <div role="radiogroup" aria-label="Spice level" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: 6 }}>
+                {SPICES.map((v, i) => {
+                  const on = spice === v;
+                  return (
+                    <button key={v} type="button" role="radio" aria-checked={on} onClick={() => setSpice(v)} style={{ display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 12px', border: 0, borderRadius: 12, background: on ? '#fff' : 'rgba(255,255,255,.08)', color: on ? '#1A1414' : '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'background .15s,color .15s' }}>
+                      <span aria-hidden="true" style={{ display: 'flex', gap: 2 }}>
+                        {[0, 1, 2].map((d) => <span key={d} style={{ width: 5, height: 12, borderRadius: 3, background: d < i ? '#FF4B57' : on ? '#DADADF' : 'rgba(255,255,255,.22)' }} />)}
+                      </span>
+                      {v}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             <div style={S.bowlActions}>
               <div style={S.stepper}>

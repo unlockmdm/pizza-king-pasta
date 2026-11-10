@@ -22,8 +22,8 @@ export const SPECIALS: Special[] = [
 
 export const DEALS: (Deal & { by: string; h: string })[] = [
   { id: 'one-large', name: 'One Large', price: 11.99, desc: '1 large pizza, 1 topping. Wood-fired or conventional oven', img: U('1593560708920-61dd98c46a4e'), by: 'Saundarya Srinivasan', h: 'saundiii' },
-  { id: 'two-large', name: 'Two Large', price: 35.99, desc: '2 large, 4 toppings each, 2 dips, 2 pops, sugarcane juice or wood-oven corn', img: U('1604382355076-af4b0eb60143'), by: 'Shourav Sheikh', h: 'shouravsheikh' },
-  { id: 'two-medium', name: 'Two Medium', price: 31.99, desc: '2 medium, 4 toppings each, 2 dips, 2 pops, sugarcane juice or wood-oven corn', img: U('1682264788192-9abdec90c425'), by: 'Joanie Simon', h: 'joaniesimon' },
+  { id: 'two-large', name: 'Two Large', price: 36.0, desc: '2 large, 4 toppings each, 2 dips, 2 pops, sugarcane juice or wood-oven corn', img: U('1604382355076-af4b0eb60143'), by: 'Shourav Sheikh', h: 'shouravsheikh' },
+  { id: 'two-medium', name: 'Two Medium', price: 32.0, desc: '2 medium, 4 toppings each, 2 dips, 2 pops, sugarcane juice or wood-oven corn', img: U('1682264788192-9abdec90c425'), by: 'Joanie Simon', h: 'joaniesimon' },
   { id: 'two-small', name: 'Two Small', price: 25.99, desc: '2 small, 4 toppings each, 2 dipping sauces', img: U('1600628421066-f6bda6a7b976'), by: 'Klara Kulikova', h: 'kkalerry' },
 ];
 

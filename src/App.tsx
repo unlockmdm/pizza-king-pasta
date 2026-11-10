@@ -8,7 +8,7 @@ import MeatFavourites from './components/MeatFavourites';
 import MenuPage from './components/MenuPage';
 import PastaPage from './components/PastaPage';
 import PizzaBuilder from './components/PizzaBuilder';
-import { creditOf, isShopOpen, SIZE_PRICES } from './lib/catalog';
+import { creditOf, isShopOpen, pricesFor, SIZE_PRICES } from './lib/catalog';
 import { money } from './lib/format';
 import { useWidth } from './lib/hooks';
 import type { BuilderItem, CartLine, Mode, NewLine } from './lib/types';
@@ -210,7 +210,7 @@ export default function App() {
     if (item.custom) return item.custom;
     if (item.id === 'byo') return { ...BYO, ...creditOf(BYO) };
     const p = SPECIALS.find((x) => x.id === item.id);
-    return p ? { ...p, ...creditOf(p), img: p.img.replace('w=900', 'w=1000'), tops: BASE_TOPS[p.id] || [] } : null;
+    return p ? { ...p, ...creditOf(p), img: p.img.replace('w=900', 'w=1000'), tops: BASE_TOPS[p.id] || [], prices: pricesFor(p.id) } : null;
   })();
   const comboDeal = combo ? DEALS.find((d) => d.id === combo) ?? null : null;
 

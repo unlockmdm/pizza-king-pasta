@@ -1,5 +1,5 @@
 import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
-import { creditOf, SHOP, SIZE_PRICES, U } from '../lib/catalog';
+import { creditOf, pricesFor, SHOP, U } from '../lib/catalog';
 import { money } from '../lib/format';
 import { Hov, IconArrow, IconPlus, Photo } from '../lib/ui';
 import { BYO_SETS, DEALS, SPECIALS, TILES, type Tile } from './data';
@@ -139,14 +139,14 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
               <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase' }}>Pickup combo</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: ph ? 12 : 16, maxWidth: 300 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <span style={{ fontWeight: 900, fontSize: ph ? 38 : 46, lineHeight: 0.9, letterSpacing: '-.05em' }}>Two Large<br />$35.99</span>
+                  <span style={{ fontWeight: 900, fontSize: ph ? 38 : 46, lineHeight: 0.9, letterSpacing: '-.05em' }}>Two Large<br />$36.00</span>
                   <span style={{ fontSize: ph ? 14 : 15, fontWeight: 600, lineHeight: 1.4 }}>2 large pizzas, 4 toppings each,<br />2 dips and 2 pops</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <Hov
                     as="button"
                     onClick={h.onTwoLarge}
-                    aria-label="Customize Two Large combo, $35.99"
+                    aria-label="Customize Two Large combo, $36.00"
                     style={{ height: 44, padding: '0 20px', border: 0, borderRadius: 999, background: '#fff', color: '#D7192D', fontFamily: 'inherit', fontWeight: 900, fontSize: 15, display: 'flex', alignItems: 'center', flex: 'none', cursor: 'pointer', transition: 'transform .2s' }}
                     hover={{ transform: 'scale(1.04)' }}
                   >
@@ -243,7 +243,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
                     <span style={{ fontSize: ph ? 12.5 : 15, lineHeight: ph ? 1.4 : 1.45, color: '#636366', ...(ph ? clamp2 : {}) }}>{p.desc}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: ph ? 6 : 12 }}>
-                    <span style={{ fontSize: ph ? 13.5 : 16, fontWeight: 700 }}>From {money(SIZE_PRICES.S)}</span>
+                    <span style={{ fontSize: ph ? 13.5 : 16, fontWeight: 700 }}>From {money(pricesFor(p.id).S)}</span>
                     <Hov as="button" aria-label={'Customize ' + p.name} style={{ width: ph ? 36 : 44, height: ph ? 36 : 44, flex: 'none', border: 0, borderRadius: '50%', background: '#1A1414', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background .2s' }} hover={{ background: '#D7192D' }}>
                       <IconPlus />
                     </Hov>

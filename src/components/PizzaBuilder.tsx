@@ -84,7 +84,10 @@ const CL: Record<string, [number, string | null]> = { Light: [1, '58%'], Regular
 
 const SIZES: [SizeKey, string, number][] = [['S', 'Small', 24], ['M', 'Medium', 29], ['L', 'Large', 34], ['XL', 'X-Large', 40]];
 const SCALE: Record<SizeKey, number> = { S: 0.8, M: 0.87, L: 0.94, XL: 1 };
-const TOP_PRICE: Record<SizeKey, number> = { S: 0.99, M: 2, L: 2.5, XL: 3 };
+// Extra topping price by size, from the shop's Square catalog (Extra Veggie / Extra Meat Toppings lists).
+const TOP_PRICE: Record<SizeKey, number> = { S: 1.15, M: 2.25, L: 2.5, XL: 3.5 };
+// Spice level, same options as Square's "Pizza Spice Level" list.
+const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
 const EXTRA_CHEESE = 0;
 
 const SECS: [SecKey, string][] = [['crust', 'Crust'], ['sauce', 'Sauce'], ['cheese', 'Cheese'], ['tops', 'Toppings'], ['notes', 'Instructions']];
@@ -97,7 +100,7 @@ const DONENESS_FILTER: Record<string, string> = { Light: 'brightness(1.1) satura
 const CUT_PATH: Record<string, string> = { Triangles: 'M38 9V67M9 38H67M17.5 17.5L58.5 58.5M58.5 17.5L17.5 58.5', Squares: 'M27 10V66M49 10V66M10 27H66M10 49H66', Uncut: '' };
 const CHIP_GROUPS: ['doneness' | 'cut', string, string[]][] = [['doneness', 'Bake', ['Regular', 'Light', 'Well done']], ['cut', 'Cut', ['Triangles', 'Squares', 'Uncut']]];
 
-const DEFAULTS = { size: 'L' as SizeKey, crust: 'Regular', bake: 'Wood-fired', sauce: 'Regular', cheese: 'Regular', doneness: 'Regular', cut: 'Triangles', notes: '', qty: 1 };
+const DEFAULTS = { size: 'L' as SizeKey, crust: 'Regular', bake: 'Wood-fired', sauce: 'Regular', cheese: 'Regular', spice: 'No spice', doneness: 'Regular', cut: 'Triangles', notes: '', qty: 1 };
 
 // ---------------------------------------------------------------------------
 // Live pizza: scatter cut-outs with deterministic positions
@@ -271,7 +274,8 @@ const photoSpan = (img: string, w: string, fit: string, extra?: CSSProperties): 
 type BuilderState = typeof DEFAULTS & { tops: Record<string, Half>; free: Record<string, boolean>; cat: TopCat; sec: SecKey };
 
 export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }: PizzaBuilderProps) {
-  const P: SizePrices = sizePrices || SIZE_PRICES;
+  // A special can carry its own size prices (desi specials cost more than the classics).
+  const P: SizePrices = (item?.prices as SizePrices | undefined) || sizePrices || SIZE_PRICES;
   const w = useWidth();
   const wide = w >= 960;
   useLockBody(true);
@@ -289,7 +293,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
       st.size = combo.size;
       st.qty = 1;
       const init = combo.init || {};
-      (['crust', 'bake', 'sauce', 'cheese', 'doneness', 'cut', 'notes'] as const).forEach((k) => { if (typeof init[k] === 'string') st[k] = init[k] as string; });
+      (['crust', 'bake', 'sauce', 'cheese', 'spice', 'doneness', 'cut', 'notes'] as const).forEach((k) => { if (typeof init[k] === 'string') st[k] = init[k] as string; });
       if (init.tops) st.tops = { ...init.tops };
       if (init.free) st.free = { ...init.free };
     }
@@ -403,16 +407,17 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
     if (s.cheese !== 'Regular') parts.push(s.cheese === 'None' ? 'no cheese' : s.cheese.toLowerCase() + ' cheese');
     if (extraCount) parts.push('+' + extraCount + ' topping' + (extraCount > 1 ? 's' : ''));
     if (lh.length || rh.length) parts.push('half & half');
+    if (s.spice !== 'No spice') parts.push(s.spice.toLowerCase());
     if (s.doneness !== 'Regular') parts.push(s.doneness.toLowerCase());
     if (s.cut !== 'Triangles') parts.push(s.cut.toLowerCase());
     const cfg: PizzaConfig = {
-      tops: s.tops, free: s.free, crust: s.crust, bake: s.bake, sauce: s.sauce, cheese: s.cheese, doneness: s.doneness, cut: s.cut, notes: s.notes,
+      tops: s.tops, free: s.free, crust: s.crust, bake: s.bake, sauce: s.sauce, cheese: s.cheese, spice: s.spice, doneness: s.doneness, cut: s.cut, notes: s.notes,
       extra,
       topNames: keys.map((k) => (TOPMAP[k]?.name || k) + (s.tops[k] === 'left' ? ' (left half)' : s.tops[k] === 'right' ? ' (right half)' : '')),
       crustName: s.crust, sauceName: s.sauce, cheeseName: s.cheese,
     };
     const line: NewLine = {
-      key: [item?.id, s.size, s.crust, s.bake, s.sauce, s.cheese, tl, s.doneness, s.cut, FREE.filter((f) => s.free[f]).join('+'), s.notes.trim()].join('|'),
+      key: [item?.id, s.size, s.crust, s.bake, s.sauce, s.cheese, tl, s.spice, s.doneness, s.cut, FREE.filter((f) => s.free[f]).join('+'), s.notes.trim()].join('|'),
       name: sizeName + ' ' + (item?.name || 'Build your own'),
       summary: parts.join(' · '),
       unit,
@@ -668,6 +673,22 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
           {/* ----- Instructions ----- */}
           <section ref={refNotes} style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '20px 0 24px', borderTop: '1px solid #E9E9EC' }}>
             <h2 style={h2Style}>Instructions</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <span style={{ fontSize: 15, fontWeight: 800 }}>Spice level</span>
+              <div role="radiogroup" aria-label="Spice level" style={{ display: 'grid', gridTemplateColumns: w < 520 ? 'repeat(2,minmax(0,1fr))' : 'repeat(4,minmax(0,1fr))', gap: 10 }}>
+                {SPICES.map((v, i) => {
+                  const on = s.spice === v, t = tile(on);
+                  return (
+                    <Hov as="button" key={v} role="radio" aria-checked={on} onClick={() => set({ spice: v })} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 54, padding: '0 10px', borderRadius: 16, border: t.border, background: t.bg, cursor: 'pointer', color: '#1A1414', fontFamily: 'inherit', fontWeight: 700, fontSize: 14, transition: 'background .15s,border-color .15s' }} hover={{ borderColor: '#1A1414' }}>
+                      <span aria-hidden="true" style={{ display: 'flex', gap: 2 }}>
+                        {[0, 1, 2].map((d) => <span key={d} style={{ width: 6, height: 14, borderRadius: 3, background: d < i ? '#D7192D' : '#E1E1E5' }} />)}
+                      </span>
+                      {v}
+                    </Hov>
+                  );
+                })}
+              </div>
+            </div>
             {CHIP_GROUPS.map(([key, label, opts]) => (
               <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <span style={{ fontSize: 15, fontWeight: 800 }}>{label}</span>

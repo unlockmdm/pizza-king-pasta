@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState, type CSSProperties, type MouseEvent }
 import type { BuilderItem, MenuPageProps, NewLine } from '../lib/types';
 import { Hov, Photo } from '../lib/ui';
 import { useEscape, useWidth } from '../lib/hooks';
-import { SIZE_PRICES, U } from '../lib/catalog';
+import { pricesFor, SIZE_PRICES, U } from '../lib/catalog';
 import { money } from '../lib/format';
 import PizzaBuilder from './PizzaBuilder';
 import './MenuPage.css';
@@ -172,8 +172,8 @@ const SCENE_ALT = ['One large pepperoni pizza', 'Two large pizzas with two dips 
 /** [key, name, price, description, combo-builder deal id] */
 const WALKINS: [string, string, number, string, string][] = [
   ['walkin-1l', '1 Large, 1 topping', 11.99, 'Wood-fired or conventional oven', 'one-large'],
-  ['walkin-2l', '2 Large combo', 35.99, '4 toppings each, 2 dips, 2 drinks or sweet corn', 'two-large'],
-  ['walkin-2m', '2 Medium combo', 31.99, '4 toppings each, 2 dips, 2 drinks or sweet corn', 'two-medium'],
+  ['walkin-2l', '2 Large combo', 36.0, '4 toppings each, 2 dips, 2 drinks or sweet corn', 'two-large'],
+  ['walkin-2m', '2 Medium combo', 32.0, '4 toppings each, 2 dips, 2 drinks or sweet corn', 'two-medium'],
   ['walkin-2s', '2 Small combo', 25.99, '4 toppings each, 2 dips', 'two-small'],
 ];
 
@@ -193,59 +193,73 @@ const PIZZAS: [string, string, string, string[], boolean?][] = [
   ['meat-lover', 'Meat Lover', 'Pepperoni, ham, bacon, sausages', ['pepperoni', 'ham', 'bacon', 'sausage']],
   ['canadian', 'Canadian', 'Pepperoni, mushroom, bacon', ['pepperoni', 'mushrooms', 'bacon']],
   ['tandoori-fish', 'Tandoori Fish', 'Tandoori fish, mushroom, onion, green pepper', ['mushrooms', 'red-onions', 'green-peppers']],
+  ['pepperoni', 'Pepperoni', 'Pepperoni and mozzarella', ['pepperoni']],
 ];
 
 /** [option label, price] — an empty label means a single fixed price. */
 type Opt = [string, number];
-/** [key, name, description, options] */
-type Row = [string, string, string, Opt[]];
+/** [key, name, description, options, asks for spice level] */
+type Row = [string, string, string, Opt[], boolean?];
+/** Spice levels, same options as the shop's Square spice lists. */
+const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
 interface Section { id: string; title: string; rows: Row[] }
 
 const SIZES3 = (p: [number, number, number]): Opt[] => [['Medium', p[0]], ['Large', p[1]], ['X-Large', p[2]]];
+// Prices match the shop's Square catalog (checked Nov 10, 2026). Items not in Square keep their flyer price.
 const SECTIONS: Section[] = [
   { id: 'tandoori', title: 'Wings & tandoori', rows: [
-    ['wings', 'Tandoori wings', 'Hot, honey garlic or BBQ', [['8 wings', 9.99], ['12 wings', 11.99], ['16 wings', 13.99], ['24 wings', 21.99], ['34 wings', 30.99], ['48 wings', 41.99]]],
-    ['leg', 'Tandoori chicken leg', 'Per piece', [['', 4.99]]],
-    ['fish', 'Tandoori fish', 'Per pound', [['', 12.5]]],
+    ['wings', 'Tandoori wings', 'Hot, honey garlic or BBQ', [['8 wings', 10], ['12 wings', 12], ['16 wings', 14], ['24 wings', 22], ['34 wings', 31], ['48 wings', 42]], true],
+    ['leg', 'Tandoori chicken leg', 'Per piece', [['', 5]]],
+    ['fish', 'Tandoori fish', 'Per pound', [['1 lb', 12.5], ['1.5 lb', 18.75], ['2 lb', 25]], true],
   ] },
   { id: 'sides', title: 'Sides & salads', rows: [
-    ['wedges', 'Potato wedges', '', [['Small', 7.99], ['Large', 9.99]]],
-    ['sub', 'Sub', '', [['', 9.99]]],
+    ['wedges', 'Potato wedges', '', [['Medium', 8], ['Large', 10]]],
+    ['garlic-bread', 'Garlic bread', 'With or without cheese', [['With cheese', 8.01], ['Without cheese', 6.99]]],
+    ['sub', 'Sub', 'One foot, veggie or non-veggie', [['Veggie', 10.18], ['Non-veggie', 11.06]], true],
     ['nv-salad', 'Non-veg salad', '', [['', 8.99]]],
     ['v-salad', 'Veg salad', '', [['', 7.99]]],
-    ['corn', 'Sweet corn', 'Cooked in the wood oven', [['', 4.99]]],
-    ['chaat', 'Fruit chaat', 'With sweet potatoes', [['', 7.99]]],
+    ['corn', 'Sweet corn', 'Cooked in the wood oven', [['', 5]]],
+    ['chaat', 'Fruit chaat', 'With sweet potatoes', [['', 8.01]]],
   ] },
   { id: 'pasta', title: 'Pasta & momos', rows: [
-    ['pasta-rose', 'Pasta, rose sauce', 'Tomato sauce, cream, parmesan, ginger, parsley', [['', 12.5]]],
-    ['pasta-alfredo', 'Pasta, Alfredo sauce', 'Cream, parmesan, ginger, parsley', [['', 13]]],
-    ['veg-pasta-rose', 'Veggie pasta, rose or tomato', 'Green pepper, onion, broccoli, mushroom', [['', 12.5]]],
-    ['veg-pasta-alfredo', 'Veggie pasta, Alfredo', 'Green pepper, onion, broccoli, mushroom', [['', 13.5]]],
-    ['ch-pasta-rose', 'Chicken pasta, rose or tomato', 'Green pepper, onion, chicken', [['', 14]]],
-    ['ch-pasta-alfredo', 'Chicken pasta, Alfredo', 'Green pepper, onion, chicken', [['', 15]]],
-    ['momos', 'Momos', 'Veggie or non-veggie', [['Veggie', 8.99], ['Non-veggie', 10.99]]],
+    ['pasta-rose', 'Pasta, rosé sauce', 'Tomato sauce, cream, parmesan, ginger, parsley', [['', 12.5]], true],
+    ['pasta-alfredo', 'Pasta, Alfredo sauce', 'Cream, parmesan, ginger, parsley', [['', 13]], true],
+    ['veg-pasta-rose', 'Veggie pasta, rosé', 'Green pepper, onion, broccoli, mushroom', [['', 13.27]], true],
+    ['veg-pasta-tomato', 'Veggie pasta, tomato', 'Green pepper, onion, broccoli, mushroom', [['', 12.5]], true],
+    ['veg-pasta-alfredo', 'Veggie pasta, Alfredo', 'Green pepper, onion, broccoli, mushroom', [['', 13.72]], true],
+    ['ch-pasta-rose', 'Chicken pasta, rosé', 'Green pepper, onion, chicken', [['', 14.6]], true],
+    ['ch-pasta-tomato', 'Chicken pasta, tomato', 'Green pepper, onion, chicken', [['', 14]], true],
+    ['ch-pasta-alfredo', 'Chicken pasta, Alfredo', 'Green pepper, onion, chicken', [['', 15.04]], true],
+    ['momos', 'Momos', 'Veggie or non-veggie', [['Veggie', 9], ['Non-veggie', 11]]],
   ] },
   { id: 'gelato', title: 'Gelato & shakes', rows: [
-    ['cone', 'Gelato cone', 'Vanilla, mango, pistachio, chocolate and more', [['', 5.99]]],
+    ['cone', 'Gelato cone', 'Vanilla, mango, pistachio, chocolate and more', [['', 6]]],
     ['scoop', 'Gelato scoop', 'Per scoop', [['', 2.99]]],
-    ['shake', 'Shake', 'Mango, strawberry, banana, vanilla, pistachio, black cherry', SIZES3([9.05, 10.15, 11.3])],
+    ['shake', 'Shake', 'Mango, strawberry, banana, badam, papaya, vanilla, pistachio, black cherry', SIZES3([8.41, 9.29, 11.11])],
   ] },
   { id: 'drinks', title: 'Drinks', rows: [
-    ['fruit-juice', 'Fresh fruit juice', 'Mix, orange, pineapple, guava', SIZES3([6.8, 8, 10])],
-    ['sugarcane', 'Sugarcane juice', '', SIZES3([6.8, 8, 10])],
-    ['coconut', 'Fresh coconut juice', '', [['', 8]]],
+    ['fruit-juice', 'Fresh fruit juice', 'Mix, orange, pineapple, guava', SIZES3([6.81, 8.01, 10])],
+    ['sugarcane', 'Sugarcane juice', '', SIZES3([6.81, 8.01, 10])],
+    ['lemonade', 'Lemonade', '', SIZES3([5.8, 7, 9])],
+    ['coconut', 'Fresh coconut juice', '', [['', 8.01]]],
     ['lassi', 'Lassi', 'Mango, mint, strawberry, sweet, salty', [['', 6.8]]],
-    ['espresso', 'Italian espresso', '', [['', 2]]],
+    ['espresso', 'Italian espresso', '', [['', 3.1]]],
     ['hot', 'Hot drinks', 'Indian coffee, cappuccino, hot chocolate, masala tea', [['', 3.1]]],
+    ['pop', 'Pop', 'Coke, Sprite, Canada Dry, Pepsi, Orange Crush', [['Can', 1.99], ['2 L bottle', 5]]],
+    ['water', 'Water', '500 mL bottle', [['', 1.99]]],
     ['beer', 'Beer', 'Canadian, Molson, Moosehead, Miller, Corona, Heineken, Stella', [['Bottle', 5.7], ['Can', 7.5]]],
   ] },
   // Dipping sauces always come last.
   { id: 'dips', title: 'Dipping sauces', rows: [
-    ['dip-garlic', 'Creamy garlic', '', [['', 1.49]]],
-    ['dip-ranch', 'Ranch', '', [['', 1.49]]],
-    ['dip-chipotle', 'Chipotle', '', [['', 1.49]]],
-    ['dip-jalapeno', 'Jalapeño cheddar', '', [['', 1.49]]],
-    ['dip-marinara', 'Marinara', '', [['', 1.49]]],
+    ['dip-garlic', 'Creamy garlic', '', [['', 1.33]]],
+    ['dip-ranch', 'Ranch', '', [['', 1.33]]],
+    ['dip-chipotle', 'Chipotle', '', [['', 1.33]]],
+    ['dip-jalapeno', 'Jalapeño cheddar', '', [['', 1.33]]],
+    ['dip-marinara', 'Marinara', '', [['', 1.33]]],
+    ['dip-bbq', 'BBQ', '', [['', 1.33]]],
+    ['dip-honey', 'Honey', '', [['', 1.33]]],
+    ['dip-hot', 'Hot wing', '', [['', 1.33]]],
+    ['dip-chutney', 'Green chutney', '', [['', 1.33]]],
   ] },
 ];
 const NAV: [string, string][] = [['walkin', 'Walk-in specials'], ['pizzas', 'Pizzas'], ...SECTIONS.map((s): [string, string] => [s.id, s.title])];
@@ -267,7 +281,7 @@ interface Tile {
   cta: string;
   act: () => void;
 }
-interface Picker { name: string; opts: { label: string; priceText: string; add: () => void }[] }
+interface Picker { name: string; spicy?: boolean; opts: { label: string; priceText: string; add: (spice?: string) => void }[] }
 
 const VegMark = () => (
   <span title="Vegetarian" style={{ width: 15, height: 15, border: '1.5px solid #12663A', borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', background: '#fff' }}>
@@ -287,7 +301,9 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
   const w = useWidth();
   const [active, setActive] = useState<string>(NAV[0][0]);
   const [builder, setBuilder] = useState<BuilderItem | null>(null);
-  const [picker, setPicker] = useState<Picker | null>(null);
+  const [picker, setPickerState] = useState<Picker | null>(null);
+  const [spice, setSpice] = useState(SPICES[0]);
+  const setPicker = (p: Picker | null) => { setSpice(SPICES[0]); setPickerState(p); };
 
   useEffect(() => {
     const onScroll = () => {
@@ -303,7 +319,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const closePicker = useCallback(() => setPicker(null), []);
+  const closePicker = useCallback(() => setPickerState(null), []);
   useEscape(!!picker, closePicker);
 
   const go = (id: string, e?: MouseEvent) => {
@@ -326,7 +342,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
 
   const byo: BuilderItem = { id: 'byo', name: 'Build Your Own', tops: [], included: 4, img: PIZZA_IMG };
   const pizzaRows: Tile[] = [
-    { key: 'byo', img: PIZZA_PICS[0], name: 'Build Your Own', desc: 'Any 4 toppings', veg: false, priceText: 'From ' + money(11.99), cta: 'Customize', act: () => setBuilder(byo) },
+    { key: 'byo', img: PIZZA_PICS[0], name: 'Build Your Own', desc: 'Any 4 toppings', veg: false, priceText: 'From ' + money(SIZE_PRICES.S), cta: 'Customize', act: () => setBuilder(byo) },
     ...PIZZAS.map(([id, name, desc, tops, veg], i): Tile => {
       const photo = PIZZA_PHOTO[id];
       return {
@@ -335,22 +351,22 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
         name,
         desc,
         veg: !!veg,
-        priceText: 'From ' + money(11.99),
+        priceText: 'From ' + money(pricesFor(id).S),
         cta: 'Customize',
-        act: () => setBuilder({ id, name, desc, tops, img: PIZZA_IMG }),
+        act: () => setBuilder({ id, name, desc, tops, img: PIZZA_IMG, prices: pricesFor(id) }),
       };
     }),
   ];
 
   const rowsOf = (sec: Section): Tile[] =>
-    sec.rows.map(([key, name, desc, opts]) => {
-      const lineOf = ([label, price]: Opt): NewLine => ({
-        key: key + (label ? '-' + label : ''),
-        name: (label ? label + ' ' : '') + name.toLowerCase().replace(/^./, (c) => (label ? c : c.toUpperCase())),
-        summary: desc || sec.title,
+    sec.rows.map(([key, name, desc, opts, spicy]) => {
+      const lineOf = ([label, price]: Opt, spice?: string): NewLine => ({
+        key: key + (label ? '-' + label : '') + (spice ? '-' + spice : ''),
+        name: label ? name + ', ' + label.toLowerCase() : name,
+        summary: [desc || sec.title, spice].filter(Boolean).join(' · '),
         unit: price,
       });
-      const multi = opts.length > 1;
+      const multi = opts.length > 1 || !!spicy;
       const min = Math.min(...opts.map((o) => o[1]));
       return {
         key,
@@ -361,7 +377,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
         priceText: (multi ? 'From ' : '') + money(min),
         cta: multi ? 'Choose' : 'Add',
         act: multi
-          ? () => setPicker({ name, opts: opts.map((o) => ({ label: o[0], priceText: money(o[1]), add: () => add(lineOf(o)) })) })
+          ? () => setPicker({ name, spicy: !!spicy, opts: opts.map((o) => ({ label: o[0] || 'Add to order', priceText: money(o[1]), add: (spice?: string) => add(lineOf(o, spice)) })) })
           : () => add(lineOf(opts[0])),
       };
     });
@@ -498,18 +514,36 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, paddingBottom: 10 }}>
               <span style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <span style={{ fontWeight: 900, fontSize: 22, letterSpacing: '-.03em' }}>{picker.name}</span>
-                <span style={{ fontSize: 14, color: '#636366' }}>Choose an option</span>
+                <span style={{ fontSize: 14, color: '#636366' }}>{picker.spicy ? 'Choose a spice level, then add' : 'Choose an option'}</span>
               </span>
               <button type="button" onClick={closePicker} aria-label="Close" style={{ width: 42, height: 42, border: 0, borderRadius: '50%', background: '#F2F2F5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1A1414', flex: 'none' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
               </button>
             </div>
+            {picker.spicy ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingBottom: 10 }}>
+                <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: '#636366' }}>Spice level</span>
+                <div role="radiogroup" aria-label="Spice level" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: 6 }}>
+                  {SPICES.map((v, i) => {
+                    const on = spice === v;
+                    return (
+                      <button key={v} type="button" role="radio" aria-checked={on} onClick={() => setSpice(v)} style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, padding: '0 12px', border: 0, borderRadius: 12, background: on ? '#1A1414' : '#F2F2F5', color: on ? '#fff' : '#1A1414', fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'background .15s,color .15s' }}>
+                        <span aria-hidden="true" style={{ display: 'flex', gap: 2 }}>
+                          {[0, 1, 2].map((d) => <span key={d} style={{ width: 5, height: 12, borderRadius: 3, background: d < i ? '#FF4B57' : on ? 'rgba(255,255,255,.25)' : '#DADADF' }} />)}
+                        </span>
+                        {v}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
             {picker.opts.map((o) => (
               <Hov
                 key={o.label}
                 as="button"
                 type="button"
-                onClick={o.add}
+                onClick={() => o.add(picker.spicy ? spice : undefined)}
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, height: 56, padding: '0 16px', border: 0, borderRadius: 14, background: '#F2F2F5', cursor: 'pointer', color: '#1A1414', transition: 'background .15s' }}
                 hover={{ background: '#E9E9EC' }}
               >

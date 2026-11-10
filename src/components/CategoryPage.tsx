@@ -53,6 +53,8 @@ const SIZES3 = (m: number, l: number, xl: number): Opt[] => [
   o('L', 'L', { price: l, long: 'Large' }),
   o('XL', 'XL', { price: xl, long: 'X-Large' }),
 ];
+/** Spice level, same options as the shop's Square spice lists. */
+const SPICE: Group = { id: 'spice', label: 'Spice level', opts: ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'].map((v) => o(v.toLowerCase().replace(/\s+/g, '-'), v)) };
 const GELATO: Opt[] = ['Vanilla', 'Mango', 'Strawberry', 'Banana', 'Pistachio', 'Black cherry', 'Cappuccino', 'Chocolate', 'Red velvet', 'Rum & raisin'].map((f) =>
   o(f.toLowerCase().replace(/[^a-z]+/g, '-'), f),
 );
@@ -66,51 +68,68 @@ const CATS: Record<CategoryId, Category> = {
         id: 'wings', f: 'tandoor', name: 'Tandoori wings', desc: 'Wood oven. Extra dip $1.25.', tag: 'Wood oven', img: '1608039755401-742074f0548d', def: { n: '12' },
         groups: [
           { id: 'flav', label: 'Flavour', opts: [o('hot', 'Hot', { img: '1608039755401-742074f0548d' }), o('honey', 'Honey garlic', { img: '1567620832903-9fc6debc209f' }), o('bbq', 'BBQ', { img: '1527477396000-e27163b481c2' })] },
-          { id: 'n', label: 'Wings', opts: ([[8, 9.99], [12, 11.99], [16, 13.99], [24, 21.99], [34, 30.99], [48, 41.99]] as const).map(([n, p]) => o(String(n), String(n), { price: p, long: n + ' wings' })) },
+          { id: 'n', label: 'Wings', opts: ([[8, 10], [12, 12], [16, 14], [24, 22], [34, 31], [48, 42]] as const).map(([n, p]) => o(String(n), String(n), { price: p, long: n + ' wings' })) },
+          SPICE,
         ],
       },
       {
-        id: 'leg', f: 'tandoor', name: 'Tandoori chicken leg', desc: '$4.99 per piece', img: '1617692855027-33b14f061079',
-        groups: [{ id: 'q', label: 'Pieces', opts: [1, 2, 3, 4].map((n) => o(String(n), String(n), { price: n * 4.99, long: n + (n === 1 ? ' piece' : ' pieces') })) }],
+        id: 'leg', f: 'tandoor', name: 'Tandoori chicken leg', desc: '$5.00 per piece', img: '1617692855027-33b14f061079',
+        groups: [{ id: 'q', label: 'Pieces', opts: [1, 2, 3, 4].map((n) => o(String(n), String(n), { price: n * 5, long: n + (n === 1 ? ' piece' : ' pieces') })) }],
       },
       {
         id: 'fish', f: 'tandoor', name: 'Tandoori fish', desc: '$12.50 per pound', img: '',
-        groups: [{ id: 'w', label: 'Weight', opts: ([[1, '1 lb'], [1.5, '1.5 lb'], [2, '2 lb']] as const).map(([n, l]) => o(String(n), l, { price: n * 12.5 })) }],
+        groups: [{ id: 'w', label: 'Weight', opts: ([[1, '1 lb'], [1.5, '1.5 lb'], [2, '2 lb']] as const).map(([n, l]) => o(String(n), l, { price: n * 12.5 })) }, SPICE],
       },
       {
-        id: 'wedges', f: 'sides', name: 'Potato wedges', desc: 'Small or large', veg: true, img: '1623238913973-21e45cced554',
-        groups: [{ id: 's', opts: [o('S', 'Small', { price: 7.99 }), o('L', 'Large', { price: 9.99 })] }],
+        id: 'wedges', f: 'sides', name: 'Potato wedges', desc: 'Medium or large', veg: true, img: '1623238913973-21e45cced554',
+        groups: [{ id: 's', opts: [o('M', 'Medium', { price: 8 }), o('L', 'Large', { price: 10 })] }],
       },
-      { id: 'sub', f: 'sides', name: 'Sub', desc: '$9.99 each', price: 9.99, img: '1509722747041-616f39b57569' },
+      {
+        id: 'garlic-bread', f: 'sides', name: 'Garlic bread', desc: 'With or without cheese', veg: true, img: '',
+        groups: [{ id: 'c', opts: [o('cheese', 'With cheese', { price: 8.01 }), o('plain', 'Without cheese', { price: 6.99 })] }],
+      },
+      {
+        id: 'sub', f: 'sides', name: 'Sub', desc: 'One foot, veggie or non-veggie', img: '1509722747041-616f39b57569',
+        groups: [{ id: 'kind', opts: [o('veg', 'Veggie', { price: 10.18 }), o('nonveg', 'Non-veggie', { price: 11.06 })] }, SPICE],
+      },
       { id: 'nv-salad', f: 'sides', name: 'Non-veg salad', price: 8.99, img: '1546069901-ba9599a7e63c' },
       { id: 'v-salad', f: 'sides', name: 'Veg salad', price: 7.99, veg: true, img: '1512621776951-a57141f2eefd' },
-      { id: 'corn', f: 'sides', name: 'Sweet corn', desc: 'Cooked in the wood oven', price: 4.99, veg: true, img: 'assets/ingredients/corn.jpg' },
-      { id: 'chaat', f: 'sides', name: 'Fruit chaat', desc: 'With sweet potatoes', price: 7.99, veg: true, img: '1490474418585-ba9bad8fd0ea' },
+      { id: 'corn', f: 'sides', name: 'Sweet corn', desc: 'Cooked in the wood oven', price: 5, veg: true, img: 'assets/ingredients/corn.jpg' },
+      { id: 'chaat', f: 'sides', name: 'Fruit chaat', desc: 'With sweet potatoes', price: 8.01, veg: true, img: '1490474418585-ba9bad8fd0ea' },
     ],
   },
   juice: {
     hero: { img: '1622597467836-f3285f2131b8', eyebrow: 'The Drinks Bar', t1: 'Fresh juice.', t2: 'Hot chai. Cold beer.', p: 'Juice, lassi, coffee and chai, and cold beer by the bottle or can.' },
-    filters: [['all', 'All'], ['juice', 'Juice'], ['lassi', 'Lassi'], ['hot', 'Coffee & chai'], ['beer', 'Beer']],
+    filters: [['all', 'All'], ['juice', 'Juice'], ['lassi', 'Lassi'], ['hot', 'Coffee & chai'], ['soft', 'Pop & water'], ['beer', 'Beer']],
     noun: 'drinks',
     items: [
       {
         id: 'fresh', f: 'juice', name: 'Fresh fruit juice', desc: 'Orange, pineapple, guava or mix', img: '1600271886742-f049cd451bba', def: { size: 'L' },
         groups: [
           { id: 'flav', label: 'Flavour', opts: [o('orange', 'Orange', { img: '1600271886742-f049cd451bba' }), o('pineapple', 'Pineapple', { img: '1534353473418-4cfa6c56fd38' }), o('guava', 'Guava', { img: '1497534446932-c925b458314e' }), o('mix', 'Mix', { img: '1622597467836-f3285f2131b8' })] },
-          { id: 'size', label: 'Size', opts: SIZES3(6.8, 8, 10) },
+          { id: 'size', label: 'Size', opts: SIZES3(6.81, 8.01, 10) },
         ],
       },
-      { id: 'sugarcane', f: 'juice', name: 'Sugarcane juice', img: '', def: { size: 'L' }, groups: [{ id: 'size', label: 'Size', opts: SIZES3(6.8, 8, 10) }] },
-      { id: 'coconut', f: 'juice', name: 'Fresh coconut juice', price: 8, img: '' },
+      { id: 'sugarcane', f: 'juice', name: 'Sugarcane juice', img: '', def: { size: 'L' }, groups: [{ id: 'size', label: 'Size', opts: SIZES3(6.81, 8.01, 10) }] },
+      { id: 'lemonade', f: 'juice', name: 'Lemonade', img: '', def: { size: 'L' }, groups: [{ id: 'size', label: 'Size', opts: SIZES3(5.8, 7, 9) }] },
+      { id: 'coconut', f: 'juice', name: 'Fresh coconut juice', price: 8.01, img: '' },
       {
         id: 'lassi', f: 'lassi', name: 'Lassi', price: 6.8, img: '',
         groups: [{ id: 'flav', label: 'Flavour', chips: true, opts: [o('mango', 'Mango'), o('mint', 'Mint'), o('strawberry', 'Strawberry', { img: '1589733955941-5eeaf752f6dd' }), o('sweet', 'Sweet'), o('salty', 'Salty')] }],
       },
-      { id: 'espresso', f: 'hot', name: 'Italian espresso', price: 2, img: '1510591509098-f4fdc6d0ff04' },
+      { id: 'espresso', f: 'hot', name: 'Italian espresso', price: 3.1, img: '1510591509098-f4fdc6d0ff04' },
       {
         id: 'hot', f: 'hot', name: 'Hot drinks', price: 3.1, img: '1509042239860-f550ce710b93',
         groups: [{ id: 'kind', label: 'Drink', chips: true, opts: [o('coffee', 'Indian coffee'), o('cappuccino', 'Cappuccino'), o('choc', 'Hot chocolate'), o('masala', 'Masala tea')] }],
       },
+      {
+        id: 'pop', f: 'soft', name: 'Pop', desc: 'Can or 2 L bottle', img: '',
+        groups: [
+          { id: 'kind', label: 'Size', opts: [o('can', 'Can', { price: 1.99 }), o('2l', '2 L bottle', { price: 5 })] },
+          { id: 'brand', label: 'Brand', chips: true, opts: ['Coke', 'Sprite', 'Canada Dry', 'Pepsi', 'Orange Crush'].map((b) => o(b.toLowerCase().replace(/\s+/g, '-'), b)) },
+        ],
+      },
+      { id: 'water', f: 'soft', name: 'Water', desc: '500 mL bottle', price: 1.99, img: '' },
       {
         id: 'beer', f: 'beer', name: 'Beer', desc: 'Prices before tax', img: '1600788886242-5c96aabe3757',
         groups: [
@@ -124,7 +143,7 @@ const CATS: Record<CategoryId, Category> = {
     hero: { img: '1501443762994-82bd5dace89a', eyebrow: 'Gelato & shakes', t1: 'Gelato &', t2: 'Shakes.', p: 'Cones, scoops and thick shakes. Ten gelato flavours.' },
     noun: 'treats',
     items: [
-      { id: 'cone', name: 'Gelato cone', price: 5.99, img: '1497034825429-c343d7c6a68f', groups: [{ id: 'flav', label: 'Flavour', chips: true, opts: GELATO }] },
+      { id: 'cone', name: 'Gelato cone', price: 6, img: '1497034825429-c343d7c6a68f', groups: [{ id: 'flav', label: 'Flavour', chips: true, opts: GELATO }] },
       {
         id: 'scoop', name: 'Gelato by the scoop', desc: '$2.99 per scoop', img: '1570197788417-0e82375c9371', def: { n: '2' },
         groups: [
@@ -135,8 +154,8 @@ const CATS: Record<CategoryId, Category> = {
       {
         id: 'shake', name: 'Thick shake', img: '1505252585461-04db1eb84625',
         groups: [
-          { id: 'flav', label: 'Flavour', chips: true, opts: [o('mango', 'Mango', { img: '1525385133512-2f3bdd039054' }), o('strawberry', 'Strawberry', { img: '1579954115545-a95591f28bfc' }), o('banana', 'Banana'), o('vanilla', 'Vanilla', { img: '1568901839119-631418a3910d' }), o('pistachio', 'Pistachio'), o('cherry', 'Black cherry', { img: '1600718374662-0483d2b9da44' })] },
-          { id: 'size', label: 'Size', opts: SIZES3(9.05, 10.15, 11.3) },
+          { id: 'flav', label: 'Flavour', chips: true, opts: [o('mango', 'Mango', { img: '1525385133512-2f3bdd039054' }), o('strawberry', 'Strawberry', { img: '1579954115545-a95591f28bfc' }), o('banana', 'Banana'), o('badam', 'Badam'), o('papaya', 'Papaya'), o('vanilla', 'Vanilla', { img: '1568901839119-631418a3910d' }), o('pistachio', 'Pistachio'), o('cherry', 'Black cherry', { img: '1600718374662-0483d2b9da44' })] },
+          { id: 'size', label: 'Size', opts: SIZES3(8.41, 9.29, 11.11) },
         ],
       },
     ],
