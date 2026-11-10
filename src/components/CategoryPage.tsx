@@ -140,17 +140,12 @@ const CATS: Record<CategoryId, Category> = {
     ],
   },
   gelato: {
-    hero: { img: '1501443762994-82bd5dace89a', eyebrow: 'Gelato & shakes', t1: 'Gelato &', t2: 'Shakes.', p: 'Cones, scoops and thick shakes. Ten gelato flavours.' },
+    hero: { img: '1501443762994-82bd5dace89a', eyebrow: 'Gelato & shakes', t1: 'Gelato &', t2: 'Shakes.', p: 'Cones, cups and thick shakes. Ten gelato flavours.' },
     noun: 'treats',
     items: [
       { id: 'cone', name: 'Gelato cone', price: 6, img: '1497034825429-c343d7c6a68f', groups: [{ id: 'flav', label: 'Flavour', chips: true, opts: GELATO }] },
-      {
-        id: 'scoop', name: 'Gelato by the scoop', desc: '$2.99 per scoop', img: '1570197788417-0e82375c9371', def: { n: '2' },
-        groups: [
-          { id: 'n', label: 'Scoops', opts: [1, 2, 3, 4].map((n) => o(String(n), String(n), { price: n * 2.99, long: n + (n === 1 ? ' scoop' : ' scoops') })) },
-          { id: 'flav', label: 'Flavour', chips: true, opts: GELATO },
-        ],
-      },
+      // Square calls gelato "Ice Cream": Cone $6.00, Medium Bowl $6.00 (Large Bowl has no price set yet).
+      { id: 'cup', name: 'Gelato cup', desc: 'Medium cup', price: 6, img: '1570197788417-0e82375c9371', groups: [{ id: 'flav', label: 'Flavour', chips: true, opts: GELATO }] },
       {
         id: 'shake', name: 'Thick shake', img: '1505252585461-04db1eb84625',
         groups: [

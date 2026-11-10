@@ -49,7 +49,7 @@ export const TILES: Tile[] = [
   { id: 'pasta', name: 'Pasta Bar', sub: 'Pasta and momos', bg: '#F2B53A', fg: '#1A1414', img: 'assets/menu/pasta.jpg', creditText: 'Photo: Dllu, Wikimedia Commons, CC BY-SA 4.0' },
   { id: 'wings', name: 'Wings & Sides', sub: 'Wings, tandoori, salads, sides', bg: '#7A2E1D', fg: '#fff', img: 'assets/ingredients/tandoori-chicken.png' },
   { id: 'juice', name: 'Drinks Bar', sub: 'Juice, lassi, coffee, beer', bg: '#1E6E6A', fg: '#fff', img: 'assets/menu/juice-mix.png', creditText: 'Photo: JIP, Wikimedia Commons, CC BY-SA 4.0' },
-  { id: 'gelato', name: 'Gelato & Shakes', sub: 'Cones, scoops, thick shakes', bg: '#F4C6CF', fg: '#1A1414', img: 'assets/menu/gelato.jpg', creditText: 'Photo: Rizka Budiati, Wikimedia Commons, CC BY 2.0' },
+  { id: 'gelato', name: 'Gelato & Shakes', sub: 'Cones, cups, thick shakes', bg: '#F4C6CF', fg: '#1A1414', img: 'assets/menu/gelato.jpg', creditText: 'Photo: Rizka Budiati, Wikimedia Commons, CC BY 2.0' },
 ];
 
 /** Toppings already on each house special when it opens in the builder. */

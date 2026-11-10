@@ -55,7 +55,7 @@ const ROW_PIC: Record<string, string> = {
   'ch-pasta-rose': 'assets/menu/pasta.jpg',
   'ch-pasta-alfredo': 'assets/menu/pasta.jpg',
   cone: 'assets/menu/gelato.jpg',
-  scoop: 'assets/menu/gelato.jpg',
+  cup: 'assets/menu/gelato.jpg',
   corn: 'assets/ingredients/corn.jpg',
 };
 
@@ -234,7 +234,7 @@ const SECTIONS: Section[] = [
   ] },
   { id: 'gelato', title: 'Gelato & shakes', rows: [
     ['cone', 'Gelato cone', 'Vanilla, mango, pistachio, chocolate and more', [['', 6]]],
-    ['scoop', 'Gelato scoop', 'Per scoop', [['', 2.99]]],
+    ['cup', 'Gelato cup', 'Medium cup, any flavour', [['', 6]]],
     ['shake', 'Shake', 'Mango, strawberry, banana, badam, papaya, vanilla, pistachio, black cherry', SIZES3([8.41, 9.29, 11.11])],
   ] },
   { id: 'drinks', title: 'Drinks', rows: [
