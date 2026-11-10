@@ -1,0 +1,7 @@
+node_modules
+dist
+.DS_Store
+*.log
+# Design handoff + research notes stay local (the handoff includes third-party reference screenshots)
+design_handoff_pizza_king_website/
+research/

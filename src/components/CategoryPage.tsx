@@ -1,0 +1,470 @@
+// Port of design_handoff_pizza_king_website/prototype/CategoryPage.dc.html
+// One shared template for Wings & Sides, Drinks Bar and Gelato & Shakes (prop `category`).
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
+import type { CategoryId, CategoryPageProps } from '../lib/types';
+import { Hov, Photo, IconArrow, IconBack, IconCheck, IconClose, IconMinus, IconPlus } from '../lib/ui';
+import { useLockBody, useWidth } from '../lib/hooks';
+import { U } from '../lib/catalog';
+import { money } from '../lib/format';
+
+// ---------- Data (the prototype's `const` arrays are the spec) ----------
+
+interface Opt {
+  id: string;
+  label: string;
+  price?: number;
+  long?: string;
+  img?: string;
+}
+interface Group {
+  id: string;
+  label?: string;
+  /** Chips (wrap) instead of a segmented control. */
+  chips?: boolean;
+  opts: Opt[];
+}
+interface Item {
+  id: string;
+  /** Filter id. */
+  f?: string;
+  name: string;
+  desc?: string;
+  tag?: string;
+  veg?: boolean;
+  /** Unsplash photo id or `assets/...` path; empty = no real photo (empty box on purpose). */
+  img: string;
+  price?: number;
+  /** Default option id per group id. */
+  def?: Record<string, string>;
+  groups?: Group[];
+}
+interface Category {
+  hero: { img: string; eyebrow: string; t1: string; t2: string; p: string };
+  filters?: [id: string, label: string][];
+  noun?: string;
+  items: Item[];
+}
+
+/** Unsplash id → URL; `assets/...` paths pass through; empty stays empty. */
+const IMG = (id: string | undefined, w = 800) => (!id ? '' : id.indexOf('assets/') === 0 ? id : U(id, w));
+const o = (id: string, label: string, x?: Partial<Opt>): Opt => ({ id, label, ...(x || {}) });
+const SIZES3 = (m: number, l: number, xl: number): Opt[] => [
+  o('M', 'M', { price: m, long: 'Medium' }),
+  o('L', 'L', { price: l, long: 'Large' }),
+  o('XL', 'XL', { price: xl, long: 'X-Large' }),
+];
+const GELATO: Opt[] = ['Vanilla', 'Mango', 'Strawberry', 'Banana', 'Pistachio', 'Black cherry', 'Cappuccino', 'Chocolate', 'Red velvet', 'Rum & raisin'].map((f) =>
+  o(f.toLowerCase().replace(/[^a-z]+/g, '-'), f),
+);
+
+const CATS: Record<CategoryId, Category> = {
+  wings: {
+    hero: { img: '1608039755401-742074f0548d', eyebrow: 'Wings & sides', t1: 'Tandoori', t2: 'Wings.', p: 'Baked in the wood oven in hot, honey garlic or BBQ. Plus tandoori chicken, fish and sides.' },
+    filters: [['all', 'All'], ['tandoor', 'Wings & tandoori'], ['sides', 'Sides & salads']],
+    items: [
+      {
+        id: 'wings', f: 'tandoor', name: 'Tandoori wings', desc: 'Wood oven. Extra dip $1.25.', tag: 'Wood oven', img: '1608039755401-742074f0548d', def: { n: '12' },
+        groups: [
+          { id: 'flav', label: 'Flavour', opts: [o('hot', 'Hot', { img: '1608039755401-742074f0548d' }), o('honey', 'Honey garlic', { img: '1567620832903-9fc6debc209f' }), o('bbq', 'BBQ', { img: '1527477396000-e27163b481c2' })] },
+          { id: 'n', label: 'Wings', opts: ([[8, 9.99], [12, 11.99], [16, 13.99], [24, 21.99], [34, 30.99], [48, 41.99]] as const).map(([n, p]) => o(String(n), String(n), { price: p, long: n + ' wings' })) },
+        ],
+      },
+      {
+        id: 'leg', f: 'tandoor', name: 'Tandoori chicken leg', desc: '$4.99 per piece', img: '1617692855027-33b14f061079',
+        groups: [{ id: 'q', label: 'Pieces', opts: [1, 2, 3, 4].map((n) => o(String(n), String(n), { price: n * 4.99, long: n + (n === 1 ? ' piece' : ' pieces') })) }],
+      },
+      {
+        id: 'fish', f: 'tandoor', name: 'Tandoori fish', desc: '$12.50 per pound', img: '',
+        groups: [{ id: 'w', label: 'Weight', opts: ([[1, '1 lb'], [1.5, '1.5 lb'], [2, '2 lb']] as const).map(([n, l]) => o(String(n), l, { price: n * 12.5 })) }],
+      },
+      {
+        id: 'wedges', f: 'sides', name: 'Potato wedges', desc: 'Small or large', veg: true, img: '1623238913973-21e45cced554',
+        groups: [{ id: 's', opts: [o('S', 'Small', { price: 7.99 }), o('L', 'Large', { price: 9.99 })] }],
+      },
+      { id: 'sub', f: 'sides', name: 'Sub', desc: '$9.99 each', price: 9.99, img: '1509722747041-616f39b57569' },
+      { id: 'nv-salad', f: 'sides', name: 'Non-veg salad', price: 8.99, img: '1546069901-ba9599a7e63c' },
+      { id: 'v-salad', f: 'sides', name: 'Veg salad', price: 7.99, veg: true, img: '1512621776951-a57141f2eefd' },
+      { id: 'corn', f: 'sides', name: 'Sweet corn', desc: 'Cooked in the wood oven', price: 4.99, veg: true, img: 'assets/ingredients/corn.jpg' },
+      { id: 'chaat', f: 'sides', name: 'Fruit chaat', desc: 'With sweet potatoes', price: 7.99, veg: true, img: '1490474418585-ba9bad8fd0ea' },
+    ],
+  },
+  juice: {
+    hero: { img: '1622597467836-f3285f2131b8', eyebrow: 'The Drinks Bar', t1: 'Fresh juice.', t2: 'Hot chai. Cold beer.', p: 'Juice, lassi, coffee and chai, and cold beer by the bottle or can.' },
+    filters: [['all', 'All'], ['juice', 'Juice'], ['lassi', 'Lassi'], ['hot', 'Coffee & chai'], ['beer', 'Beer']],
+    noun: 'drinks',
+    items: [
+      {
+        id: 'fresh', f: 'juice', name: 'Fresh fruit juice', desc: 'Orange, pineapple, guava or mix', img: '1600271886742-f049cd451bba', def: { size: 'L' },
+        groups: [
+          { id: 'flav', label: 'Flavour', opts: [o('orange', 'Orange', { img: '1600271886742-f049cd451bba' }), o('pineapple', 'Pineapple', { img: '1534353473418-4cfa6c56fd38' }), o('guava', 'Guava', { img: '1497534446932-c925b458314e' }), o('mix', 'Mix', { img: '1622597467836-f3285f2131b8' })] },
+          { id: 'size', label: 'Size', opts: SIZES3(6.8, 8, 10) },
+        ],
+      },
+      { id: 'sugarcane', f: 'juice', name: 'Sugarcane juice', img: '', def: { size: 'L' }, groups: [{ id: 'size', label: 'Size', opts: SIZES3(6.8, 8, 10) }] },
+      { id: 'coconut', f: 'juice', name: 'Fresh coconut juice', price: 8, img: '' },
+      {
+        id: 'lassi', f: 'lassi', name: 'Lassi', price: 6.8, img: '',
+        groups: [{ id: 'flav', label: 'Flavour', chips: true, opts: [o('mango', 'Mango'), o('mint', 'Mint'), o('strawberry', 'Strawberry', { img: '1589733955941-5eeaf752f6dd' }), o('sweet', 'Sweet'), o('salty', 'Salty')] }],
+      },
+      { id: 'espresso', f: 'hot', name: 'Italian espresso', price: 2, img: '1510591509098-f4fdc6d0ff04' },
+      {
+        id: 'hot', f: 'hot', name: 'Hot drinks', price: 3.1, img: '1509042239860-f550ce710b93',
+        groups: [{ id: 'kind', label: 'Drink', chips: true, opts: [o('coffee', 'Indian coffee'), o('cappuccino', 'Cappuccino'), o('choc', 'Hot chocolate'), o('masala', 'Masala tea')] }],
+      },
+      {
+        id: 'beer', f: 'beer', name: 'Beer', desc: 'Prices before tax', img: '1600788886242-5c96aabe3757',
+        groups: [
+          { id: 'kind', label: 'Bottle or can', opts: [o('bottle', 'Bottle', { price: 5.7 }), o('can', 'Can', { price: 7.5 })] },
+          { id: 'brand', label: 'Brand', chips: true, opts: ['Canadian', 'Molson', 'Moosehead Blue', 'Miller', 'Corona', 'Heineken', 'Stella'].map((b) => o(b.toLowerCase().replace(/\s+/g, '-'), b)) },
+        ],
+      },
+    ],
+  },
+  gelato: {
+    hero: { img: '1501443762994-82bd5dace89a', eyebrow: 'Gelato & shakes', t1: 'Gelato &', t2: 'Shakes.', p: 'Cones, scoops and thick shakes. Ten gelato flavours.' },
+    noun: 'treats',
+    items: [
+      { id: 'cone', name: 'Gelato cone', price: 5.99, img: '1497034825429-c343d7c6a68f', groups: [{ id: 'flav', label: 'Flavour', chips: true, opts: GELATO }] },
+      {
+        id: 'scoop', name: 'Gelato by the scoop', desc: '$2.99 per scoop', img: '1570197788417-0e82375c9371', def: { n: '2' },
+        groups: [
+          { id: 'n', label: 'Scoops', opts: [1, 2, 3, 4].map((n) => o(String(n), String(n), { price: n * 2.99, long: n + (n === 1 ? ' scoop' : ' scoops') })) },
+          { id: 'flav', label: 'Flavour', chips: true, opts: GELATO },
+        ],
+      },
+      {
+        id: 'shake', name: 'Thick shake', img: '1505252585461-04db1eb84625',
+        groups: [
+          { id: 'flav', label: 'Flavour', chips: true, opts: [o('mango', 'Mango', { img: '1525385133512-2f3bdd039054' }), o('strawberry', 'Strawberry', { img: '1579954115545-a95591f28bfc' }), o('banana', 'Banana'), o('vanilla', 'Vanilla', { img: '1568901839119-631418a3910d' }), o('pistachio', 'Pistachio'), o('cherry', 'Black cherry', { img: '1600718374662-0483d2b9da44' })] },
+          { id: 'size', label: 'Size', opts: SIZES3(9.05, 10.15, 11.3) },
+        ],
+      },
+    ],
+  },
+};
+
+// ---------- Static styles ----------
+
+const S = {
+  root: { fontFamily: "'Figtree',system-ui,sans-serif", color: '#1A1414', background: '#fff', paddingBottom: 96 },
+  heroSection: { maxWidth: 1320, margin: '0 auto', padding: '16px clamp(16px,3vw,32px) 0' },
+  hero: { position: 'relative', borderRadius: 32, overflow: 'hidden', minHeight: 'clamp(380px,48vh,480px)', background: '#1A1210', color: '#fff', display: 'flex' },
+  heroShade: {
+    position: 'absolute', inset: 0, pointerEvents: 'none',
+    background: 'linear-gradient(0deg,rgba(18,10,8,.92) 0%,rgba(18,10,8,.5) 45%,rgba(18,10,8,.15) 100%),linear-gradient(90deg,rgba(18,10,8,.6) 0%,rgba(18,10,8,0) 65%)',
+  },
+  heroBody: { position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 48, padding: 'clamp(20px,4vw,52px)', pointerEvents: 'none' },
+  back: {
+    pointerEvents: 'auto', alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 18px 0 14px', border: 0, borderRadius: 999,
+    background: 'rgba(255,255,255,.14)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.28)',
+    color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 15, cursor: 'pointer', transition: 'background .2s',
+  },
+  backHover: { background: 'rgba(255,255,255,.26)' },
+  heroText: { display: 'flex', flexDirection: 'column', gap: 18 },
+  eyebrow: { fontSize: 12, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: '#FF8A80' },
+  h1: { margin: 0, fontWeight: 900, fontSize: 'clamp(52px,7.4vw,104px)', lineHeight: 0.9, letterSpacing: '-.055em' },
+  heroP: { margin: 0, maxWidth: 520, fontSize: 'clamp(16px,1.4vw,18px)', lineHeight: 1.5, color: '#DADADD', textWrap: 'pretty' },
+  listSection: { maxWidth: 1320, margin: '0 auto', padding: '0 clamp(16px,3vw,32px)' },
+  bar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, padding: '36px 0 24px' },
+  tabs: { display: 'flex', gap: 8, flexWrap: 'wrap' },
+  tab: { display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 18px', border: 0, borderRadius: 999, fontFamily: 'inherit', fontWeight: 800, fontSize: 15, whiteSpace: 'nowrap', cursor: 'pointer', transition: 'background .2s,color .2s' },
+  tabCount: { fontSize: 13, fontWeight: 700, opacity: 0.6 },
+  count: { fontWeight: 900, fontSize: 'clamp(26px,2.6vw,34px)', letterSpacing: '-.04em' },
+  fullMenu: { display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 15, color: '#1A1414', textDecoration: 'none' },
+  fullMenuHover: { color: '#D7192D' },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,290px),1fr))', gap: 20 },
+  card: { cursor: 'pointer', display: 'flex', flexDirection: 'column', borderRadius: 28, overflow: 'hidden', background: '#fff', boxShadow: 'inset 0 0 0 1px #E8E8EB', transition: 'transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s' },
+  cardHover: { transform: 'translateY(-4px)', boxShadow: 'inset 0 0 0 1px #E8E8EB,0 22px 44px rgba(26,20,20,.12)' },
+  cardMedia: { position: 'relative', aspectRatio: '4/3', background: '#EDEDF0' },
+  badges: { position: 'absolute', left: 14, top: 14, display: 'flex', gap: 6, pointerEvents: 'none' },
+  tag: { height: 30, padding: '0 12px', borderRadius: 999, background: '#fff', color: '#1A1414', fontSize: 12, fontWeight: 800, whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', boxShadow: '0 4px 14px rgba(0,0,0,.12)' },
+  veg: { height: 30, padding: '0 12px 0 10px', borderRadius: 999, background: '#fff', color: '#1E7A3C', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 14px rgba(0,0,0,.12)' },
+  vegDot: { width: 8, height: 8, borderRadius: '50%', background: '#1E9E4A' },
+  cardBody: { flex: 1, display: 'flex', flexDirection: 'column', gap: 18, padding: 20 },
+  cardHead: { display: 'flex', flexDirection: 'column', gap: 6 },
+  cardName: { fontWeight: 900, fontSize: 22, letterSpacing: '-.03em', lineHeight: 1.1 },
+  cardDesc: { fontSize: 14, lineHeight: 1.45, color: '#646467', textWrap: 'pretty' },
+  cardFoot: { marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  priceCol: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 },
+  price: { fontWeight: 900, fontSize: 26, letterSpacing: '-.04em', lineHeight: 1 },
+  sub: { fontSize: 12, fontWeight: 600, color: '#818184', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  addBtn: { width: 48, height: 48, flex: 'none', border: 0, borderRadius: '50%', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .2s,transform .2s' },
+  addBtnHover: { transform: 'scale(1.06)' },
+  // Customize sheet
+  dialog: { position: 'fixed', inset: 0, zIndex: 200, display: 'flex', justifyContent: 'center' },
+  scrim: { position: 'absolute', inset: 0, background: 'rgba(20,14,12,.5)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' },
+  panel: { position: 'relative', width: '100%', maxWidth: 880, display: 'flex', background: '#fff', overflow: 'hidden', boxShadow: '0 40px 100px rgba(0,0,0,.3)' },
+  close: { position: 'absolute', right: 14, top: 14, width: 44, height: 44, border: 0, borderRadius: '50%', background: '#fff', color: '#1A1414', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 18px rgba(0,0,0,.18)' },
+  sheetCol: { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: 0 },
+  sheetScroll: { flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 26, padding: '28px 28px 20px' },
+  sheetHead: { display: 'flex', flexDirection: 'column', gap: 8 },
+  sheetName: { fontWeight: 900, fontSize: 32, letterSpacing: '-.04em', lineHeight: 1.05 },
+  sheetDesc: { fontSize: 15, lineHeight: 1.5, color: '#646467', textWrap: 'pretty' },
+  groups: { display: 'flex', flexDirection: 'column', gap: 22 },
+  group: { display: 'flex', flexDirection: 'column', gap: 8 },
+  groupLabel: { fontSize: 13, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: '#818184' },
+  seg: { display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: '#EDEDF0' },
+  segBtn: { flex: 1, minWidth: 0, height: 46, padding: '0 6px', border: 0, borderRadius: 999, fontFamily: 'inherit', fontWeight: 800, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', cursor: 'pointer', transition: 'background .2s,color .2s' },
+  chips: { display: 'flex', flexWrap: 'wrap', gap: 6 },
+  chip: { height: 44, padding: '0 16px', border: 0, borderRadius: 999, fontFamily: 'inherit', fontWeight: 700, fontSize: 14, whiteSpace: 'nowrap', cursor: 'pointer', transition: 'background .2s,color .2s' },
+  sheetFoot: { display: 'flex', alignItems: 'center', gap: 12, padding: '16px 28px 24px', borderTop: '1px solid #EDEDF0' },
+  stepper: { display: 'flex', alignItems: 'center', gap: 4, height: 56, padding: '0 6px', borderRadius: 999, background: '#EDEDF0' },
+  stepBtn: { width: 44, height: 44, border: 0, borderRadius: '50%', background: 'transparent', color: '#1A1414', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  stepBtnHover: { background: '#fff' },
+  qty: { minWidth: 22, textAlign: 'center', fontWeight: 900, fontSize: 17 },
+  sheetAdd: { flex: 1, height: 56, border: 0, borderRadius: 999, background: '#D7192D', color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 16, whiteSpace: 'nowrap', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '0 24px', transition: 'background .2s' },
+  sheetAddHover: { background: '#B5121F' },
+} satisfies Record<string, CSSProperties>;
+
+// ---------- Component ----------
+
+/** Remounts on category change so filter / selections / open sheet reset. */
+export default function CategoryPage(props: CategoryPageProps) {
+  return <CategoryView key={props.category} {...props} />;
+}
+
+type Sel = Record<string, Record<string, string>>;
+
+function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
+  const w = useWidth();
+  const [filter, setFilter] = useState('all');
+  const [sel, setSel] = useState<Sel>({});
+  const [added, setAdded] = useState<string | null>(null);
+  const [open, setOpen] = useState<string | null>(null);
+  const [qty, setQty] = useState(1);
+  const timer = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (!open) return;
+    const onK = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(null); };
+    window.addEventListener('keydown', onK);
+    return () => window.removeEventListener('keydown', onK);
+  }, [open]);
+  useLockBody(!!open);
+
+  const key = category || 'wings';
+  const cat = CATS[key] || CATS.wings;
+  const ev = (fn?: () => void) => (e?: { preventDefault?: () => void }) => { e?.preventDefault?.(); fn?.(); };
+  const filters = cat.filters || null;
+  const shown = filters && filter !== 'all' ? cat.items.filter((i) => i.f === filter) : cat.items;
+  const hero = { ...cat.hero, img: IMG(cat.hero.img, 2000) };
+
+  const build = (it: Item) => {
+    const groups = it.groups || [];
+    const mine = sel[it.id] || {};
+    const chosen = groups.map((g) => g.opts.find((x) => x.id === (mine[g.id] || (it.def && it.def[g.id]))) || g.opts[0]);
+    const priced = chosen.filter((c) => c.price != null).pop();
+    const price = (priced ? priced.price : it.price) ?? 0;
+    const pic = chosen.filter((c) => c.img).pop();
+    const sub = chosen.map((c) => c.long || c.label).join(' · ');
+    const justAdded = added === it.id;
+    const hasOpts = groups.length > 0;
+    const minP = hasOpts
+      ? Math.min(...groups.flatMap((g) => g.opts.map((x) => x.price)).filter((p): p is number => p != null).concat(it.price != null ? [it.price] : []))
+      : price;
+    const rawImg = pic ? pic.img : it.img;
+    const addLine = (q: number) => {
+      onAdd?.({ key: [it.id].concat(chosen.map((c) => c.id)).join('-'), name: it.name, summary: sub || it.desc || cat.hero.eyebrow, unit: price, img: IMG(rawImg) }, q);
+      clearTimeout(timer.current);
+      setAdded(it.id);
+      setOpen(null);
+      timer.current = setTimeout(() => setAdded(null), 1400);
+    };
+    const openOrAdd = () => {
+      if (hasOpts) { setOpen(it.id); setQty(1); } else addLine(1);
+    };
+    return {
+      it, groups, chosen, price, sub, justAdded, hasOpts, addLine, openOrAdd,
+      img: IMG(rawImg),
+      credit: rawImg && rawImg.indexOf('assets/') !== 0 ? 'Photo on Unsplash' : '',
+      priceText: hasOpts && isFinite(minP) && minP !== price ? 'From ' + money(minP) : money(price),
+      addAria: 'Add ' + it.name + (sub ? ', ' + sub : '') + ', ' + money(price),
+    };
+  };
+
+  const pick = (itemId: string, groupId: string, optId: string) =>
+    setSel((st) => ({ ...st, [itemId]: { ...(st[itemId] || {}), [groupId]: optId } }));
+
+  const mob = w < 720;
+  const oi = open ? cat.items.find((i) => i.id === open) : undefined;
+  const m = oi ? build(oi) : null;
+
+  return (
+    <div style={S.root}>
+      <section style={S.heroSection}>
+        <div style={S.hero}>
+          <Photo src={hero.img} alt="" credit="Photo on Unsplash" creditHref="https://unsplash.com" eager />
+          <div style={S.heroShade} />
+          <div style={S.heroBody}>
+            <Hov as="button" type="button" onClick={ev(onBack)} style={S.back} hover={S.backHover}>
+              <IconBack size={16} stroke={2.8} />
+              Back
+            </Hov>
+            <div style={S.heroText}>
+              <span style={S.eyebrow}>{hero.eyebrow}</span>
+              <h1 style={S.h1}>
+                {hero.t1}
+                <br />
+                <span style={{ color: '#FF5A4E' }}>{hero.t2}</span>
+              </h1>
+              <p style={S.heroP}>{hero.p}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={S.listSection}>
+        <div style={S.bar}>
+          {filters ? (
+            <div role="tablist" aria-label="Filter" style={S.tabs}>
+              {filters.map(([id, label]) => {
+                const on = filter === id;
+                const count = id === 'all' ? cat.items.length : cat.items.filter((i) => i.f === id).length;
+                return (
+                  <button key={id} type="button" role="tab" aria-selected={on} onClick={() => setFilter(id)} style={{ ...S.tab, background: on ? '#1A1414' : '#EDEDF0', color: on ? '#fff' : '#1A1414' }}>
+                    {label}
+                    <span style={S.tabCount}>{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <span style={S.count}>{cat.items.length + ' ' + (cat.noun || 'items')}</span>
+          )}
+          <Hov as="a" href="#menu" onClick={ev(onMenu)} style={S.fullMenu} hover={S.fullMenuHover}>
+            Full menu
+            <IconArrow size={14} stroke={2.8} />
+          </Hov>
+        </div>
+
+        <div style={S.grid}>
+          {shown.map((it) => {
+            const b = build(it);
+            return (
+              <Hov as="article" key={it.id} onClick={b.openOrAdd} style={S.card} hover={S.cardHover}>
+                {/* Items without a real photo keep an empty image box on purpose (owner rule). */}
+                <div style={S.cardMedia}>
+                  <Photo src={b.img} alt={it.name} credit={b.credit} creditHref="https://unsplash.com" />
+                  <div style={S.badges}>
+                    {it.tag ? <span style={S.tag}>{it.tag}</span> : null}
+                    {it.veg ? (
+                      <span style={S.veg}>
+                        <span style={S.vegDot} />
+                        Veg
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+                <div style={S.cardBody}>
+                  <div style={S.cardHead}>
+                    <span style={S.cardName}>{it.name}</span>
+                    {it.desc ? <span style={S.cardDesc}>{it.desc}</span> : null}
+                  </div>
+                  <div style={S.cardFoot}>
+                    <div style={S.priceCol}>
+                      <span style={S.price}>{b.priceText}</span>
+                      <span style={S.sub}>{b.hasOpts ? 'Tap to customize' : ''}</span>
+                    </div>
+                    <Hov
+                      as="button"
+                      type="button"
+                      aria-label={b.addAria}
+                      onClick={(e: MouseEvent) => { e.stopPropagation(); b.openOrAdd(); }}
+                      style={{ ...S.addBtn, background: b.justAdded ? '#1E8A4C' : '#D7192D' }}
+                      hover={S.addBtnHover}
+                    >
+                      {b.justAdded ? <IconCheck size={18} stroke={3.2} /> : <IconPlus size={18} stroke={3} />}
+                    </Hov>
+                  </div>
+                </div>
+              </Hov>
+            );
+          })}
+        </div>
+      </section>
+
+      {m ? (
+        <div role="dialog" aria-modal="true" aria-label={m.it.name} style={{ ...S.dialog, alignItems: mob ? 'flex-end' : 'center', padding: mob ? '0' : '24px' }}>
+          <div onClick={() => setOpen(null)} style={S.scrim} />
+          <div style={{ ...S.panel, maxHeight: mob ? '92vh' : 'min(640px,90vh)', flexDirection: mob ? 'column' : 'row', borderRadius: mob ? '28px 28px 0 0' : '28px' }}>
+            <div style={{ position: 'relative', flex: mob ? 'none' : '0 0 44%', minHeight: mob ? '220px' : '0', background: '#EDEDF0' }}>
+              <Photo src={m.img} alt={m.it.name} credit={m.credit} creditHref="https://unsplash.com" />
+              <button type="button" onClick={() => setOpen(null)} aria-label="Close" style={S.close}>
+                <IconClose size={16} stroke={2.8} />
+              </button>
+            </div>
+            <div style={S.sheetCol}>
+              <div style={S.sheetScroll}>
+                <div style={S.sheetHead}>
+                  <span style={S.sheetName}>{m.it.name}</span>
+                  {m.it.desc ? <span style={S.sheetDesc}>{m.it.desc}</span> : null}
+                </div>
+                <div style={S.groups}>
+                  {m.groups.map((g, gi) => (
+                    <div key={g.id} style={S.group}>
+                      {g.label ? <span style={S.groupLabel}>{g.label}</span> : null}
+                      {!g.chips ? (
+                        <div role="radiogroup" aria-label={g.label || 'Option'} style={S.seg}>
+                          {g.opts.map((x) => {
+                            const on = x.id === m.chosen[gi].id;
+                            return (
+                              <button
+                                key={x.id}
+                                type="button"
+                                role="radio"
+                                aria-checked={on}
+                                aria-label={(x.long || x.label) + (x.price != null ? ', ' + money(x.price) : '')}
+                                onClick={() => pick(m.it.id, g.id, x.id)}
+                                style={{ ...S.segBtn, background: on ? '#fff' : 'transparent', color: on ? '#1A1414' : '#818184', boxShadow: on ? '0 2px 8px rgba(26,20,20,.12)' : 'none' }}
+                              >
+                                {x.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div role="radiogroup" aria-label={g.label || 'Option'} style={S.chips}>
+                          {g.opts.map((x) => {
+                            const on = x.id === m.chosen[gi].id;
+                            return (
+                              <button
+                                key={x.id}
+                                type="button"
+                                role="radio"
+                                aria-checked={on}
+                                onClick={() => pick(m.it.id, g.id, x.id)}
+                                style={{ ...S.chip, background: on ? '#1A1414' : '#EDEDF0', color: on ? '#fff' : '#1A1414' }}
+                              >
+                                {x.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={S.sheetFoot}>
+                <div style={S.stepper}>
+                  <Hov as="button" type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease quantity" style={S.stepBtn} hover={S.stepBtnHover}>
+                    <IconMinus size={16} stroke={3} />
+                  </Hov>
+                  <span style={S.qty}>{qty}</span>
+                  <Hov as="button" type="button" onClick={() => setQty((q) => Math.min(20, q + 1))} aria-label="Increase quantity" style={S.stepBtn} hover={S.stepBtnHover}>
+                    <IconPlus size={16} stroke={3} />
+                  </Hov>
+                </div>
+                <Hov as="button" type="button" onClick={() => m.addLine(qty)} style={S.sheetAdd} hover={S.sheetAddHover}>
+                  <span>Add to order</span>
+                  <span>{money(m.price * qty)}</span>
+                </Hov>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}

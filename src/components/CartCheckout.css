@@ -1,0 +1,4 @@
+/* Keyframes from prototype/CartCheckout.dc.html */
+@keyframes ccIn { from { transform: translateX(24px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes ccUp { from { transform: translateY(16px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes ccFade { from { opacity: 0 } to { opacity: 1 } }

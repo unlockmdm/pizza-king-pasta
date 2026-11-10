@@ -1,0 +1,39 @@
+/* Global styles + shared keyframes (from Pizza King Home v2.dc.html).
+   Screen-specific keyframes live in src/components/<Screen>.css. */
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: #FFFFFF;
+  color: #1A1414;
+  font-family: 'Figtree', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+*, *::before, *::after { box-sizing: border-box; }
+a { color: #D7192D; }
+a:hover { color: #A8101F; }
+button, input, textarea, select { font-family: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+img { max-width: none; }
+:focus-visible { outline: 3px solid rgba(215, 25, 45, .45); outline-offset: 2px; }
+
+@keyframes pkDrop { 0% { opacity: 0; transform: translate(-50%, -50%) translateY(-26px) scale(1.35) rotate(var(--r)) } 60% { opacity: 1 } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(var(--r)) } }
+@keyframes pkpFade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes pkpIn { from { opacity: 0; transform: translateY(10px) scale(.985) } to { opacity: 1; transform: none } }
+@keyframes pkpUp { from { transform: translateY(100%) } to { transform: none } }
+@keyframes pkSpin { to { transform: rotate(360deg) } }
+@keyframes pkFloat { 0%, 100% { transform: translateY(0) rotate(0deg) } 50% { transform: translateY(-14px) rotate(8deg) } }
+@keyframes pkZoom { from { transform: scale(1) } to { transform: scale(1.1) } }
+@keyframes pkUp { from { transform: translateY(40px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes pkBob { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

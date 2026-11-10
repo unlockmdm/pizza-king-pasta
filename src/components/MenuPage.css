@@ -1,0 +1,4 @@
+/* Keyframes from MenuPage.dc.html (option picker). pkmUp was only used by the
+   standalone "Added" toast, which the shell now owns, so it is not ported. */
+@keyframes pkmFade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes pkmIn { from { opacity: 0; transform: translateY(12px) scale(.98) } to { opacity: 1; transform: none } }
