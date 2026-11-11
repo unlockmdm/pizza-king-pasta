@@ -61,7 +61,7 @@ export default function Footer({
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 15, lineHeight: 1.5 }}>
             <span style={colHead}>Visit</span>
-            <span>{SHOP.street}<br />{SHOP.cityLine}</span>
+            <Hov as="a" href={SHOP.mapsSearch} target="_blank" rel="noopener noreferrer" aria-label={'Open ' + SHOP.street + ' in Google Maps'} style={link} hover={linkHover}>{SHOP.street}<br />{SHOP.cityLine}</Hov>
             <span>{SHOP.hoursDays}, {SHOP.hoursText}</span>
             <Hov as="a" href={SHOP.phoneHref} style={link} hover={linkHover}>{SHOP.phoneText}</Hov>
           </div>

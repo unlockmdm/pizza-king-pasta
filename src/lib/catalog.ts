@@ -9,7 +9,7 @@ export const SHOP = {
   phoneHref: 'tel:+19054609494',
   hoursDays: 'Every day',
   hoursText: '4 PM – 2 AM',
-  mapsSearch: 'https://www.google.com/maps/search/?api=1&query=511+Ray+Lawson+Blvd+Brampton+ON',
+  mapsSearch: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Pizza King & Pasta, 511 Ray Lawson Blvd Unit 10, Brampton, ON L6Y 0N2'),
   mapsDirections: 'https://www.google.com/maps/dir/?api=1&destination=511+Ray+Lawson+Blvd+Brampton+ON',
   mapsEmbed: 'https://www.google.com/maps?q=511+Ray+Lawson+Blvd,+Brampton,+ON+L6Y+0N2&z=15&output=embed',
   // Delivery is handled by the apps (the shop has no drivers). Swap in the commission-free

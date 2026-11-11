@@ -1,5 +1,6 @@
 import { useEffect, useState, type MouseEvent } from 'react';
 import { Hov, IconCart, IconChevronDown } from '../lib/ui';
+import { SHOP } from '../lib/catalog';
 
 type Nav = (e?: MouseEvent) => void;
 
@@ -99,6 +100,16 @@ export default function Header({
               <IconChevronDown />
             </Hov>
           </div>
+          <Hov
+            as="a"
+            href={SHOP.phoneHref}
+            aria-label={'Call the shop, ' + SHOP.phoneText}
+            title={'Call ' + SHOP.phoneText}
+            style={{ flex: 'none', width: 44, height: 44, borderRadius: '50%', background: '#F0F0F3', color: '#1A1414', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            hover={{ background: '#E6E6E9' }}
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" /></svg>
+          </Hov>
           <Hov
             as="button"
             onClick={onCart}

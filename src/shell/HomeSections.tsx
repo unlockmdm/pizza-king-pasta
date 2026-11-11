@@ -328,7 +328,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
           <div style={{ background: '#F2F2F5', borderRadius: 32, padding: 'clamp(28px,4vw,56px)', display: 'flex', flexDirection: 'column', gap: 32 }}>
             <h2 style={H2}>Hours &amp; location</h2>
             <div style={{ display: 'grid', gridTemplateColumns: ph ? 'repeat(2,minmax(0,1fr))' : 'repeat(auto-fit,minmax(200px,1fr))', gap: ph ? 20 : 24 }}>
-              <InfoBlock label="Address"><span>{SHOP.street}<br />{SHOP.cityLine}</span></InfoBlock>
+              <InfoBlock label="Address"><a href={SHOP.mapsSearch} target="_blank" rel="noopener noreferrer" style={{ color: '#1A1414', textDecoration: 'none' }}>{SHOP.street}<br />{SHOP.cityLine}</a></InfoBlock>
               <InfoBlock label="Hours"><span>{SHOP.hoursDays}<br />{SHOP.hoursText}</span></InfoBlock>
               <InfoBlock label="Phone"><a href={SHOP.phoneHref} style={{ fontSize: 17, fontWeight: 600, color: '#1A1414', textDecoration: 'none' }}>{SHOP.phoneText}</a></InfoBlock>
             </div>
