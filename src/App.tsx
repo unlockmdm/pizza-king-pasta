@@ -60,7 +60,8 @@ export default function App() {
   const w = useWidth();
   const saved = useMemo(() => readJSON<SavedMode>(MODE_KEY, null), []);
 
-  const [mode, setMode] = useState<Mode | null>(saved?.mode ?? null);
+  // The site is pickup-only (delivery goes through DoorDash / Uber Eats).
+  const [mode, setMode] = useState<Mode | null>(saved ? 'pickup' : null);
   const [addr, setAddr] = useState(saved?.addr ?? '');
   const [when, setWhen] = useState(saved?.when ?? 'asap');
   const [cart, setCart] = useState<CartLine[]>(() => {
@@ -71,7 +72,7 @@ export default function App() {
   const [view, setViewState] = useState<View>(viewFromUrl);
   // Start sheet: shown on a first visit (no saved pickup/delivery choice yet).
   const [welcome, setWelcome] = useState(!saved);
-  const [wMode, setWMode] = useState<Mode>(saved?.mode ?? 'pickup');
+  const [wMode, setWMode] = useState<Mode>('pickup');
   const [addrErr, setAddrErr] = useState('');
   const [item, setItem] = useState<{ id: string; custom?: BuilderItem } | null>(null);
   const [combo, setCombo] = useState<string | null>(null);
@@ -79,7 +80,8 @@ export default function App() {
   const [added, setAdded] = useState<Added | null>(null);
 
   const open = isShopOpen();
-  const pickup = (mode || 'pickup') === 'pickup';
+  const pickup = true;
+  void mode;
   const count = cart.reduce((a, l) => a + l.qty, 0);
 
   // ---- timers / pointer tracking ----
@@ -94,7 +96,7 @@ export default function App() {
   }, []);
 
   useEffect(() => writeJSON(CART_KEY, cart), [cart]);
-  useEffect(() => { if (mode) writeJSON(MODE_KEY, { mode, addr, when }); }, [mode, addr, when]);
+  useEffect(() => { if (mode) writeJSON(MODE_KEY, { mode: 'pickup', addr: '', when }); }, [mode, when]);
 
   // Escape closes the start sheet and cart (builders handle their own Escape).
   useEffect(() => {
@@ -183,20 +185,16 @@ export default function App() {
   const changeQty = (key: string, d: number) => setCart((c) => c.map((l) => (l.key === key ? { ...l, qty: l.qty + d } : l)).filter((l) => l.qty > 0));
 
   // ---- start sheet ----
-  const openStart = () => { setWMode(mode || 'pickup'); setAddrErr(''); setWelcome(true); };
+  const openStart = (tab: Mode = 'pickup') => { setWMode(tab); setAddrErr(''); setWelcome(true); };
   const confirmWelcome = () => {
-    if (wMode === 'delivery' && addr.trim().length < 5) { setAddrErr('Enter your street address or postal code.'); return; }
-    setMode(wMode);
+    setMode('pickup');
     setWelcome(false);
     setAddrErr('');
-    showToast(wMode === 'pickup' ? 'Pickup' + (when === 'asap' ? ', as soon as possible' : ' at ' + when) : 'Delivering to ' + addr.trim());
+    showToast('Pickup' + (when === 'asap' ? ', as soon as possible' : ' at ' + when));
   };
 
   // ---- combos (pickup only) ----
-  const addDeal = (id: string) => {
-    if (!pickup) { setMode('pickup'); setCombo(id); showToast('Switched to pickup. Combos are pickup only.'); return; }
-    setCombo(id);
-  };
+  const addDeal = (id: string) => setCombo(id);
 
   const onTile = (t: Tile) => {
     if (t.id === 'byo') setItem({ id: 'byo' });
@@ -214,12 +212,7 @@ export default function App() {
   })();
   const comboDeal = combo ? DEALS.find((d) => d.id === combo) ?? null : null;
 
-  const modeLabel =
-    w < 480
-      ? pickup ? 'Pickup' : 'Delivery'
-      : pickup
-        ? when === 'asap' ? 'Pickup · ' + (open ? 'ASAP' : '11 AM') : 'Pickup · ' + when
-        : addr ? 'Delivery · ' + (addr.length > 16 ? addr.slice(0, 15).trim() + '…' : addr) : 'Delivery';
+  const modeLabel = w < 480 ? 'Pickup' : when === 'asap' ? 'Pickup · ' + (open ? 'ASAP' : '11 AM') : 'Pickup · ' + when;
   const toastBottom = count > 0 ? '100px' : '24px';
   const ctaText = open ? 'Start your order' : 'Order for later';
 
@@ -236,7 +229,7 @@ export default function App() {
         onBest={goSection('bestsellers')}
         onDeals={goSection('deals')}
         onVisit={goSection('visit')}
-        onStart={openStart}
+        onStart={() => openStart()}
         onCart={() => { setCartOpen(true); setToast(null); }}
       />
 
@@ -244,9 +237,8 @@ export default function App() {
         <HomeSections
           w={w}
           h={{
-            onStart: openStart,
+            onStart: () => openStart(),
             onMenu: openMenu,
-            onShahi: () => setItem({ id: 'shahi-paneer' }),
             onTwoLarge: () => addDeal('two-large'),
             onByo: () => setItem({ id: 'byo' }),
             onPasta: openView('pasta'),
@@ -273,7 +265,7 @@ export default function App() {
         onDeals={goSection('deals')}
         onOven={goSection('oven')}
         onPickup={(e) => { e?.preventDefault(); setMode('pickup'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-        onDelivery={(e) => { e?.preventDefault(); setMode('delivery'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        onDelivery={(e) => { e?.preventDefault(); openStart('delivery'); }}
       />
 
       {added && <AddedToast added={added} right={w < 560 ? '16px' : '24px'} bottom={toastBottom} />}
@@ -315,13 +307,13 @@ export default function App() {
       <CartCheckout
         pageBg="#FFFFFF"
         lines={cart}
-        mode={pickup ? 'pickup' : 'delivery'}
+        mode="pickup"
         open={cartOpen}
         onOpen={() => { setCartOpen(true); setToast(null); }}
         onClose={() => setCartOpen(false)}
         onQty={changeQty}
         onAdd={(line) => addLine(line)}
-        onMode={setMode}
+        onMode={() => setMode('pickup')}
         onBrowse={() => { setCartOpen(false); goSection('bestsellers')(); }}
         onPlaced={() => { setCart([]); setCartOpen(false); }}
         when={when}

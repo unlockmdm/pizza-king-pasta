@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</helmet>
+<div role="dialog" aria-modal="true" aria-label="{{ title }}" style="position:fixed;inset:0;z-index:120;background:#fff;color:#1A1414;font-family:'Figtree',system-ui,sans-serif;display:flex;flex-direction:column">
+  <header style="flex:none;display:flex;align-items:center;gap:14px;min-height:72px;padding:10px clamp(16px,3vw,32px);box-sizing:border-box;border-bottom:1px solid #EDEDF0">
+    <button onClick="{{ close }}" aria-label="Close" style="width:44px;height:44px;flex:none;border:0;border-radius:50%;background:#F2F2F5;color:#1A1414;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#E6E6EA"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    <div style="flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column">
+      <span style="display:block;max-width:100%;font-weight:900;font-size:20px;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ title }}</span>
+      <span style="display:block;max-width:100%;font-size:13px;font-weight:600;line-height:1.35;color:#646467;text-wrap:pretty">{{ subtitle }}</span>
+    </div>
+    <span style="flex:none;font-weight:900;font-size:22px;letter-spacing:-.03em">{{ priceText }}</span>
+  </header>
+
+  <div style="flex:1;overflow-y:auto">
+    <div style="max-width:1080px;margin:0 auto;padding:32px clamp(16px,3vw,32px) 140px;display:flex;flex-direction:column;gap:44px">
+
+      <section style="display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px 20px;flex-wrap:wrap">
+          <h2 style="margin:0;font-weight:900;font-size:clamp(26px,3vw,34px);letter-spacing:-.04em">{{ pizzaHead }}</h2>
+          <div role="status" aria-label="{{ pzTAria }}" style="flex:none;display:flex;align-items:center;gap:12px;height:44px;padding:0 6px 0 16px;border-radius:999px;background:{{ pzTBg }};color:{{ pzTFg }};transition:background .25s,color .25s">
+              <span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;white-space:nowrap"><sc-if value="{{ pzTDone }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>{{ pzTText }}</span>
+              <span style="display:flex;padding-left:8px">
+                <sc-for list="{{ pzTSlots }}" as="t" hint-placeholder-count="2">
+                  <span style="width:34px;height:34px;box-sizing:border-box;margin-left:-8px;border-radius:50%;border:2px {{ t.bs }} {{ t.bc }};background-color:#fff;background-image:{{ t.bg }};background-position:center;background-repeat:no-repeat;background-size:{{ t.sz }};box-shadow:{{ t.sh }};transition:border-color .2s"></span>
+                </sc-for>
+              </span>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px">
+          <sc-for list="{{ pizzas }}" as="p" hint-placeholder-count="2">
+            <button onClick="{{ p.edit }}" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;padding:clamp(14px,3.5vw,18px);border:0;border-radius:24px;background:#fff;box-shadow:{{ p.ring }};text-align:left;font-family:inherit;color:#1A1414;cursor:pointer;transition:box-shadow .2s,transform .2s" style-hover="transform:translateY(-2px)">
+              <span style="position:relative;width:clamp(84px,24vw,112px);height:clamp(84px,24vw,112px);flex:none;border-radius:50%;background:radial-gradient(circle,#FFFFFF 0%,#F2F2F5 100%);display:flex;align-items:center;justify-content:center">
+                <img src="assets/pizza-base.png" alt="" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 14px rgba(60,30,10,.22))">
+                <sc-if value="{{ p.done }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:2px;top:2px;width:30px;height:30px;border-radius:50%;background:#1E8A4C;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></sc-if>
+              </span>
+              <span style="flex:1 1 150px;min-width:0;display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:{{ p.kickerColor }}">{{ p.kicker }}</span>
+                <span style="font-weight:900;font-size:22px;letter-spacing:-.03em;line-height:1.1">{{ p.name }}</span>
+                <span style="font-size:14px;line-height:1.45;color:#646467;text-wrap:pretty">{{ p.summary }}</span>
+              </span>
+              <span style="flex:none;margin-left:auto;height:44px;padding:0 18px;border-radius:999px;background:{{ p.btnBg }};color:{{ p.btnFg }};font-weight:800;font-size:14px;display:flex;align-items:center;white-space:nowrap">{{ p.btn }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+
+      <sc-if value="{{ hasDips }}" hint-placeholder-val="{{ true }}">
+        <section style="display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px 20px;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <h2 style="margin:0;font-weight:900;font-size:clamp(26px,3vw,34px);letter-spacing:-.04em">Dipping sauces</h2>
+              <span style="font-size:14px;font-weight:600;color:#646467">{{ dipNote }}</span>
+            </div>
+            <div role="status" aria-label="{{ dipTAria }}" style="flex:none;display:flex;align-items:center;gap:12px;height:44px;padding:0 6px 0 16px;border-radius:999px;background:{{ dipTBg }};color:{{ dipTFg }};transition:background .25s,color .25s">
+              <span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;white-space:nowrap"><sc-if value="{{ dipTDone }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>{{ dipTText }}</span>
+              <span style="display:flex;padding-left:8px">
+                <sc-for list="{{ dipTSlots }}" as="t" hint-placeholder-count="2">
+                  <span style="width:34px;height:34px;box-sizing:border-box;margin-left:-8px;border-radius:50%;border:2px {{ t.bs }} {{ t.bc }};background-color:#fff;background-image:{{ t.bg }};background-position:center;background-repeat:no-repeat;background-size:{{ t.sz }};box-shadow:{{ t.sh }};transition:border-color .2s"></span>
+                </sc-for>
+              </span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,180px),1fr));gap:14px">
+            <sc-for list="{{ dips }}" as="d" hint-placeholder-count="5">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 14px 14px;border-radius:22px;background:#fff;box-shadow:{{ d.ring }};transition:box-shadow .2s">
+                <span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ d.img }}');background-position:center;background-repeat:no-repeat;width:112px;height:112px;background-size:contain"></span>
+                <span style="font-weight:800;font-size:15px;text-align:center;line-height:1.2;min-height:36px;display:flex;align-items:center">{{ d.name }}</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;width:100%;height:44px;padding:0 4px;border-radius:999px;background:#F2F2F5">
+                  <button onClick="{{ d.dec }}" aria-label="{{ d.decAria }}" style="width:36px;height:36px;border:0;border-radius:50%;background:{{ d.decBg }};color:#1A1414;opacity:{{ d.decOp }};cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+                  <span style="font-weight:900;font-size:16px">{{ d.n }}</span>
+                  <button onClick="{{ d.inc }}" aria-label="{{ d.incAria }}" style="width:36px;height:36px;border:0;border-radius:50%;background:#fff;color:#1A1414;opacity:{{ d.incOp }};cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.08)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ hasPops }}" hint-placeholder-val="{{ true }}">
+        <section style="display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px 20px;flex-wrap:wrap">
+            <h2 style="margin:0;font-weight:900;font-size:clamp(26px,3vw,34px);letter-spacing:-.04em">Pops</h2>
+            <div role="status" aria-label="{{ popTAria }}" style="flex:none;display:flex;align-items:center;gap:12px;height:44px;padding:0 6px 0 16px;border-radius:999px;background:{{ popTBg }};color:{{ popTFg }};transition:background .25s,color .25s">
+              <span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;white-space:nowrap"><sc-if value="{{ popTDone }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>{{ popTText }}</span>
+              <span style="display:flex;padding-left:8px">
+                <sc-for list="{{ popTSlots }}" as="t" hint-placeholder-count="2">
+                  <span style="width:34px;height:34px;box-sizing:border-box;margin-left:-8px;border-radius:50%;border:2px {{ t.bs }} {{ t.bc }};background-color:#fff;background-image:{{ t.bg }};background-position:center;background-repeat:no-repeat;background-size:{{ t.sz }};box-shadow:{{ t.sh }};transition:border-color .2s"></span>
+                </sc-for>
+              </span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:12px">
+            <sc-for list="{{ pops }}" as="d" hint-placeholder-count="5">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 14px 14px;border-radius:22px;background:#fff;box-shadow:{{ d.ring }};transition:box-shadow .2s">
+                <span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ d.img }}');background-position:center;background-repeat:no-repeat;width:100%;height:132px;background-size:contain;mix-blend-mode:multiply"></span>
+                <span style="font-weight:800;font-size:15px;text-align:center;line-height:1.2">{{ d.name }}</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;width:100%;height:44px;padding:0 4px;border-radius:999px;background:#F2F2F5">
+                  <button onClick="{{ d.dec }}" aria-label="{{ d.decAria }}" style="width:36px;height:36px;border:0;border-radius:50%;background:{{ d.decBg }};color:#1A1414;opacity:{{ d.decOp }};cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+                  <span style="min-width:16px;text-align:center;font-weight:900;font-size:16px">{{ d.n }}</span>
+                  <button onClick="{{ d.inc }}" aria-label="{{ d.incAria }}" style="width:36px;height:36px;border:0;border-radius:50%;background:#fff;color:#1A1414;opacity:{{ d.incOp }};cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.08)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ hasSide }}" hint-placeholder-val="{{ true }}">
+        <section style="display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#D7192D">On the house</span>
+              <h2 style="margin:0;font-weight:900;font-size:clamp(26px,3vw,34px);letter-spacing:-.04em">Pick your free extra</h2>
+            </div>
+            <div role="status" aria-label="{{ sideTAria }}" style="flex:none;display:flex;align-items:center;gap:12px;height:44px;padding:0 6px 0 16px;border-radius:999px;background:{{ sideTBg }};color:{{ sideTFg }};transition:background .25s,color .25s">
+              <span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;white-space:nowrap"><sc-if value="{{ sideTDone }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>{{ sideTText }}</span>
+              <span style="display:flex;padding-left:8px">
+                <sc-for list="{{ sideTSlots }}" as="t" hint-placeholder-count="2">
+                  <span style="width:34px;height:34px;box-sizing:border-box;margin-left:-8px;border-radius:50%;border:2px {{ t.bs }} {{ t.bc }};background-color:#fff;background-image:{{ t.bg }};background-position:center;background-repeat:no-repeat;background-size:{{ t.sz }};box-shadow:{{ t.sh }};transition:border-color .2s"></span>
+                </sc-for>
+              </span>
+            </div>
+          </div>
+          <div role="radiogroup" aria-label="Free extra" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px">
+            <sc-for list="{{ sides }}" as="s" hint-placeholder-count="2">
+              <button role="radio" aria-checked="{{ s.on }}" onClick="{{ s.pick }}" style="position:relative;aspect-ratio:16/10;padding:0;border:0;border-radius:28px;overflow:hidden;background:#1A1210;cursor:pointer;text-align:left;font-family:inherit;color:#fff;box-shadow:{{ s.shadow }};transform:{{ s.lift }};transition:box-shadow .25s,transform .3s cubic-bezier(.2,.8,.2,1)" style-hover="transform:translateY(-3px)">
+                <span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ s.img }}');background-position:center;background-repeat:no-repeat;position:absolute;inset:0;width:100%;height:100%;background-size:cover;transform:scale({{ s.zoom }});transition:transform .6s cubic-bezier(.2,.8,.2,1)"></span>
+                <span style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,10,8,.88) 0%,rgba(18,10,8,.35) 45%,rgba(18,10,8,0) 70%)"></span>
+                <span style="position:absolute;left:18px;top:18px;height:32px;padding:0 14px;border-radius:999px;background:#fff;color:#1A1414;font-size:13px;font-weight:900;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,.18)"><span style="color:#D7192D">FREE</span><span style="color:#8A7F79;text-decoration:line-through;font-weight:700">{{ s.worth }}</span></span>
+                <span style="position:absolute;right:18px;top:18px;width:36px;height:36px;border-radius:50%;background:{{ s.checkBg }};box-shadow:{{ s.checkRing }};display:flex;align-items:center;justify-content:center;color:#fff;transition:background .2s"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ s.checkOp }};transition:opacity .2s"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+                <span style="position:absolute;left:20px;right:20px;bottom:18px;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-weight:900;font-size:clamp(22px,2.4vw,28px);letter-spacing:-.035em;line-height:1.05">{{ s.name }}</span>
+                  <span style="font-size:14px;font-weight:600;color:#E2D7D1">{{ s.desc }}</span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+    </div>
+  </div>
+
+  <footer style="position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;padding:14px clamp(16px,3vw,32px) 18px;background:linear-gradient(0deg,#fff 70%,rgba(255,255,255,0))">
+    <button onClick="{{ primary }}" style="width:100%;max-width:560px;height:60px;border:0;border-radius:999px;background:{{ primaryBg }};color:#fff;font-family:inherit;font-weight:800;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 26px;box-shadow:0 14px 30px rgba(215,25,45,.25);transition:background .2s" style-hover="background:#B5121F"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ primaryLabel }}</span><span style="white-space:nowrap">{{ totalText }}</span></button>
+  </footer>
+
+  <sc-if value="{{ editing }}" hint-placeholder-val="{{ false }}">
+    <dc-import name="PizzaBuilder" item="{{ editItem }}" combo="{{ editCombo }}" size-prices="{{ sizePrices }}" on-close="{{ closeEdit }}" on-add="{{ saveEdit }}" hint-size="100%,100%" style="position:fixed;inset:0;z-index:130"></dc-import>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: &quot;1280px&quot;, &quot;height&quot;: &quot;860px&quot;}, &quot;deal&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;{id,name,price}&quot;}, &quot;sizePrices&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;object&quot;}, &quot;onAdd&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;(line, qty) =&gt; void&quot;}, &quot;onClose&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;() =&gt; void&quot;}}">const money = n => '$' + n.toFixed(2);
+const EXTRA_DIP = 1.33, MAX_DIPS = 8;
+const SIZE_NAME = { S: 'Small', M: 'Medium', L: 'Large', XL: 'X-Large' };
+const DIPS = [['garlic', 'Creamy garlic'], ['ranch', 'Ranch'], ['chipotle', 'Chipotle'], ['jalapeno-cheddar', 'Jalapeño cheddar'], ['marinara', 'Marinara']];
+const POPS = ['Coca-Cola', 'Pepsi', 'Sprite', 'Canada Dry', 'Orange Crush'];
+const POP_IMG = { 'Coca-Cola': 'n-coke.png', Pepsi: 'n-pepsi.png', Sprite: 'n-sprite.png', 'Canada Dry': 'n-canada-dry.png', 'Orange Crush': 'n-crush.png' };
+const SIDES = [['sugarcane', 'Sugarcane juice', 'assets/menu/juice-mix.png', '$6.81', 'Fresh pressed, ice cold'], ['corn', 'Wood-oven corn', 'assets/ingredients/corn.jpg', '$5.00', 'Sweet corn from the wood oven']];
+const SPEC = {
+  'one-large': { size: 'L', pizzas: 1, tops: 1, dips: 0, pops: 0, side: false },
+  'two-large': { size: 'L', pizzas: 2, tops: 4, dips: 2, pops: 2, side: true },
+  'two-medium': { size: 'M', pizzas: 2, tops: 4, dips: 2, pops: 2, side: true },
+  'two-small': { size: 'S', pizzas: 2, tops: 4, dips: 2, pops: 0, side: false },
+};
+class Component extends DCLogic {
+  state = { pizzas: {}, dips: {}, pops: {}, side: null, edit: (SPEC[(this.props.deal || {}).id] || {}).pizzas === 1 ? 0 : null };
+  componentDidMount() { this.onK = e => { if (e.key === 'Escape' && this.state.edit == null && this.props.onClose) this.props.onClose(); }; window.addEventListener('keydown', this.onK); }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onK); }
+  renderVals() {
+    const deal = this.props.deal || { id: 'two-large', name: 'Two Large', price: 36 };
+    const sp = SPEC[deal.id] || SPEC['two-large'];
+    const s = this.state;
+    const sum = o => Object.values(o).reduce((a, b) => a + b, 0);
+    const nd = sum(s.dips), np = sum(s.pops);
+    const extra = Object.values(s.pizzas).reduce((a, p) => a + Math.max(0, p.cfg.extra || 0), 0);
+    const extraDips = Math.max(0, nd - sp.dips);
+    const total = deal.price + extra + extraDips * EXTRA_DIP;
+    const step = (bag, max) => list => list.map(([id, name, img]) => {
+      const n = s[bag][id] || 0, full = sum(s[bag]) >= max;
+      return { name, img, n, ring: n ? 'inset 0 0 0 2px #D7192D' : 'inset 0 0 0 1px #E6E6EA',
+        decBg: 'transparent', decOp: n ? 1 : .35, incOp: full ? .35 : 1,
+        decAria: 'Remove ' + name, incAria: 'Add ' + name,
+        dec: () => this.setState(st => { const b = { ...st[bag] }; if (b[id]) b[id]--; if (!b[id]) delete b[id]; return { [bag]: b }; }),
+        inc: () => this.setState(st => sum(st[bag]) >= max ? null : { [bag]: { ...st[bag], [id]: (st[bag][id] || 0) + 1 } }) };
+    });
+    const pz = Array.from({ length: sp.pizzas }, (_, i) => i);
+    const missing = pz.find(i => !s.pizzas[i]);
+    const dipsOk = nd >= sp.dips, popsOk = np >= sp.pops, sideOk = !sp.side || !!s.side;
+    const ready = missing == null && dipsOk && popsOk && sideOk;
+    const editAt = i => () => this.setState({ edit: i });
+    let primaryLabel = 'Add to order', primary = () => {};
+    if (missing != null) { primaryLabel = 'Customize pizza ' + (missing + 1); primary = editAt(missing); }
+    else if (!dipsOk) primaryLabel = 'Choose ' + (sp.dips - nd) + ' more dip' + (sp.dips - nd > 1 ? 's' : '');
+    else if (!popsOk) primaryLabel = 'Choose ' + (sp.pops - np) + ' more pop' + (sp.pops - np > 1 ? 's' : '');
+    else if (!sideOk) primaryLabel = 'Choose juice or corn';
+    if (ready) primary = () => {
+      const parts = pz.map(i => 'Pizza ' + (i + 1) + ': ' + (s.pizzas[i].summary || 'Cheese'));
+      const dl = DIPS.filter(([id]) => s.dips[id]).map(([id, n]) => (s.dips[id] > 1 ? s.dips[id] + '× ' : '') + n);
+      const pl = POPS.filter(n => s.pops[n]).map(n => (s.pops[n] > 1 ? s.pops[n] + '× ' : '') + n);
+      if (dl.length) parts.push('Dips: ' + dl.join(', '));
+      if (pl.length) parts.push('Pops: ' + pl.join(', '));
+      if (sp.side) parts.push(SIDES.find(x => x[0] === s.side)[1]);
+      const key = [deal.id, JSON.stringify(s.pizzas), JSON.stringify(s.dips), JSON.stringify(s.pops), s.side].join('|');
+      this.props.onAdd && this.props.onAdd({ key, name: deal.name + ' combo', summary: parts.join(' · '), unit: Math.round(total * 100) / 100 }, 1);
+    };
+    const ei = s.edit;
+    const solo = sp.pizzas === 1 && !sp.dips && !sp.pops && !sp.side;
+    const tw = n => n + (n > 1 ? ' toppings' : ' topping');
+    const url = u => u ? 'url("' + u + '")' : 'none';
+    const track = (imgs, max, sz, unit) => {
+      const n = imgs.length, done = n >= max;
+      return { Done: done, Text: done ? 'All set' : (n + ' of ' + max + (unit ? ' ' + unit : '')), Aria: n + ' of ' + max + ' chosen', Bg: done ? '#E8F5EC' : '#F2F2F5', Fg: done ? '#1E7A3C' : '#1A1414',
+        Slots: Array.from({ length: max }, (_, i) => { const im = imgs[i]; return { bg: url(im), sz: sz, bs: im ? 'solid' : 'dashed', bc: im ? '#fff' : '#C7C7CC', sh: im ? '0 2px 8px rgba(26,20,20,.16)' : 'none' }; }) };
+    };
+    const pre = (k, o) => Object.keys(o).reduce((a, x) => (a[k + x] = o[x], a), {});
+    const dipImgs = [].concat(...DIPS.map(([id]) => Array(s.dips[id] || 0).fill('assets/dips/' + id + '.png')));
+    const popImgs = [].concat(...POPS.map(n => Array(s.pops[n] || 0).fill('assets/pops/' + POP_IMG[n])));
+    const pzImgs = pz.filter(i => s.pizzas[i]).map(() => 'assets/pizza-base.png');
+    const sideImgs = s.side ? [SIDES.find(x => x[0] === s.side)[2]] : [];
+    const trackers = { ...pre('pzT', track(pzImgs, sp.pizzas, '118%', 'ready')), ...pre('dipT', track(dipImgs, sp.dips || 0, '84%')), ...pre('popT', track(popImgs, sp.pops || 0, 'auto 78%')), ...pre('sideT', track(sideImgs, sp.side ? 1 : 0, 'cover')) };
+    return {
+      ...trackers,
+      title: deal.name + ' combo',
+      subtitle: [sp.pizzas + ' ' + SIZE_NAME[sp.size].toLowerCase() + (sp.pizzas > 1 ? ' pizzas' : ' pizza'), tw(sp.tops) + (sp.pizzas > 1 ? ' each' : ''), sp.dips ? sp.dips + ' dips' : '', sp.pops ? sp.pops + ' pops' : '', 'Pickup only'].filter(Boolean).join(' · '),
+      priceText: money(deal.price),
+      close: () => this.props.onClose && this.props.onClose(),
+      pizzaHead: sp.pizzas > 1 ? 'Your pizzas' : 'Your pizza',
+      pizzaRule: tw(sp.tops) + ' included' + (sp.pizzas > 1 ? ' on each' : ''),
+      pizzas: pz.map(i => { const p = s.pizzas[i]; return {
+        kicker: p ? 'Done' : SIZE_NAME[sp.size], kickerColor: p ? '#1E8A4C' : '#D7192D', done: !!p,
+        name: sp.pizzas > 1 ? 'Pizza ' + (i + 1) : SIZE_NAME[sp.size] + ' pizza',
+        summary: p ? (p.summary || 'Cheese') + (p.cfg.extra > 0.001 ? ' · +' + money(p.cfg.extra) : '') : 'Pick your sauce, cheese and ' + tw(sp.tops) + '.',
+        btn: p ? 'Edit' : 'Customize', btnBg: p ? '#F2F2F5' : '#D7192D', btnFg: p ? '#1A1414' : '#fff',
+        ring: p ? 'inset 0 0 0 1px #E6E6EA' : 'inset 0 0 0 2px #D7192D', edit: editAt(i) }; }),
+      hasDips: sp.dips > 0, dipCount: nd + ' of ' + sp.dips + ' chosen', dipNote: 'Want more? Add extra dips from the menu.', dipCountColor: dipsOk ? '#1E8A4C' : '#646467',
+      dips: step('dips', sp.dips)(DIPS.map(([id, n]) => [id, n, 'assets/dips/top-' + id + '.png'])),
+      hasPops: sp.pops > 0, popCount: np + ' of ' + sp.pops + ' chosen', popCountColor: popsOk ? '#1E8A4C' : '#646467',
+      pops: step('pops', sp.pops)(POPS.map(n => [n, n, 'assets/pops/' + POP_IMG[n]])),
+      hasSide: sp.side, sideCount: s.side ? 'Added' : 'Choose 1', sideCountColor: s.side ? '#1E8A4C' : '#646467',
+      sides: SIDES.map(([id, name, img, worth, desc]) => { const on = s.side === id; return { name, img, worth, desc, on, shadow: on ? '0 0 0 3px #fff,0 0 0 6px #D7192D,0 18px 40px rgba(215,25,45,.22)' : '0 10px 28px rgba(26,20,20,.12)', lift: on ? 'translateY(-3px)' : 'none', zoom: on ? 1.06 : 1, checkBg: on ? '#D7192D' : 'rgba(255,255,255,.18)', checkRing: on ? 'none' : 'inset 0 0 0 2px rgba(255,255,255,.85)', checkOp: on ? 1 : 0, ring: on ? 'inset 0 0 0 2px #D7192D' : 'inset 0 0 0 1px #E6E6EA', dot: on ? '8px' : '0', dotRing: on ? '#D7192D' : '#C9C9CE', pick: () => this.setState({ side: id }) }; }),
+      primary, primaryLabel, primaryBg: ready || missing != null ? '#D7192D' : '#9A9A9F', totalText: money(total),
+      editing: ei != null,
+      showSheet: !solo,
+      editItem: ei != null ? { id: 'byo', name: solo ? deal.name : 'Pizza ' + (ei + 1), desc: SIZE_NAME[sp.size] + ' · ' + tw(sp.tops) + ' included', tops: [], included: sp.tops } : null,
+      editCombo: ei != null ? { size: sp.size, btn: solo ? 'Add to order' : 'Save pizza ' + (ei + 1), init: s.pizzas[ei] ? s.pizzas[ei].cfg : null } : null,
+      sizePrices: this.props.sizePrices,
+      closeEdit: () => solo ? (this.props.onClose && this.props.onClose()) : this.setState({ edit: null }),
+      saveEdit: (line, qty, cfg) => { cfg = cfg || { extra: 0 }; const bits = [(cfg.topNames && cfg.topNames.length) ? cfg.topNames.join(', ') : 'Cheese only']; if (cfg.crustName && cfg.crustName !== 'Regular') bits.push(cfg.crustName.toLowerCase() + ' crust'); if (cfg.sauceName && cfg.sauceName !== 'Regular') bits.push(cfg.sauceName.toLowerCase() + ' sauce'); if (cfg.cheeseName && cfg.cheeseName !== 'Regular') bits.push(cfg.cheeseName === 'None' ? 'no cheese' : cfg.cheeseName.toLowerCase() + ' cheese'); if (cfg.notes && cfg.notes.trim()) bits.push('Note: ' + cfg.notes.trim()); if (solo) { const ex = Math.max(0, cfg.extra || 0); this.props.onAdd && this.props.onAdd({ key: [deal.id, JSON.stringify(cfg)].join('|'), name: deal.name + ' combo', summary: bits.join(' · '), unit: Math.round((deal.price + ex) * 100) / 100 }, 1); return; } this.setState(st => ({ edit: null, pizzas: { ...st.pizzas, [st.edit]: { summary: bits.join(' · '), cfg } } })); },
+    };
+  }
+}</script>
+</body>
+</html>

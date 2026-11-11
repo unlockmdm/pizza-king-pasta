@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="image-slot.js"></script>
+</helmet>
+<div data-screen-label="Pasta Bar" style="font-family:'Figtree',system-ui,sans-serif;color:#1A1414;background:#fff;padding-bottom:96px">
+
+  <section style="max-width:1320px;margin:0 auto;padding:16px clamp(16px,3vw,32px) 0">
+    <div style="position:relative;border-radius:32px;overflow:hidden;background:#1A1210;color:#fff;display:grid;grid-template-columns:{{ heroCols }};min-height:clamp(320px,40vh,420px)">
+      <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}"><img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?fm=jpg&q=72&w=1200&auto=format&fit=crop" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(26,18,16,.95) 0%,rgba(26,18,16,.55) 55%,rgba(26,18,16,.25) 100%)"></div></sc-if>
+      <div style="position:relative;z-index:1;display:flex;flex-direction:column;justify-content:space-between;gap:40px;padding:clamp(22px,4vw,52px)">
+        <button onClick="{{ back }}" style="align-self:flex-start;display:flex;align-items:center;gap:8px;height:44px;padding:0 18px 0 14px;border:0;border-radius:999px;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.24);color:#fff;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer" style-hover="background:rgba(255,255,255,.22)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Back</button>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <span style="font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#F2B53A">The Pasta Bar</span>
+          <h1 style="margin:0;font-weight:900;font-size:clamp(48px,6.6vw,92px);line-height:.9;letter-spacing:-.055em">Pick a sauce.<br><span style="color:#F2B53A">We do the rest.</span></h1>
+          <p style="margin:0;max-width:440px;font-size:17px;line-height:1.5;color:#D9D0CA;text-wrap:pretty">Rosé, Alfredo or tomato. Classic, veggie or chicken. Cooked to order, with parmesan, ginger and parsley.</p>
+        </div>
+      </div>
+      <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+        <div style="position:relative;min-height:100%">
+          <image-slot id="pastabar-hero" shape="rect" credit="Photo on Unsplash" credit-href="https://unsplash.com" src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?fm=jpg&q=72&w=1400&auto=format&fit=crop" placeholder="Pasta photo" style="position:absolute;inset:0;display:block;width:100%;height:100%"></image-slot>
+          <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#1A1210 0%,rgba(26,18,16,0) 40%)"></div>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+
+  <section style="max-width:1320px;margin:0 auto;padding:40px clamp(16px,3vw,32px) 0;display:grid;grid-template-columns:{{ bodyCols }};gap:40px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:48px;min-width:0">
+
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+                    <span style="font-weight:900;font-size:14px;letter-spacing:.12em;color:#D7192D">01</span><h2 style="margin:0;font-weight:900;font-size:clamp(28px,3vw,36px);letter-spacing:-.04em">Choose your sauce</h2>
+        </div>
+        <div role="radiogroup" aria-label="Sauce" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px">
+          <sc-for list="{{ sauces }}" as="o" hint-placeholder-count="3">
+            <button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.pick }}" style="display:flex;flex-direction:column;padding:0;border:0;border-radius:24px;overflow:hidden;background:#fff;box-shadow:{{ o.ring }};font-family:inherit;color:#1A1414;text-align:left;cursor:pointer;transition:box-shadow .2s,transform .2s" style-hover="transform:translateY(-3px)">
+              <span style="position:relative;display:block;aspect-ratio:4/3;background:#EDEDF0;overflow:hidden">
+                <span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ o.img }}');background-position:center;background-repeat:no-repeat;position:absolute;inset:0;width:100%;height:100%;background-size:cover;transform:scale({{ o.zoom }});transition:transform .5s cubic-bezier(.2,.8,.2,1)"></span>
+                <span style="position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;background:{{ o.tickBg }};box-shadow:0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;color:#fff;transition:background .2s"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+              </span>
+              <span style="display:flex;flex-direction:column;gap:4px;padding:16px 18px 18px">
+                <span style="font-weight:900;font-size:21px;letter-spacing:-.03em">{{ o.name }}</span>
+                <span style="font-size:14px;line-height:1.4;color:#646467">{{ o.desc }}</span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+                    <span style="font-weight:900;font-size:14px;letter-spacing:.12em;color:#D7192D">02</span><h2 style="margin:0;font-weight:900;font-size:clamp(28px,3vw,36px);letter-spacing:-.04em">Choose your pasta</h2>
+        </div>
+        <div role="radiogroup" aria-label="Pasta" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px">
+          <sc-for list="{{ bases }}" as="b" hint-placeholder-count="3">
+            <button role="radio" aria-checked="{{ b.on }}" aria-disabled="{{ b.off }}" onClick="{{ b.pick }}" style="display:flex;flex-direction:column;padding:0;border:0;border-radius:24px;overflow:hidden;background:#fff;box-shadow:{{ b.ring }};opacity:{{ b.op }};font-family:inherit;color:#1A1414;text-align:left;cursor:{{ b.cursor }};transition:box-shadow .2s,transform .2s,opacity .2s" style-hover="{{ b.hover }}">
+              <span style="position:relative;display:block;aspect-ratio:4/3;background:{{ b.tint }};overflow:hidden">
+                <sc-for list="{{ b.ings }}" as="g" hint-placeholder-count="0">
+                  <span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ g.src }}');background-position:center;background-repeat:no-repeat;position:absolute;left:{{ g.x }};top:{{ g.y }};width:{{ g.w }};aspect-ratio:1/1;background-size:contain;transform:translate(-50%,-50%) rotate({{ g.r }}) scale({{ b.zoom }});filter:drop-shadow(0 10px 14px rgba(0,0,0,.18));transition:transform .5s cubic-bezier(.2,.8,.2,1)"></span>
+                </sc-for>
+                <span style="position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;background:{{ b.tickBg }};box-shadow:0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;color:#fff;transition:background .2s"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+                <sc-if value="{{ b.noBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:12px;top:12px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#fff;color:#12663A;font-size:12px;font-weight:800;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,.1)"><span style="width:8px;height:8px;border-radius:50%;background:#1E9E4A"></span>Veg</span></sc-if>
+              </span>
+              <span style="display:flex;flex-direction:column;gap:4px;padding:16px 18px 18px;flex:1">
+                <span style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><span style="font-weight:900;font-size:21px;letter-spacing:-.03em">{{ b.name }}</span><span style="font-weight:900;font-size:17px;white-space:nowrap">{{ b.price }}</span></span>
+                <span style="font-size:14px;line-height:1.4;color:#646467">{{ b.desc }}</span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+    </div>
+
+    <aside style="position:{{ asidePos }};top:96px;display:flex;flex-direction:column;border-radius:28px;overflow:hidden;background:#1A1414;color:#fff">
+      <div style="position:relative;aspect-ratio:{{ bowlRatio }};background:#2A2020;overflow:hidden">
+        <span role="img" aria-label="{{ bowl.title }}" style="display:block;flex:none;background-image:url('{{ bowl.img }}');background-position:center;background-repeat:no-repeat;position:absolute;inset:0;width:100%;height:100%;background-size:cover"></span>
+        <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(26,20,20,1) 0%,rgba(26,20,20,0) 55%)"></div>
+        <span style="position:absolute;left:20px;top:18px;height:30px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.16);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;display:flex;align-items:center">Your bowl</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;padding:0 22px 22px;margin-top:-28px;position:relative">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-weight:900;font-size:26px;letter-spacing:-.035em;line-height:1.1">{{ bowl.title }}</span>
+          <span style="font-size:14px;line-height:1.5;color:#CFC6C0">{{ bowl.desc }}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9C928C">Spice level</span>
+          <div role="radiogroup" aria-label="Spice level" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">
+            <sc-for list="{{ spiceOpts }}" as="v" hint-placeholder-count="4">
+              <button role="radio" aria-checked="{{ v.on }}" onClick="{{ v.pick }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border:0;border-radius:12px;background:{{ v.bg }};color:{{ v.fg }};font-family:inherit;font-weight:700;font-size:14px;white-space:nowrap;cursor:pointer;transition:background .15s,color .15s"><span aria-hidden="true" style="display:flex;gap:3px"><sc-for list="{{ v.dots }}" as="d" hint-placeholder-count="3"><span style="width:6px;height:6px;border-radius:50%;background:{{ d.bg }}"></span></sc-for></span>{{ v.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+          <div style="flex:none;display:flex;align-items:center;gap:2px;height:52px;padding:0 4px;border-radius:999px;background:rgba(255,255,255,.1)">
+            <button onClick="{{ dec }}" aria-label="Decrease quantity" style="width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(255,255,255,.12)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+            <span style="min-width:20px;text-align:center;font-weight:900;font-size:17px">{{ qty }}</span>
+            <button onClick="{{ inc }}" aria-label="Increase quantity" style="width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(255,255,255,.12)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+          </div>
+          <button onClick="{{ add }}" style="flex:1 1 190px;min-width:0;height:52px;white-space:nowrap;border:0;border-radius:999px;background:{{ addBg }};color:#fff;font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 20px;transition:background .2s" style-hover="background:#B5121F"><span>{{ addLabel }}</span><span>{{ totalText }}</span></button>
+        </div>
+      </div>
+    </aside>
+  </section>
+  <section style="max-width:1320px;margin:0 auto;padding:48px clamp(16px,3vw,32px) 0">
+  <div style="max-width:{{ momoMax }}">
+      <div style="display:flex;flex-direction:column;gap:18px;border-top:1px solid #EDEDF0">
+        <div style="display:flex;flex-direction:column;gap:4px;padding-top:28px">
+          <span style="font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#818184">Also at the bar</span>
+          <h2 style="margin:0;font-weight:900;font-size:clamp(28px,3vw,36px);letter-spacing:-.04em">Momos</h2>
+        </div>
+        <div style="display:grid;grid-template-columns:{{ momoCols }};border-radius:28px;overflow:hidden;background:#1A1414;color:#fff">
+          <div style="position:relative;min-height:260px;background:#2A2020">
+            <image-slot id="pastabar-momos" shape="rect" credit="Photo on Unsplash" credit-href="https://unsplash.com" src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?fm=jpg&q=72&w=1000&auto=format&fit=crop" placeholder="Momos photo" style="position:absolute;inset:0;display:block;width:100%;height:100%"></image-slot>
+          </div>
+          <div style="display:flex;flex-direction:column;justify-content:center;gap:22px;padding:clamp(22px,3vw,36px)">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-weight:900;font-size:clamp(30px,3vw,40px);letter-spacing:-.045em;line-height:1">Steamed momos</span>
+              <span style="font-size:15px;line-height:1.5;color:#CFC6C0">Dumplings, steamed to order.</span>
+            </div>
+            <div role="radiogroup" aria-label="Momos" style="display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(255,255,255,.1)">
+              <sc-for list="{{ momos }}" as="m" hint-placeholder-count="2">
+                <button role="radio" aria-checked="{{ m.on }}" onClick="{{ m.pick }}" style="flex:1;min-width:0;height:48px;border:0;border-radius:999px;background:{{ m.bg }};color:{{ m.fg }};font-family:inherit;font-weight:800;font-size:15px;white-space:nowrap;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,color .2s">{{ m.name }}<span style="opacity:.7;font-weight:700">{{ m.price }}</span></button>
+              </sc-for>
+            </div>
+            <button onClick="{{ addMomo }}" style="height:54px;border:0;border-radius:999px;background:{{ momoBtnBg }};color:#fff;font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 22px;transition:background .2s" style-hover="background:#B5121F"><span>{{ momoBtn }}</span><span>{{ momoPrice }}</span></button>
+          </div>
+        </div>
+      </div>
+  </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;onAdd&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;(line, qty) =&gt; void&quot;}, &quot;onBack&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;() =&gt; void&quot;}, &quot;onMenu&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;() =&gt; void&quot;}}">
+const U = (id, w) => id.indexOf('assets/') === 0 ? id : 'https://images.unsplash.com/photo-' + id + '?fm=jpg&q=72&w=' + (w || 900) + '&auto=format&fit=crop';
+const money = n => '$' + n.toFixed(2);
+const SAUCES = [
+  ['rose', 'Rosé', 'Tomato, cream, parmesan', 'assets/menu/pasta-rose.png'],
+  ['alfredo', 'Alfredo', 'Cream, parmesan', 'assets/menu/pasta-alfredo.png'],
+  ['tomato', 'Tomato', 'Tomato sauce', '1598866594230-a7c12756260f'],
+];
+const BASES = [
+  { id: 'classic', name: 'Classic', tint: '#F6F0E4', ings: [['ginger', 34, 44, 46, -12], ['coriander', 68, 58, 44, 18]], desc: 'Ginger and parsley', p: { rose: 12.5, alfredo: 13 } },
+  { id: 'veggie', name: 'Veggie', veg: true, tint: '#EAF3E6', ings: [['broccoli', 30, 36, 36, -10], ['mushrooms', 70, 34, 34, 14], ['green-peppers', 34, 70, 36, 8], ['red-onions', 70, 70, 34, -16]], desc: 'Green pepper, onion, broccoli, mushroom', p: { rose: 13.27, tomato: 12.5, alfredo: 13.72 } },
+  { id: 'chicken', name: 'Chicken', tint: '#F7ECE4', ings: [['tandoori-chicken', 46, 48, 52, -6], ['green-peppers', 78, 30, 30, 20], ['red-onions', 78, 72, 30, -12]], desc: 'Green pepper, onion, chicken', p: { rose: 14.6, tomato: 14, alfredo: 15.04 } },
+];
+const PHOTO = { 'chicken-tomato': '1611270629569-8b357cb88da9', };
+const MOMOS = [['veg', 'Veggie', 9], ['nonveg', 'Non-veggie', 11]];
+const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
+
+class Component extends DCLogic {
+  state = { momo: 'veg', sauce: 'rose', base: 'classic', spice: 'No spice', qty: 1, added: false, addedM: null, w: typeof window !== 'undefined' ? window.innerWidth : 1200 };
+  componentDidMount() { this.onR = () => this.setState({ w: window.innerWidth }); window.addEventListener('resize', this.onR); }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); clearTimeout(this.t); }
+  flash(patch) { clearTimeout(this.t); this.setState(patch); this.t = setTimeout(() => this.setState({ added: false, addedM: null }), 1400); }
+  renderVals() {
+    const s = this.state, wide = s.w >= 980;
+    const base = BASES.find(b => b.id === s.base);
+    const sauce = SAUCES.find(x => x[0] === s.sauce);
+    const price = base.p[s.sauce];
+    const img = U(PHOTO[s.base + '-' + s.sauce] || sauce[3], 900);
+    const title = (base.id === 'classic' ? '' : base.name + ' ') + 'pasta, ' + sauce[1].toLowerCase() + ' sauce';
+    return {
+      spiceOpts: SPICES.map((v, i) => { const on = s.spice === v; return { label: v, on, bg: on ? '#fff' : 'rgba(255,255,255,.08)', fg: on ? '#1A1414' : '#fff', dots: [0, 1, 2].map(d => ({ bg: d < i ? '#FF5A4E' : (on ? '#E3E3E7' : 'rgba(255,255,255,.22)') })), pick: () => this.setState({ spice: v }) }; }),
+      back: e => { if (e && e.preventDefault) e.preventDefault(); this.props.onBack && this.props.onBack(); },
+      wide, narrow: !wide, momoMax: 'none', heroCols: wide ? 'minmax(0,1.1fr) minmax(0,1fr)' : 'minmax(0,1fr)',
+      bodyCols: wide ? 'minmax(0,1fr) 380px' : 'minmax(0,1fr)', asidePos: wide ? 'sticky' : 'relative', bowlRatio: wide ? '4/3' : '16/10',
+      sauces: SAUCES.map(([id, name, desc, ph]) => { const on = s.sauce === id; return { name, desc, img: U(ph, 600), on, zoom: on ? 1.06 : 1, tickBg: on ? '#D7192D' : 'rgba(0,0,0,.25)', ring: on ? '0 0 0 3px #D7192D, 0 16px 32px rgba(215,25,45,.16)' : '0 0 0 1px #E6E6EA',
+        pick: () => this.setState(st => ({ sauce: id, base: BASES.find(b => b.id === st.base).p[id] != null ? st.base : 'veggie' })) }; }),
+      bases: BASES.map(b => { const ok = b.p[s.sauce] != null, on = s.base === b.id; return { name: b.name, veg: !!b.veg, desc: ok ? b.desc : 'Rosé or Alfredo only', price: ok ? money(b.p[s.sauce]) : '', on, off: !ok, op: ok ? 1 : .4, cursor: ok ? 'pointer' : 'default', tint: b.tint, zoom: on ? 1.08 : 1, hover: ok ? 'transform:translateY(-3px)' : '',
+        ings: b.ings.map(([f, x, y, w, r]) => ({ src: 'assets/ingredients/' + f + '.png', x: x + '%', y: y + '%', w: w + '%', r: r + 'deg' })), tickBg: on ? '#D7192D' : 'rgba(0,0,0,.25)',
+        ring: on ? '0 0 0 3px #D7192D, 0 16px 32px rgba(215,25,45,.16)' : '0 0 0 1px #E6E6EA', pick: () => { if (ok) this.setState({ base: b.id }); } }; }),
+      bowl: { img, title: title.charAt(0).toUpperCase() + title.slice(1), desc: base.desc + ' · ' + sauce[2] + '. Prices before tax.' },
+      qty: s.qty, totalText: money(price * s.qty),
+      inc: () => this.setState(st => ({ qty: Math.min(20, st.qty + 1) })), dec: () => this.setState(st => ({ qty: Math.max(1, st.qty - 1) })),
+      addLabel: s.added ? 'Added' : 'Add to order', addBg: s.added ? '#1E8A4C' : '#D7192D',
+      add: () => { this.props.onAdd && this.props.onAdd({ key: 'pasta-' + s.base + '-' + s.sauce + '-' + s.spice, name: title.charAt(0).toUpperCase() + title.slice(1), summary: base.desc + ' · ' + s.spice, unit: price }, s.qty); this.flash({ added: true, qty: 1 }); },
+      momoCols: wide ? 'minmax(0,1.1fr) minmax(0,1fr)' : 'minmax(0,1fr)',
+      momos: MOMOS.map(([id, name, pr]) => { const on = s.momo === id; return { name, price: money(pr), on, bg: on ? '#fff' : 'transparent', fg: on ? '#1A1414' : '#fff', pick: () => this.setState({ momo: id }) }; }),
+      momoPrice: money(MOMOS.find(m => m[0] === s.momo)[2]), momoBtn: s.addedM ? 'Added' : 'Add to order', momoBtnBg: s.addedM ? '#1E8A4C' : '#D7192D',
+      addMomo: () => { const m = MOMOS.find(x => x[0] === s.momo); this.props.onAdd && this.props.onAdd({ key: 'momos-' + m[0], name: m[1] + ' momos', summary: 'Steamed dumplings', unit: m[2] }, 1); this.flash({ addedM: m[0] }); },
+    };
+  }
+}
+</script>
+</body>
+</html>

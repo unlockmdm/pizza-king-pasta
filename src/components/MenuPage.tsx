@@ -42,20 +42,35 @@ const PIZZA_PHOTO: Record<string, string> = {
  * ("leave an empty image box rather than a misleading picture").
  */
 const ROW_PIC: Record<string, string> = {
-  'dip-garlic': 'assets/dips/garlic.png',
-  'dip-ranch': 'assets/dips/ranch.png',
-  'dip-chipotle': 'assets/dips/chipotle.png',
-  'dip-jalapeno': 'assets/dips/jalapeno-cheddar.png',
-  'dip-marinara': 'assets/dips/marinara.png',
+  'fruit-juice': 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  espresso: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  hot: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  beer: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  shake: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  momos: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  chaat: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  sub: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  'nv-salad': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  'v-salad': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  wedges: 'https://images.unsplash.com/photo-1623238913973-21e45cced554?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  leg: 'https://images.unsplash.com/photo-1617692855027-33b14f061079?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  'dip-garlic': 'assets/dips/menu-garlic.png',
+  'dip-ranch': 'assets/dips/menu-ranch.png',
+  'dip-chipotle': 'assets/dips/menu-chipotle.png',
+  'dip-jalapeno': 'assets/dips/menu-jalapeno-cheddar.png',
+  'dip-marinara': 'assets/dips/menu-marinara.png',
   wings: 'assets/ingredients/tandoori-chicken.png',
-  'pasta-rose': 'assets/menu/pasta.jpg',
-  'pasta-alfredo': 'assets/menu/pasta.jpg',
-  'veg-pasta-rose': 'assets/menu/pasta.jpg',
-  'veg-pasta-alfredo': 'assets/menu/pasta.jpg',
-  'ch-pasta-rose': 'assets/menu/pasta.jpg',
-  'ch-pasta-alfredo': 'assets/menu/pasta.jpg',
+  'pasta-rose': 'assets/menu/pasta-rose.png',
+  'pasta-alfredo': 'assets/menu/pasta-alfredo.png',
+  'veg-pasta-rose': 'assets/menu/pasta-rose.png',
+  'veg-pasta-alfredo': 'assets/menu/pasta-alfredo.png',
+  'ch-pasta-rose': 'assets/menu/pasta-rose.png',
+  'ch-pasta-alfredo': 'assets/menu/pasta-alfredo.png',
+  'veg-pasta-tomato': 'assets/menu/pasta.jpg',
+  'ch-pasta-tomato': 'assets/menu/pasta.jpg',
   cone: 'assets/menu/gelato.jpg',
   cup: 'assets/menu/gelato.jpg',
+  lassi: 'assets/menu/juice.jpg',
   corn: 'assets/ingredients/corn.jpg',
 };
 
@@ -222,8 +237,8 @@ const SECTIONS: Section[] = [
     ['chaat', 'Fruit chaat', 'With sweet potatoes', [['', 8.01]]],
   ] },
   { id: 'pasta', title: 'Pasta & momos', rows: [
-    ['pasta-rose', 'Pasta, rosé sauce', 'Tomato sauce, cream, parmesan, ginger, parsley', [['', 12.5]], true],
-    ['pasta-alfredo', 'Pasta, Alfredo sauce', 'Cream, parmesan, ginger, parsley', [['', 13]], true],
+    ['pasta-rose', 'Rosé sauce pasta', 'Tomato sauce, cream, parmesan, ginger, parsley', [['', 12.5]], true],
+    ['pasta-alfredo', 'Alfredo sauce pasta', 'Cream, parmesan, ginger, parsley', [['', 13]], true],
     ['veg-pasta-rose', 'Veggie pasta, rosé', 'Green pepper, onion, broccoli, mushroom', [['', 13.27]], true],
     ['veg-pasta-tomato', 'Veggie pasta, tomato', 'Green pepper, onion, broccoli, mushroom', [['', 12.5]], true],
     ['veg-pasta-alfredo', 'Veggie pasta, Alfredo', 'Green pepper, onion, broccoli, mushroom', [['', 13.72]], true],
@@ -528,8 +543,8 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
                     const on = spice === v;
                     return (
                       <button key={v} type="button" role="radio" aria-checked={on} onClick={() => setSpice(v)} style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, padding: '0 12px', border: 0, borderRadius: 12, background: on ? '#1A1414' : '#F2F2F5', color: on ? '#fff' : '#1A1414', fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'background .15s,color .15s' }}>
-                        <span aria-hidden="true" style={{ display: 'flex', gap: 2 }}>
-                          {[0, 1, 2].map((d) => <span key={d} style={{ width: 5, height: 12, borderRadius: 3, background: d < i ? '#FF4B57' : on ? 'rgba(255,255,255,.25)' : '#DADADF' }} />)}
+                        <span aria-hidden="true" style={{ display: 'flex', gap: 3 }}>
+                          {[0, 1, 2].map((d) => <span key={d} style={{ width: 6, height: 6, borderRadius: '50%', background: d < i ? '#D7192D' : on ? 'rgba(255,255,255,.28)' : '#D9D9DE' }} />)}
                         </span>
                         {v}
                       </button>

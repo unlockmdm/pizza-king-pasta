@@ -15,8 +15,8 @@ type BaseId = 'classic' | 'veggie' | 'chicken';
 /** [id, name, description, Unsplash photo id] */
 type Sauce = readonly [id: SauceId, name: string, desc: string, photo: string];
 const SAUCES: readonly Sauce[] = [
-  ['rose', 'Rosé', 'Tomato, cream, parmesan', '1621996346565-e3dbc646d9a9'],
-  ['alfredo', 'Alfredo', 'Cream, parmesan', '1608219992759-8d74ed8d76eb'],
+  ['rose', 'Rosé', 'Tomato, cream, parmesan', 'assets/menu/pasta-rose.png'],
+  ['alfredo', 'Alfredo', 'Cream, parmesan', 'assets/menu/pasta-alfredo.png'],
   ['tomato', 'Tomato', 'Tomato sauce', '1598866594230-a7c12756260f'],
 ];
 
@@ -40,10 +40,7 @@ const BASES: readonly Base[] = [
 
 /** Bowl photo per `${base}-${sauce}`; falls back to the sauce photo. */
 const PHOTO: Partial<Record<`${BaseId}-${SauceId}`, string>> = {
-  'chicken-rose': '1611270629569-8b357cb88da9',
   'chicken-tomato': '1611270629569-8b357cb88da9',
-  'chicken-alfredo': '1645112411341-6c4fd023714a',
-  'veggie-alfredo': '1555949258-eb67b1ef0ceb',
 };
 
 type MomoId = 'veg' | 'nonveg';
@@ -171,7 +168,8 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
   const base = BASES.find((b) => b.id === baseId) || BASES[0];
   const sauce = SAUCES.find((x) => x[0] === sauceId) || SAUCES[0];
   const price = base.p[sauceId] ?? 0;
-  const img = U(PHOTO[`${baseId}-${sauceId}`] || sauce[3], 900);
+  const raw = PHOTO[`${baseId}-${sauceId}`] || sauce[3];
+  const img = raw.indexOf('assets/') === 0 ? raw : U(raw, 900);
   const rawTitle = (base.id === 'classic' ? '' : base.name + ' ') + 'pasta, ' + sauce[1].toLowerCase() + ' sauce';
   const title = rawTitle.charAt(0).toUpperCase() + rawTitle.slice(1);
   const momoSel = MOMOS.find((m) => m[0] === momo) || MOMOS[0];
@@ -331,8 +329,8 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
                   const on = spice === v;
                   return (
                     <button key={v} type="button" role="radio" aria-checked={on} onClick={() => setSpice(v)} style={{ display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 12px', border: 0, borderRadius: 12, background: on ? '#fff' : 'rgba(255,255,255,.08)', color: on ? '#1A1414' : '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'background .15s,color .15s' }}>
-                      <span aria-hidden="true" style={{ display: 'flex', gap: 2 }}>
-                        {[0, 1, 2].map((d) => <span key={d} style={{ width: 5, height: 12, borderRadius: 3, background: d < i ? '#FF4B57' : on ? '#DADADF' : 'rgba(255,255,255,.22)' }} />)}
+                      <span aria-hidden="true" style={{ display: 'flex', gap: 3 }}>
+                        {[0, 1, 2].map((d) => <span key={d} style={{ width: 6, height: 6, borderRadius: '50%', background: d < i ? '#FF5A4E' : on ? '#E3E3E7' : 'rgba(255,255,255,.22)' }} />)}
                       </span>
                       {v}
                     </button>

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap">
+<script src="./image-slot.js"></script>
+<style>
+#dc-root,#dc-root>.sc-host{height:auto!important;min-height:100%}
+body{margin:0;background:#FFFFFF;color:#1A1414;font-family:'Figtree',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#D7192D}
+a:hover{color:#A8101F}
+button{font-family:inherit}
+@keyframes pkDrop{0%{opacity:0;transform:translate(-50%,-50%) translateY(-26px) scale(1.35) rotate(var(--r))}60%{opacity:1}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(var(--r))}}
+@keyframes pkpFade{from{opacity:0}to{opacity:1}}
+@keyframes pkpIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes pkpUp{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pkSpin{to{transform:rotate(360deg)}}
+@keyframes pkFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(8deg)}}
+@keyframes pkZoom{from{transform:scale(1)}to{transform:scale(1.1)}}
+@keyframes pkUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes pkBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+</style>
+</helmet>
+
+<header style="position:sticky;top:0;z-index:30;background:rgba(255,255,255,.86);backdrop-filter:saturate(1.6) blur(16px);-webkit-backdrop-filter:saturate(1.6) blur(16px);border-bottom:1px solid rgba(26,20,20,.07)">
+  <div style="max-width:1320px;margin:0 auto;padding:12px clamp(16px,3vw,32px);display:flex;align-items:center;gap:{{ headGap }}">
+    <a href="#top" onClick="{{ goHome }}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#1A1414;flex:none">
+      <span style="width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(26,20,20,.1);display:flex;align-items:center;justify-content:center;overflow:hidden"><img src="assets/chef-logo.png" alt="" style="width:36px;height:auto"></span>
+      <sc-if value="{{ showWordmark }}" hint-placeholder-val="{{ true }}"><span style="font-weight:900;font-size:19px;letter-spacing:-.02em;white-space:nowrap">Pizza King <span style="color:#D7192D">&amp;</span> Pasta</span></sc-if>
+    </a>
+    <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+      <nav style="flex:1;display:flex;justify-content:center;gap:32px;font-weight:600;font-size:15px;white-space:nowrap">
+        <a href="#menu" onClick="{{ navMenu }}" style="color:#1A1414;text-decoration:none;padding:10px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s" style-hover="border-color:#D7192D">Menu</a>
+        <a href="#bestsellers" onClick="{{ navBest }}" style="color:#1A1414;text-decoration:none;padding:10px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s" style-hover="border-color:#D7192D">Specials</a>
+        <a href="#deals" onClick="{{ navDeals }}" style="color:#1A1414;text-decoration:none;padding:10px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s" style-hover="border-color:#D7192D">Pickup combos</a>
+        <a href="#visit" onClick="{{ navVisit }}" style="color:#1A1414;text-decoration:none;padding:10px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s" style-hover="border-color:#D7192D">Hours &amp; location</a>
+      </nav>
+    </sc-if>
+    <div style="margin-left:auto;min-width:0;display:flex;align-items:center;gap:8px">
+      <div data-mode-menu="1" style="position:relative;min-width:0">
+        <button onClick="{{ toggleModeMenu }}" aria-haspopup="true" style="max-width:100%;height:44px;display:flex;align-items:center;gap:6px;border:0;background:#F0F0F3;color:#1A1414;border-radius:999px;padding:0 12px 0 16px;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;white-space:nowrap" style-hover="background:#E6E6E9"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis">{{ modeLabel }}</span><svg style="flex:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <sc-if value="{{ modeMenuOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:0;top:calc(100% + 10px);z-index:41;width:min(290px,calc(100vw - 32px));background:#fff;border-radius:22px;padding:8px;box-shadow:0 0 0 1px rgba(26,20,20,.06),0 24px 60px rgba(26,20,20,.18);display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ modeOpts }}" as="m" hint-placeholder-count="2">
+              <button onClick="{{ m.pick }}" style="border:0;background:{{ m.bg }};border-radius:16px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;text-align:left;color:#1A1414" style-hover="background:#F2F2F5">
+                <span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:800;font-size:16px">{{ m.name }}</span><span style="font-size:14px;color:#636366">{{ m.sub }}</span></span>
+                <sc-if value="{{ m.on }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D7192D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <button onClick="{{ openCart }}" aria-label="Cart" style="flex:none;height:44px;display:flex;align-items:center;gap:8px;border:0;background:#1A1414;color:#fff;border-radius:999px;padding:0 {{ cartPadR }} 0 14px;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap" style-hover="background:#D7192D">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.5h2.6l2.3 11.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.5L21 7.5H6"></path><circle cx="10" cy="20.2" r="1.5"></circle><circle cx="17.5" cy="20.2" r="1.5"></circle></svg>
+        <sc-if value="{{ showCartLabel }}" hint-placeholder-val="{{ true }}"><span>Cart</span></sc-if>
+        <span style="background:#D7192D;color:#fff;border-radius:999px;min-width:22px;height:22px;padding:0 7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">{{ cartCount }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<sc-if value="{{ homeView }}" hint-placeholder-val="{{ true }}">
+<main id="top">
+
+<section data-screen-label="Hero" style="max-width:1320px;margin:0 auto;padding:16px clamp(16px,3vw,32px) 0">
+  <div style="display:grid;grid-template-columns:{{ bentoCols }};grid-template-rows:{{ bentoRows }};grid-template-areas:{{ bentoAreas }};gap:14px;height:{{ bentoH }}">
+    <div style="grid-area:hero;position:relative;min-height:0;border-radius:36px;overflow:hidden;color:#fff;background:#1A1414">
+      <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?fm=jpg&q=75&w=1800&auto=format&fit=crop" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:pkZoom 18s ease-in-out infinite alternate">
+      <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(14,8,8,.9),rgba(14,8,8,.1) 62%)"></div>
+      
+      <div style="position:absolute;left:clamp(22px,3vw,40px);right:clamp(22px,3vw,40px);bottom:clamp(22px,3vw,40px);display:flex;flex-direction:column;gap:24px">
+        <h1 style="margin:0;font-weight:900;font-size:{{ bentoFont }};line-height:.86;letter-spacing:-.065em"><span style="display:block;animation:pkUp 1s cubic-bezier(.2,.8,.2,1) both">Wood-fired.</span><span style="display:block;color:#FF4B57;animation:pkUp 1s cubic-bezier(.2,.8,.2,1) .12s both">Made to order.</span></h1>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;animation:pkUp 1s cubic-bezier(.2,.8,.2,1) .24s both">
+          <button onClick="{{ toggleModeMenu }}" style="height:60px;padding:0 10px 0 28px;border:0;border-radius:999px;background:#D7192D;color:#fff;font-family:inherit;font-weight:900;font-size:18px;display:flex;align-items:center;gap:14px;white-space:nowrap;cursor:pointer;transition:background .2s,transform .2s" style-hover="background:#C0121F;transform:translateY(-2px)">Start your order<span style="width:40px;height:40px;border-radius:50%;background:#fff;color:#D7192D;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></button>
+          <a href="#menu" onClick="{{ openMenu }}" style="height:60px;padding:0 28px;border-radius:999px;background:rgba(255,255,255,.14);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);color:#fff;text-decoration:none;font-weight:800;font-size:18px;display:flex;align-items:center;white-space:nowrap;transition:background .2s" style-hover="background:rgba(255,255,255,.24);color:#fff">See the menu</a>
+        </div>
+      </div>
+      <a href="https://unsplash.com/@briewilly" target="_blank" style="position:absolute;right:22px;top:18px;font-size:11px;color:rgba(255,255,255,.7);text-decoration:none">Photo: Chad Montano / Unsplash</a>
+    </div>
+    <div style="grid-area:deal;position:relative;min-height:0;border-radius:36px;background:#D7192D;color:#fff;overflow:hidden;transition:transform .3s" style-hover="transform:translateY(-3px)">
+      <div style="position:absolute;right:-60px;top:-90px;width:330px;height:330px;filter:drop-shadow(0 24px 40px rgba(0,0,0,.35))"><img src="assets/pizza-base.png" alt="" style="width:100%;height:100%;object-fit:contain;animation:pkSpin 40s linear infinite"></div>
+      <div style="position:absolute;right:170px;top:110px;width:300px;height:300px;filter:drop-shadow(0 24px 40px rgba(0,0,0,.35));display:{{ dealSecondPizza }}"><img src="assets/pizza-base.png" alt="" style="width:100%;height:100%;object-fit:contain;animation:pkSpin 50s linear reverse infinite"></div>
+      <div aria-hidden="true" style="position:absolute;right:18px;bottom:14px;width:236px;height:128px;display:{{ dealExtras }};pointer-events:none">
+        <span style="position:absolute;left:14px;right:8px;bottom:-4px;height:20px;border-radius:50%;background:radial-gradient(closest-side,rgba(60,0,8,.5),rgba(60,0,8,0))"></span>
+        <img src="assets/combo/coke.png" alt="" style="position:absolute;left:68px;bottom:10px;height:108px;filter:drop-shadow(0 8px 10px rgba(70,0,10,.35)) drop-shadow(0 2px 3px rgba(70,0,10,.35))">
+        <img src="assets/combo/coke.png" alt="" style="position:absolute;left:118px;bottom:4px;height:112px;filter:drop-shadow(0 8px 10px rgba(70,0,10,.35)) drop-shadow(0 2px 3px rgba(70,0,10,.35))">
+        <img src="assets/combo/pk-garlic-dip.png?v=2" alt="" style="position:absolute;left:0;bottom:8px;width:84px;filter:drop-shadow(0 8px 10px rgba(70,0,10,.35)) drop-shadow(0 2px 3px rgba(70,0,10,.35))">
+        <img src="assets/combo/pk-garlic-dip.png?v=2" alt="" style="position:absolute;right:0;bottom:6px;width:84px;filter:drop-shadow(0 8px 10px rgba(70,0,10,.35)) drop-shadow(0 2px 3px rgba(70,0,10,.35))">
+      </div>
+      <div style="position:absolute;inset:0;padding:26px 30px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(90deg,rgba(215,25,45,.92) 0%,rgba(215,25,45,.6) 34%,rgba(215,25,45,0) 52%)">
+        <span style="font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase">Pickup combo</span>
+        <div style="display:flex;flex-direction:column;gap:16px;max-width:300px">
+          <div style="display:flex;flex-direction:column;gap:10px"><span style="font-weight:900;font-size:46px;line-height:.9;letter-spacing:-.05em">Two Large<br>$36.00</span><span style="font-size:15px;font-weight:600;line-height:1.4">2 large pizzas, 4 toppings each,<br>2 dips and 2 pops</span></div>
+          <div style="display:flex;align-items:center;gap:14px"><button onClick="{{ addTwoLarge }}" aria-label="Customize Two Large combo, $36.00" style="height:44px;padding:0 20px;border:0;border-radius:999px;background:#fff;color:#D7192D;font-family:inherit;font-weight:900;font-size:15px;display:flex;align-items:center;flex:none;cursor:pointer;transition:transform .2s" style-hover="transform:scale(1.04)">Customize</button></div>
+        </div>
+      </div>
+    </div>
+    <button onClick="{{ openByo }}" style="grid-area:byo;position:relative;min-height:0;padding:0;border:0;border-radius:36px;overflow:hidden;background:#1A1414;color:#fff;font-family:inherit;text-align:left;cursor:pointer;transition:transform .3s" style-hover="transform:translateY(-3px)">
+      <span style="position:absolute;left:50%;top:120px;width:360px;height:360px;margin-left:-180px;animation:pkSpin 60s linear infinite"><img src="assets/pizza-base.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain">{{ byoToppings }}</span>
+      <span style="position:absolute;left:24px;right:24px;top:22px;display:flex;flex-direction:column;gap:2px"><span style="font-weight:900;font-size:24px;letter-spacing:-.03em;white-space:nowrap">Build your own</span><span style="font-size:14px;color:rgba(255,255,255,.7)">Any 4 toppings</span><span style="font-size:13px;font-weight:700;color:#fff;opacity:.92;margin-top:6px;min-height:18px">{{ byoNames }}</span></span>
+      <span style="position:absolute;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;background:#fff;color:#1A1414;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+    </button>
+    <button onClick="{{ openPasta }}" style="grid-area:pasta;position:relative;min-height:0;padding:0;border:0;border-radius:36px;overflow:hidden;background:#F2F2F5;color:#fff;font-family:inherit;text-align:left;cursor:pointer;transition:transform .3s" style-hover="transform:translateY(-3px)">
+      <img src="assets/menu/pasta.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:pkZoom 16s ease-in-out -4s infinite alternate">
+      <span style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,8,8,.55),rgba(14,8,8,0) 45%)"></span>
+      <span style="position:absolute;left:24px;right:24px;top:22px;display:flex;flex-direction:column;gap:2px"><span style="font-weight:900;font-size:24px;letter-spacing:-.03em;white-space:nowrap">Fresh pasta</span><span style="font-size:14px;color:rgba(255,255,255,.88)">Rosé, Alfredo, tomato</span></span>
+      <span style="position:absolute;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;background:#fff;color:#1A1414;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+      <span style="position:absolute;left:24px;bottom:16px;font-size:11px;color:rgba(255,255,255,.75)">Photo: Dllu, Wikimedia Commons, CC BY-SA 4.0</span>
+    </button>
+  </div>
+</section>
+
+<section id="menu" data-screen-label="Menu categories" style="max-width:1320px;margin:0 auto;padding:clamp(56px,7vw,96px) clamp(16px,3vw,32px) 0;display:flex;flex-direction:column;gap:24px;scroll-margin-top:84px">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <h2 style="margin:0;font-weight:900;font-size:clamp(34px,4vw,52px);line-height:1;letter-spacing:-.04em">Menu</h2>
+    <a href="#menu" onClick="{{ openMenu }}" style="font-weight:700;font-size:15px;color:#1A1414;text-decoration:none;display:flex;align-items:center;gap:8px" style-hover="color:#D7192D">View full menu <span aria-hidden="true">→</span></a>
+  </div>
+  <div style="display:grid;grid-template-columns:{{ tileCols }};gap:14px">
+    <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="6">
+      <button onClick="{{ t.go }}" style="position:relative;border:0;padding:0;text-align:left;cursor:pointer;background:{{ t.bg }};color:{{ t.fg }};border-radius:28px;overflow:hidden;aspect-ratio:3/4;display:flex;flex-direction:column;transition:transform .25s ease" style-hover="transform:translateY(-4px)">
+        <div style="position:relative;z-index:2;padding:20px 20px 0;display:flex;flex-direction:column;gap:3px;pointer-events:none">
+          <span style="font-weight:900;font-size:21px;line-height:1.05;letter-spacing:-.025em">{{ t.name }}</span>
+          <span style="font-size:14px;font-weight:600;opacity:.8">{{ t.sub }}</span>
+        </div>
+        <div style="position:absolute;left:9%;right:9%;bottom:-13%;aspect-ratio:1/1;border-radius:50%;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,.28)">
+          <sc-if value="{{ t.hasImg }}" hint-placeholder-val="{{ true }}"><image-slot id="{{ t.slotId }}" shape="circle" src="{{ t.img }}" credit="{{ t.credit }}" credit-href="{{ t.creditHref }}"></image-slot></sc-if>
+          <sc-if value="{{ t.noImg }}" hint-placeholder-val="{{ false }}"><image-slot id="{{ t.slotId }}" shape="circle" placeholder="{{ t.slot }}"></image-slot></sc-if>
+        </div>
+      </button>
+    </sc-for>
+  </div>
+</section>
+
+<section id="bestsellers" data-screen-label="Bestsellers" style="max-width:1320px;margin:0 auto;padding:clamp(56px,7vw,96px) clamp(16px,3vw,32px) 0;display:flex;flex-direction:column;gap:24px;scroll-margin-top:84px">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h2 style="margin:0;font-weight:900;font-size:clamp(34px,4vw,52px);line-height:1;letter-spacing:-.04em">House specials</h2>
+      <span style="font-size:17px;color:#636366">Our most-ordered pizzas. Choose size, crust and oven when you add one.</span>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:{{ specialCols }};gap:16px">
+    <sc-for list="{{ specials }}" as="p" hint-placeholder-count="4">
+      <article onClick="{{ p.open }}" style="cursor:pointer;background:#fff;border-radius:28px;padding:10px;display:flex;flex-direction:column;box-shadow:0 0 0 1px rgba(26,20,20,.06),0 12px 32px rgba(26,20,20,.06);transition:transform .25s ease,box-shadow .25s ease" style-hover="transform:translateY(-4px);box-shadow:0 0 0 1px rgba(26,20,20,.06),0 26px 50px rgba(26,20,20,.13)">
+        <div style="position:relative;aspect-ratio:1/1;border-radius:20px;overflow:hidden;background:#F0F0F3">
+          <image-slot id="{{ p.slotId }}" shape="rect" src="{{ p.img }}" credit="{{ p.credit }}" credit-href="{{ p.creditHref }}"></image-slot>
+        </div>
+        <div style="padding:16px 8px 6px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+            <sc-if value="{{ p.hasMeta }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:{{ p.metaColor }}">{{ p.meta }}</span></sc-if>
+            <span style="font-weight:900;font-size:21px;letter-spacing:-.025em">{{ p.name }}</span>
+            <span style="font-size:15px;line-height:1.45;color:#636366">{{ p.desc }}</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <span style="font-size:16px;font-weight:700">{{ p.fromText }}</span>
+            <button aria-label="{{ p.addLabel }}" style="width:44px;height:44px;border:0;border-radius:50%;background:#1A1414;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s" style-hover="background:#D7192D"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+          </div>
+        </div>
+      </article>
+    </sc-for>
+  </div>
+</section>
+
+<section id="deals" data-screen-label="Pickup deals" style="max-width:1320px;margin:0 auto;padding:clamp(56px,7vw,96px) clamp(16px,3vw,32px) 0;display:flex;flex-direction:column;gap:24px;scroll-margin-top:84px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <h2 style="margin:0;font-weight:900;font-size:clamp(34px,4vw,52px);line-height:1;letter-spacing:-.04em">Pickup combos</h2>
+    <span style="font-size:17px;color:#636366">Walk-in combo prices, available on online pickup orders.</span>
+  </div>
+  <div style="display:grid;grid-template-columns:{{ dealCols }};gap:16px">
+    <sc-for list="{{ deals }}" as="d" hint-placeholder-count="4">
+      <article style="position:relative;aspect-ratio:4/5;border-radius:28px;overflow:hidden;background:#1A1210;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s" style-hover="transform:translateY(-6px);box-shadow:0 26px 50px rgba(26,20,20,.22)">
+        <div style="position:absolute;inset:0"><image-slot id="{{ d.slotId }}" shape="rect" credit="{{ d.credit }}" credit-href="{{ d.creditHref }}" src="{{ d.img }}" placeholder="Combo photo" style="display:block;width:100%;height:100%"></image-slot></div>
+        <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,rgba(18,10,8,.94) 0%,rgba(18,10,8,.72) 34%,rgba(18,10,8,0) 66%)"></div>
+        <div style="position:relative;display:flex;flex-direction:column;gap:14px;padding:22px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-weight:900;font-size:26px;line-height:1;letter-spacing:-.03em">{{ d.name }}</span>
+            <span style="font-size:14px;line-height:1.45;color:#DADADD;text-wrap:pretty">{{ d.desc }}</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <span style="font-weight:900;font-size:38px;line-height:1;letter-spacing:-.045em">{{ d.priceText }}</span>
+            <button onClick="{{ d.add }}" aria-label="{{ d.aria }}" style="width:52px;height:52px;flex:none;border:0;border-radius:50%;background:#fff;color:#1A1414;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s,transform .2s" style-hover="background:#D7192D;color:#fff;transform:scale(1.06)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+          </div>
+        </div>
+      </article>
+    </sc-for>
+  </div>
+</section>
+
+<section id="oven" data-screen-label="Wood oven" style="max-width:1320px;margin:0 auto;padding:clamp(56px,7vw,96px) clamp(16px,3vw,32px) 0;scroll-margin-top:84px">
+  <div style="display:grid;grid-template-columns:{{ ovenCols }};background:#1A1414;color:#fff;border-radius:32px;overflow:hidden">
+    <div style="position:relative;min-height:{{ ovenImgMinH }};aspect-ratio:{{ ovenImgAR }}">
+      <image-slot id="v2-oven" shape="rect" src="https://images.unsplash.com/photo-1651981075280-9a9e01acbff0?fm=jpg&amp;q=72&amp;w=1400&amp;auto=format&amp;fit=crop" credit="Photo by Daniel on Unsplash" credit-href="https://unsplash.com/@unsplashbydan" placeholder="Your wood oven, fire visible"></image-slot>
+    </div>
+    <div style="padding:clamp(28px,5vw,64px);display:flex;flex-direction:column;justify-content:center;gap:clamp(24px,3vw,36px)">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#FF7A85">Our ovens</span>
+        <h2 style="margin:0;font-weight:900;font-size:clamp(32px,4vw,54px);line-height:1;letter-spacing:-.04em;text-wrap:balance">Wood-fired or conventional, on every pizza.</h2>
+        <p style="margin:0;font-size:clamp(16px,1.4vw,18px);line-height:1.55;color:#CFC6C0;max-width:460px;text-wrap:pretty">Pick the wood-fired oven or the conventional oven when you order. Same price either way.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <div style="background:#D7192D;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:6px">
+          <span style="font-weight:900;font-size:20px;letter-spacing:-.02em">Wood-fired</span>
+          <span style="font-size:15px;line-height:1.45;color:#fff">Smoky, blistered, charred crust. Our default.</span>
+        </div>
+        <div style="background:#2C2424;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:6px">
+          <span style="font-weight:900;font-size:20px;letter-spacing:-.02em">Conventional</span>
+          <span style="font-size:15px;line-height:1.45;color:#CFC6C0">Even bake, softer crust. The classic.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="visit" data-screen-label="Visit" style="max-width:1320px;margin:0 auto;padding:clamp(56px,7vw,96px) clamp(16px,3vw,32px);scroll-margin-top:84px">
+  <div style="display:grid;grid-template-columns:{{ ovenCols }};gap:16px">
+    <div style="background:#F2F2F5;border-radius:32px;padding:clamp(28px,4vw,56px);display:flex;flex-direction:column;gap:32px">
+      <h2 style="margin:0;font-weight:900;font-size:clamp(34px,4vw,52px);line-height:1;letter-spacing:-.04em">Hours &amp; location</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px">
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#636366">Address</span><span style="font-size:17px;font-weight:600;line-height:1.45">10-511 Ray Lawson Blvd<br>Brampton, ON L6Y 0N2</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#636366">Hours</span><span style="font-size:17px;font-weight:600;line-height:1.45">Every day<br>11 AM – 2 AM</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#636366">Phone</span><a href="tel:+19054609494" style="font-size:17px;font-weight:600;color:#1A1414;text-decoration:none">905-460-9494</a></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=511+Ray+Lawson+Blvd+Brampton+ON" target="_blank" style="background:#1A1414;color:#fff;border-radius:999px;padding:15px 24px;font-weight:800;font-size:15px;text-decoration:none" style-hover="background:#D7192D;color:#fff">Get directions</a>
+        <a href="tel:+19054609494" style="background:#fff;color:#1A1414;border-radius:999px;padding:15px 24px;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 0 0 1px rgba(26,20,20,.12)" style-hover="color:#D7192D">Call the shop</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;padding-top:24px;border-top:1px solid rgba(26,20,20,.1)">
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#636366">Delivery</span><span style="font-size:17px;font-weight:600;line-height:1.45;text-wrap:pretty">Available through DoorDash and Uber Eats.</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <a href="https://www.doordash.com/store/pizza-king-and-pasta-brampton-24430450/" target="_blank" rel="noopener" aria-label="Order delivery on DoorDash" style="display:flex;align-items:center;gap:10px;height:50px;background:#fff;color:#1A1414;border-radius:999px;padding:0 20px;text-decoration:none;box-shadow:0 0 0 1px rgba(26,20,20,.12);transition:box-shadow .15s" style-hover="box-shadow:0 0 0 2px #1A1414"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/DoorDash_Logo.svg" alt="DoorDash" style="display:block;height:14px;width:auto;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M7 17 17 7M8 7h9v9"></path></svg></a>
+          <a href="https://www.ubereats.com/ca/store/pizza-king-&amp;-pasta/j1VSW4wkX02MplHbVNOSpg" target="_blank" rel="noopener" aria-label="Order delivery on Uber Eats" style="display:flex;align-items:center;gap:10px;height:50px;background:#fff;color:#1A1414;border-radius:999px;padding:0 20px;text-decoration:none;box-shadow:0 0 0 1px rgba(26,20,20,.12);transition:box-shadow .15s" style-hover="box-shadow:0 0 0 2px #1A1414"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Uber_Eats_2020_logo.svg" alt="Uber Eats" style="display:block;height:18px;width:auto;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M7 17 17 7M8 7h9v9"></path></svg></a>
+        </div>
+      </div>
+    </div>
+    <div style="position:relative;border-radius:32px;overflow:hidden;min-height:380px;background:#2A1E1A">
+      <image-slot id="v2-visit" shape="rect" src="https://images.unsplash.com/photo-1555072956-7758afb20e8f?fm=jpg&amp;q=72&amp;w=1400&amp;auto=format&amp;fit=crop" credit="Photo by Pinar Kucuk on Unsplash" credit-href="https://unsplash.com/@pinarimsi" placeholder="Storefront photo"></image-slot>
+    </div>
+  </div>
+</section>
+
+</main>
+</sc-if>
+<sc-if value="{{ menuView }}" hint-placeholder-val="{{ false }}">
+  <dc-import name="MenuPage" on-add="{{ menuAdd }}" on-deal="{{ menuDeal }}" hint-size="100%,1400px"></dc-import>
+</sc-if>
+<sc-if value="{{ wingsView }}" hint-placeholder-val="{{ false }}">
+  <dc-import name="CategoryPage" category="wings" on-add="{{ menuAdd }}" on-back="{{ backToTiles }}" on-menu="{{ openMenu }}" hint-size="100%,1500px"></dc-import>
+</sc-if>
+<sc-if value="{{ juiceView }}" hint-placeholder-val="{{ false }}">
+  <dc-import name="CategoryPage" category="juice" on-add="{{ menuAdd }}" on-back="{{ backToTiles }}" on-menu="{{ openMenu }}" hint-size="100%,1500px"></dc-import>
+</sc-if>
+<sc-if value="{{ gelatoView }}" hint-placeholder-val="{{ false }}">
+  <dc-import name="CategoryPage" category="gelato" on-add="{{ menuAdd }}" on-back="{{ backToTiles }}" on-menu="{{ openMenu }}" hint-size="100%,1500px"></dc-import>
+</sc-if>
+<sc-if value="{{ pastaView }}" hint-placeholder-val="{{ false }}">
+  <dc-import name="PastaPage" on-add="{{ menuAdd }}" on-back="{{ backToTiles }}" on-menu="{{ openMenu }}" hint-size="100%,1400px"></dc-import>
+</sc-if>
+<sc-if value="{{ meatView }}" hint-placeholder-val="{{ false }}">
+  <dc-import name="MeatFavourites" on-add="{{ menuAdd }}" on-customize="{{ openCustom }}" on-back="{{ backToTiles }}" on-menu="{{ openMenu }}" on-build="{{ openByo }}" hint-size="100%,1600px"></dc-import>
+</sc-if>
+
+<footer style="background:#1A1414;color:#fff;overflow:hidden">
+  <div style="max-width:1320px;margin:0 auto;padding:72px clamp(16px,3vw,32px) {{ footPadB }};display:flex;flex-direction:column;gap:56px">
+    <div style="display:grid;grid-template-columns:{{ footCols }};gap:40px 32px">
+      <div style="display:flex;flex-direction:column;gap:22px;align-items:flex-start">
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="width:60px;height:60px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden"><img src="assets/chef-logo.png" alt="" style="width:48px;height:auto"></span>
+          <span style="font-weight:900;font-size:24px;letter-spacing:-.03em">Pizza King <span style="color:#FF5A6A">&amp;</span> Pasta</span>
+        </div>
+        <button onClick="{{ navMenu }}" style="border:0;background:#D7192D;color:#fff;border-radius:999px;padding:16px 28px;font-weight:800;font-size:16px;cursor:pointer" style-hover="background:#B5121F">{{ ctaText }}</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:15px">
+        <span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#87878A">Menu</span>
+        <a href="#bestsellers" onClick="{{ navBest }}" style="color:#fff;text-decoration:none" style-hover="color:#FF7A85">House specials</a>
+        <a href="#menu" onClick="{{ navMenu }}" style="color:#fff;text-decoration:none" style-hover="color:#FF7A85">Build your own</a>
+        <a href="#menu" onClick="{{ openMenu }}" style="color:#fff;text-decoration:none" style-hover="color:#FF7A85">Pasta</a>
+        <a href="#menu" onClick="{{ openMenu }}" style="color:#fff;text-decoration:none" style-hover="color:#FF7A85">Wings &amp; sides</a>
+        <a href="#menu" onClick="{{ openMenu }}" style="color:#fff;text-decoration:none" style-hover="color:#FF7A85">Juice &amp; gelato</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:15px">
+        <span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#87878A">Order</span>
+        <a href="#top" onClick="{{ pickupTop }}" style="color:#fff;text-decoration:none" style-hover="color:#FF7A85">Pickup</a>
+        <a href="#top" onClick="{{ deliveryTop }}" style="color:#fff;text-decoration:none" style-hover="color:#FF7A85">Delivery</a>
+        <a href="#deals" onClick="{{ navDeals }}" style="color:#fff;text-decoration:none" style-hover="color:#FF7A85">Pickup combos</a>
+        <a href="#oven" onClick="{{ navOven }}" style="color:#fff;text-decoration:none" style-hover="color:#FF7A85">Our wood oven</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:15px;line-height:1.5">
+        <span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#87878A">Visit</span>
+        <span>10-511 Ray Lawson Blvd<br>Brampton, ON L6Y 0N2</span>
+        <span>Every day, 11 AM – 2 AM</span>
+        <a href="tel:+19054609494" style="color:#fff;text-decoration:none" style-hover="color:#FF7A85">905-460-9494</a>
+      </div>
+    </div>
+    <div style="font-weight:900;font-size:clamp(44px,9.2vw,136px);line-height:.85;letter-spacing:-.06em;color:#2A2222;text-wrap:balance;user-select:none">Pizza King &amp; Pasta</div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 32px;padding-top:22px;border-top:1px solid #362C2C;font-size:13px;color:#87878A">
+      <span>© 2026 Pizza King &amp; Pasta · Prices exclude HST</span>
+      <nav aria-label="Legal" style="display:flex;gap:24px"><a href="#terms" style="color:#C9C9CE;text-decoration:none" style-hover="color:#fff">Terms of Service</a><a href="#privacy" style="color:#C9C9CE;text-decoration:none" style-hover="color:#fff">Privacy Policy</a></nav>
+    </div>
+  </div>
+</footer>
+
+
+
+<sc-if value="{{ addedOn }}" hint-placeholder-val="{{ false }}">
+  <div ref="{{ addedEnter }}" role="status" aria-live="polite" style="position:fixed;right:{{ addedRight }};bottom:{{ toastBottom }};z-index:60;width:min(380px,calc(100vw - 24px));box-sizing:border-box;background:#fff;color:#1A1414;border-radius:24px;box-shadow:0 1px 2px rgba(26,20,20,.06),0 24px 56px -12px rgba(26,20,20,.3);font-family:'Figtree',system-ui,sans-serif;padding:12px 18px 12px 12px;display:flex;align-items:center;gap:14px">
+    <span style="position:relative;width:72px;height:72px;flex:none">
+      <sc-if value="{{ addedHasImg }}" hint-placeholder-val="{{ false }}"><span role="img" aria-label="{{ addedName }}" style="width:72px;height:72px;border-radius:18px;background:#F2F2F5 {{ addedBg }} center/cover no-repeat;display:block"></span></sc-if>
+      <sc-if value="{{ addedNoImg }}" hint-placeholder-val="{{ true }}"><span style="width:72px;height:72px;border-radius:18px;background:#F2F2F5;display:block"></span></sc-if>
+      <span data-ck="1" style="position:absolute;right:-6px;bottom:-6px;width:26px;height:26px;border-radius:50%;background:#1E9E4A;color:#fff;box-shadow:0 0 0 3px #fff;display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+    </span>
+    <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+      <span style="font-size:13px;font-weight:700;color:#1E7A3C">Added to your order</span>
+      <span style="font-weight:900;font-size:17px;letter-spacing:-.025em;line-height:1.2;text-wrap:pretty">{{ addedName }}</span>
+      <span style="font-size:13px;line-height:1.35;color:#646467;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ addedSub }}</span>
+    </span>
+    <span style="flex:none;align-self:flex-start;padding-top:22px;font-weight:900;font-size:17px;letter-spacing:-.025em">{{ addedPrice }}</span>
+  </div>
+</sc-if>
+<sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:{{ toastBottom }};transform:translateX(-50%);z-index:50;background:#1A1414;color:#fff;border-radius:24px;padding:10px 10px 10px 20px;display:flex;align-items:center;gap:14px;font-size:15px;font-weight:600;line-height:1.35;box-shadow:0 16px 40px rgba(0,0,0,.3);width:max-content;max-width:calc(100vw - 24px);box-sizing:border-box">
+    <span style="min-width:0;padding:4px 0;text-wrap:pretty">{{ toast }}</span>
+    <sc-if value="{{ toastHasCart }}" hint-placeholder-val="{{ false }}"><button onClick="{{ openCart }}" style="border:0;background:#fff;color:#1A1414;border-radius:999px;padding:9px 16px;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap">View cart</button></sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ welcomeOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ skipWelcome }}" style="position:fixed;inset:0;z-index:70;background:rgba(18,12,12,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:{{ sheetAlign }};justify-content:center;padding:{{ sheetPad }};animation:pkpFade .2s ease both">
+    <div onClick="{{ stop }}" role="dialog" aria-modal="true" aria-labelledby="pkp-start-title" style="position:relative;width:{{ wModalW }};max-height:calc(100vh - 24px);overflow:auto;background:#fff;border-radius:{{ sheetRadius }};box-shadow:0 40px 120px rgba(18,12,12,.35);display:grid;grid-template-columns:{{ wGridCols }};animation:{{ sheetAnim }}">
+      <div style="position:relative;min-height:{{ wImgMinH }};background:#2A1E1A">
+        <image-slot id="v2-welcome-img" shape="rect" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?fm=jpg&amp;q=75&amp;w=1200&amp;auto=format&amp;fit=crop" credit="Photo by Ivan Torres on Unsplash" credit-href="https://unsplash.com/@iavnt" placeholder="Order pop-up photo"></image-slot>
+        <div style="position:absolute;left:0;right:0;top:0;height:60%;background:linear-gradient(180deg,rgba(14,9,9,.62),rgba(14,9,9,0));pointer-events:none"></div>
+        <div style="position:absolute;left:24px;top:22px;right:64px;display:flex;align-items:center;gap:12px;color:#fff;pointer-events:none">
+          <span style="width:44px;height:44px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none"><img src="assets/chef-logo.png" alt="" style="width:36px;height:auto"></span>
+          <span style="display:flex;flex-direction:column;gap:1px"><span style="font-weight:800;font-size:16px;letter-spacing:-.01em">Pizza King &amp; Pasta</span><span style="font-size:13px;font-weight:500;color:rgba(255,255,255,.85)">Wood-fired pizza · Brampton</span></span>
+        </div>
+      </div>
+      <div style="padding:{{ wPad }};display:flex;flex-direction:column;gap:22px;min-width:0">
+        <div style="display:flex;flex-direction:column;gap:8px;padding-right:44px">
+          <span style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#D7192D">Online ordering</span>
+          <h2 id="pkp-start-title" style="margin:0;font-weight:800;font-size:34px;line-height:1.02;letter-spacing:-.035em">Start your order</h2>
+          <span style="font-size:15px;color:#636366">{{ welcomeSub }}</span>
+        </div>
+        <div role="tablist" style="position:relative;display:grid;grid-template-columns:1fr 1fr;background:#EFEFF2;border-radius:14px;padding:4px">
+          <span style="position:absolute;top:4px;bottom:4px;left:{{ segLeft }};width:calc(50% - 4px);background:#fff;border-radius:10px;box-shadow:0 1px 2px rgba(26,20,20,.1),0 3px 10px rgba(26,20,20,.06);transition:left .28s cubic-bezier(.3,.8,.3,1)"></span>
+          <button role="tab" aria-selected="{{ wIsPickup }}" onClick="{{ setWPickup }}" style="position:relative;border:0;background:transparent;height:42px;font-weight:700;font-size:15px;color:{{ pickFg }};cursor:pointer;transition:color .2s">Pickup</button>
+          <button role="tab" aria-selected="{{ wIsDelivery }}" onClick="{{ setWDelivery }}" style="position:relative;border:0;background:transparent;height:42px;font-weight:700;font-size:15px;color:{{ delFg }};cursor:pointer;transition:color .2s">Delivery</button>
+        </div>
+        <sc-if value="{{ wIsPickup }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;border:1px solid #E4E4E7;border-radius:16px;overflow:hidden">
+            <div style="height:140px;background:#E9E9EC">
+              <iframe title="Map to Pizza King and Pasta" src="https://www.google.com/maps?q=511+Ray+Lawson+Blvd,+Brampton,+ON+L6Y+0N2&amp;z=15&amp;output=embed" loading="lazy" style="width:100%;height:100%;border:0;display:block"></iframe>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-top:1px solid #E4E4E7">
+              <span style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:700">10-511 Ray Lawson Blvd</span><span style="font-size:13px;color:#636366">Brampton, ON L6Y 0N2</span></span>
+              <a href="https://www.google.com/maps/dir/?api=1&amp;destination=511+Ray+Lawson+Blvd+Brampton+ON" target="_blank" style="margin-left:auto;font-size:14px;font-weight:700;color:#1A1414;text-decoration:none;white-space:nowrap;border:1px solid #E4E4E7;border-radius:999px;padding:8px 14px" style-hover="border-color:#1A1414">Directions</a>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ wIsDelivery }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <p style="margin:0;font-size:16px;line-height:1.5;color:#1A1414;text-wrap:pretty">Delivery is handled by DoorDash and Uber Eats. You’ll finish your order in their app.</p>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <a href="https://www.doordash.com/store/pizza-king-and-pasta-brampton-24430450/" target="_blank" rel="noopener" aria-label="Order delivery on DoorDash" style="display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:0 20px;border-radius:14px;background:#fff;color:#1A1414;text-decoration:none;box-shadow:inset 0 0 0 1px #E4E4E7;transition:box-shadow .15s" style-hover="box-shadow:inset 0 0 0 2px #1A1414"><span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0"><span style="font-weight:700;font-size:15px;color:#636366;white-space:nowrap">Order delivery on</span><img src="https://commons.wikimedia.org/wiki/Special:FilePath/DoorDash_Logo.svg" alt="DoorDash" style="display:block;height:15px;width:auto;flex:none"></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M7 17 17 7M8 7h9v9"></path></svg></a>
+              <a href="https://www.ubereats.com/ca/store/pizza-king-&amp;-pasta/j1VSW4wkX02MplHbVNOSpg" target="_blank" rel="noopener" aria-label="Order delivery on Uber Eats" style="display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:0 20px;border-radius:14px;background:#fff;color:#1A1414;text-decoration:none;box-shadow:inset 0 0 0 1px #E4E4E7;transition:box-shadow .15s" style-hover="box-shadow:inset 0 0 0 2px #1A1414"><span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0"><span style="font-weight:700;font-size:15px;color:#636366;white-space:nowrap">Order delivery on</span><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Uber_Eats_2020_logo.svg" alt="Uber Eats" style="display:block;height:20px;width:auto;flex:none"></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M7 17 17 7M8 7h9v9"></path></svg></a>
+            </div>
+            <span style="font-size:13px;line-height:1.45;color:#636366">Delivery fees and tips are paid in the app.</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ wIsPickup }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#818184">When</span>
+          <div style="display:flex;flex-direction:column;border:1px solid #E4E4E7;border-radius:16px;overflow:hidden">
+            <button onClick="{{ setAsap }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:0;background:{{ asapRowBg }};text-align:left;cursor:pointer;color:#1A1414;transition:background .15s">
+              <span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700">{{ asapTitle }}</span><span style="font-size:13px;color:#636366">{{ asapSub }}</span></span>
+              <span style="margin-left:auto;width:20px;height:20px;display:flex;align-items:center;justify-content:center"><sc-if value="{{ isAsap }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D7192D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if></span>
+            </button>
+            <button onClick="{{ setLater }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:0;border-top:1px solid #E4E4E7;background:{{ laterRowBg }};text-align:left;cursor:pointer;color:#1A1414;transition:background .15s">
+              <span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700">Schedule for later</span><span style="font-size:13px;color:#636366">{{ laterSub }}</span></span>
+              <span style="margin-left:auto;width:20px;height:20px;display:flex;align-items:center;justify-content:center"><sc-if value="{{ isLater }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D7192D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if></span>
+            </button>
+            <sc-if value="{{ isLater }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:2px 16px 16px;background:#F8F8FB;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+                <sc-for list="{{ timeOpts }}" as="t" hint-placeholder-count="6">
+                  <button onClick="{{ t.pick }}" style="border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.fg }};border-radius:10px;height:40px;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s">{{ t.label }}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <button onClick="{{ confirmWelcome }}" style="margin-top:auto;border:0;background:#D7192D;color:#fff;border-radius:14px;height:54px;font-weight:700;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s" style-hover="background:#B5121F">{{ confirmLabel }}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+        </sc-if>
+      </div>
+      <button onClick="{{ skipWelcome }}" aria-label="Close" style="position:absolute;right:16px;top:16px;width:44px;height:44px;border-radius:50%;border:0;background:{{ wCloseBg }};color:#1A1414;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.08)" style-hover="background:#E3E3E6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ comboOpen }}" hint-placeholder-val="{{ false }}">
+  <dc-import name="ComboBuilder" deal="{{ comboDeal }}" size-prices="{{ sizePrices }}" on-close="{{ closeCombo }}" on-add="{{ comboAdd }}" hint-size="100%,100%" style="position:fixed;inset:0;z-index:120"></dc-import>
+</sc-if>
+<sc-if value="{{ itemOpen }}" hint-placeholder-val="{{ false }}">
+  <dc-import name="PizzaBuilder" item="{{ builderItem }}" size-prices="{{ sizePrices }}" on-close="{{ closeItem }}" on-add="{{ builderAdd }}" hint-size="100%,100%" style="position:fixed;inset:0;z-index:80"></dc-import>
+</sc-if>
+
+<dc-import name="CartCheckout" page-bg="{{ checkoutBg }}" lines="{{ ccLines }}" mode="{{ ccMode }}" open="{{ cartOpen }}" on-open="{{ openCart }}" on-close="{{ closeCart }}" on-qty="{{ ccQty }}" on-add="{{ ccAdd }}" on-mode="{{ ccMode2 }}" on-browse="{{ shopFromCart }}" on-placed="{{ ccPlaced }}" hint-size="0px,0px"></dc-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showWelcome&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;always&quot;,&quot;first-visit&quot;,&quot;never&quot;],&quot;default&quot;:&quot;always&quot;,&quot;tsType&quot;:&quot;'always' | 'first-visit' | 'never'&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;autoplay&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;openState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;open&quot;,&quot;closed&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;'auto' | 'open' | 'closed'&quot;,&quot;section&quot;:&quot;Preview&quot;}}">
+const U = (id, w) => 'https://images.unsplash.com/photo-' + id + '?fm=jpg&q=72&w=' + (w || 900) + '&auto=format&fit=crop';
+const SIZE_PRICES = { S: 12, M: 14.6, L: 16.5, XL: 22.8 };
+const PIZZA_PRICES = (() => { const D = { S: 13, M: 15.5, L: 17.3, XL: 23.8 }, C = { S: 12, M: 14.6, L: 16.5, XL: 22.5 }; return { 'butter-chicken': D, 'shahi-paneer': D, 'chicken-shawarma': D, 'tandoori-fish': D, pepperoni: D, bismark: C, 'non-veg': C, 'sea-food': C }; })();
+const pricesFor = id => PIZZA_PRICES[id] || SIZE_PRICES;
+const SIZE_NAMES = { S: 'Small', M: 'Medium', L: 'Large', XL: 'X-Large' };
+const SPECIALS = [
+  { id: 'shahi-paneer', name: 'Shahi Paneer', desc: 'Tandoori paneer, green pepper, onion, jalapeño', veg: true, img: U('1655673654158-9f7285b7d1ea'), by: 'RUSU CIPRIAN', h: 'tehnosign' },
+  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green pepper, onion', veg: false, img: U('1604382354936-07c5d9983bd3'), by: 'Shourav Sheikh', h: 'shouravsheikh' },
+  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, onions', veg: false, tag: 'Spicy', img: U('1590947132387-155cc02f3212'), by: 'Vit Ch', h: 'v_uk_europe' },
+  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausages', veg: false, img: U('1692737580547-b45bb4a02356'), by: 'David Foodphototasty', h: 'phototastyfood' },
+];
+const DEALS = [
+  { id: 'one-large', name: 'One Large', price: 11.99, desc: '1 large pizza, 1 topping. Wood-fired or conventional oven', img: U('1593560708920-61dd98c46a4e'), by: 'Saundarya Srinivasan', h: 'saundiii' },
+  { id: 'two-large', name: 'Two Large', price: 36, desc: '2 large, 4 toppings each, 2 dips, 2 pops, sugarcane juice or wood-oven corn', img: U('1604382355076-af4b0eb60143'), by: 'Shourav Sheikh', h: 'shouravsheikh' },
+  { id: 'two-medium', name: 'Two Medium', price: 32, desc: '2 medium, 4 toppings each, 2 dips, 2 pops, sugarcane juice or wood-oven corn', img: U('1682264788192-9abdec90c425'), by: 'Joanie Simon', h: 'joaniesimon' },
+  { id: 'two-small', name: 'Two Small', price: 25.99, desc: '2 small, 4 toppings each, 2 dipping sauces', img: U('1600628421066-f6bda6a7b976'), by: 'Klara Kulikova', h: 'kkalerry' },
+];
+const TILES = [
+  { id: 'byo', name: 'Build Your Own', sub: 'Any 4 toppings', bg: '#EDEDF0', fg: '#1A1414', img: U('1593560708920-61dd98c46a4e'), by: 'Saundarya Srinivasan', h: 'saundiii' },
+  { id: 'specials', name: 'House Specials', sub: 'Desi & classic', bg: '#D7192D', fg: '#fff', img: U('1565299624946-b28f40a0ae38'), by: 'Chad Montano', h: 'briewilly', target: 'bestsellers' },
+  { id: 'meat', name: 'Meat Favourites', sub: 'Pepperoni, bacon, sausage', bg: '#C2511F', fg: '#fff', img: U('1611915365928-565c527a0590'), by: 'Tamas Pap', h: 'tamasp' },
+  { id: 'combos', name: 'Pickup Combos', sub: 'From $11.99', bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
+  { id: 'pasta', name: 'Pasta Bar', sub: 'Pasta and momos', bg: '#F2B53A', fg: '#1A1414', img: 'assets/menu/pasta.jpg', creditText: 'Photo: Dllu, Wikimedia Commons, CC BY-SA 4.0' },
+  { id: 'wings', name: 'Wings & Sides', sub: 'Wings, tandoori, salads, sides', bg: '#7A2E1D', fg: '#fff', img: 'assets/ingredients/tandoori-chicken.png' },
+  { id: 'juice', name: 'Drinks Bar', sub: 'Juice, lassi, coffee, beer', bg: '#1E6E6A', fg: '#fff', img: 'assets/menu/juice-mix.png', creditText: 'Photo: JIP, Wikimedia Commons, CC BY-SA 4.0' },
+  { id: 'gelato', name: 'Gelato & Shakes', sub: 'Cones, scoops, thick shakes', bg: '#F4C6CF', fg: '#1A1414', img: 'assets/menu/gelato.jpg', creditText: 'Photo: Rizka Budiati, Wikimedia Commons, CC BY 2.0' },
+];
+const HERO = [
+  { img: U('1565299624946-b28f40a0ae38', 2200), by: 'Chad Montano', h: 'briewilly' },
+  { img: U('1513104890138-7c749659a591', 2200), by: 'Ivan Torres', h: 'iavnt' },
+  { img: U('1682264788192-9abdec90c425', 2200), by: 'Joanie Simon', h: 'joaniesimon' },
+];
+const SLIDES = [
+  { id: 1, kicker: 'Wood-fired on every pizza', title: 'Wood-fired. Every pizza.', body: 'Shahi Paneer, Butter Chicken, Chicken Shawarma and fresh pasta, baked to order in Brampton until 2 AM.', cta: '$cta', primaryAct: 'menu', secLabel: 'Pickup deals', secondaryAct: 'deals', bg: '#D7192D', fg: '#fff', blob: '#C11425', chipBg: 'rgba(255,255,255,.16)', btnBg: '#fff', btnFg: '#1A1414', barOff: 'rgba(255,255,255,.38)', showChip: true, img: U('1513104890138-7c749659a591', 1600), by: 'Ivan Torres', h: 'iavnt' },
+  { id: 2, kicker: 'Pickup combo', title: 'Two Large. $35.99.', body: 'Two large pizzas, four toppings each and two dips. Order ahead and pick it up hot.', cta: 'Add combo', primaryAct: 'deal', secLabel: 'All combos', secondaryAct: 'deals', bg: '#1A1414', fg: '#fff', blob: '#262020', chipBg: 'rgba(255,255,255,.12)', btnBg: '#D7192D', btnFg: '#fff', barOff: 'rgba(255,255,255,.3)', showChip: false, img: U('1604382355076-af4b0eb60143', 1600), by: 'Shourav Sheikh', h: 'shouravsheikh' },
+  { id: 3, kicker: 'Open late', title: 'Open till 2 AM.', body: 'Butter Chicken, Shawarma and Tandoori Wings, every night of the week.', cta: 'Order now', primaryAct: 'menu', secLabel: 'House specials', secondaryAct: 'best', bg: '#F2B53A', fg: '#1A1414', blob: '#E8A72C', chipBg: 'rgba(26,20,20,.08)', btnBg: '#1A1414', btnFg: '#fff', barOff: 'rgba(26,20,20,.25)', showChip: false, img: U('1611915365928-565c527a0590', 1600), by: 'Tamas Pap', h: 'tamasp' },
+];
+const BASE_TOPS = { 'shahi-paneer': ['paneer', 'green-peppers', 'red-onions', 'jalapenos'], 'butter-chicken': ['tandoori-chicken', 'green-peppers', 'red-onions'], 'chicken-shawarma': ['shawarma-chicken', 'red-onions', 'hot-peppers'], 'meat-lover': ['pepperoni', 'ham', 'bacon', 'sausage'] };
+const BYO = { id: 'byo', name: 'Build Your Own', desc: 'Any 4 toppings', tops: [], included: 4, img: U('1593560708920-61dd98c46a4e', 1000), by: 'Saundarya Srinivasan', h: 'saundiii' };
+const BYO_SETS = [
+  [['Pepperoni', ['pep-0', 'pep-1'], 48], ['Mushrooms', ['mushroom-0', 'mushroom-1'], 40], ['Green peppers', ['gp-0', 'gp-1', 'gp-2', 'gp-3'], 34], ['Black olives', ['bol-0'], 24]],
+  [['Shahi paneer', ['shahi-0', 'shahi-1', 'shahi-2'], 30], ['Red onions', ['onion-0', 'onion-1'], 34], ['Green peppers', ['gp-0', 'gp-2'], 34], ['Jalapeños', ['jal-0'], 28]],
+  [['Tandoori chicken', ['tand-0', 'tand-1'], 38], ['Red onions', ['onion-0', 'onion-1'], 34], ['Red peppers', ['rp-0', 'rp-1', 'rp-2'], 34], ['Pineapple', ['pine-0'], 32]],
+  [['Pepperoni', ['pep-0', 'pep-1'], 48], ['Italian sausage', ['isaus-0'], 32], ['Bacon', ['bacon-0'], 46], ['Black olives', ['bol-0'], 24]],
+  [['Broccoli', ['broc-0'], 40], ['Tomatoes', ['tomato-0'], 40], ['Green olives', ['gol-0'], 24], ['Sweet corn', ['corn-0', 'corn-2', 'corn-4', 'corn-6'], 16]],
+  [['Grilled chicken', ['grilled-0', 'grilled-1'], 44], ['Mushrooms', ['mushroom-0', 'mushroom-1'], 40], ['Red onions', ['onion-0', 'onion-1'], 34], ['Jalapeños', ['jal-0'], 28]],
+];
+const byoLayer = (si) => {
+  const set = BYO_SETS[si % BYO_SETS.length], per = 5, N = set.length * per, GA = 2.39996, out = [];
+  for (let k = 0; k < per; k++) set.forEach(([name, imgs, w], t) => {
+    const i = k * set.length + t, rr = Math.sqrt((i + 0.6) / N) * 128, a = i * GA + si * 0.7;
+    const rot = ((i * 73 + si * 41) % 360) + 'deg';
+    out.push(React.createElement('img', { key: si + '-' + i, src: 'assets/toppings/pz/' + imgs[(k + t) % imgs.length] + '.png', alt: '',
+      style: { position: 'absolute', left: (180 + Math.cos(a) * rr) + 'px', top: (180 + Math.sin(a) * rr) + 'px', width: w * (0.9 + ((i * 37) % 20) / 100) + 'px', '--r': rot, transform: 'translate(-50%,-50%) rotate(' + rot + ')', opacity: 0, filter: 'drop-shadow(0 3px 3px rgba(0,0,0,.35))', animation: 'pkDrop .5s cubic-bezier(.2,.8,.2,1) ' + (i * 0.025).toFixed(3) + 's forwards' } }));
+  });
+  return out;
+};
+const money = n => '$' + n.toFixed(2);
+const CART_KEY = 'pkp-home-v2-cart';
+
+class Component extends DCLogic {
+  state = { w: typeof window !== 'undefined' ? window.innerWidth : 1200, mode: null, sizes: {}, cart: [], cartOpen: false, toast: null, toastCart: false, slide: 0, modeMenu: false, welcome: false, wMode: 'pickup', addr: '', addrErr: '', when: 'asap', item: null };
+
+  componentDidMount() {
+    this.onPt = e => { this.lastPt = { x: e.clientX, y: e.clientY }; }; document.addEventListener('pointerdown', this.onPt, true);
+    this.onResize = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onResize);
+    this.startTimer();
+    this.onDoc = e => { if (this.state.modeMenu && !(e.target.closest && e.target.closest('[data-mode-menu]'))) this.setState({ modeMenu: false }); };
+    document.addEventListener('mousedown', this.onDoc);
+    try { const c = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); if (Array.isArray(c)) this.setState({ cart: c }); } catch (e) {}
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('pkp-v2-mode') || 'null'); } catch (e) {}
+    if (saved && saved.mode) this.setState({ mode: 'pickup', when: saved.when || 'asap' });
+    const sw = this.props.showWelcome ?? 'always';
+    if (sw === 'always' || (sw === 'first-visit' && !saved)) this.setState({ welcome: true, wMode: 'pickup' });
+    this.onKey = e => { if (e.key === 'Escape') this.setState({ welcome: false, cartOpen: false, modeMenu: false, item: null }); };
+    document.addEventListener('keydown', this.onKey);
+  }
+  timeSlots(open) {
+    const out = []; const d = new Date();
+    if (!open) { if (d.getHours() >= 2) { d.setHours(11, 0, 0, 0); } }
+    else { d.setMinutes(d.getMinutes() < 30 ? 30 : 60, 0, 0); d.setMinutes(d.getMinutes() + 30); }
+    for (let i = 0; i < 6; i++) {
+      const hh = d.getHours();
+      if (open && hh >= 2 && hh < 11) break;
+      out.push(d.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' }).replace('a.m.', 'AM').replace('p.m.', 'PM'));
+      d.setMinutes(d.getMinutes() + 30);
+    }
+    return out;
+  }
+  confirmWelcome() {
+    const s = this.state;
+    const when = s.when;
+    this.setState({ mode: 'pickup', welcome: false });
+    try { localStorage.setItem('pkp-v2-mode', JSON.stringify({ mode: 'pickup', when })); } catch (e) {}
+    this.showToast('Pickup' + (when === 'asap' ? ', as soon as possible' : ' at ' + when));
+  }
+  componentWillUnmount() { clearTimeout(this.at); if (this.onPt) document.removeEventListener('pointerdown', this.onPt, true); window.removeEventListener('resize', this.onResize); clearTimeout(this.tt); clearInterval(this.timer); document.removeEventListener('mousedown', this.onDoc); document.removeEventListener('keydown', this.onKey); }
+  startTimer() {
+    clearInterval(this.timer);
+    if ((this.props.autoplay ?? true) === false) return;
+    this.timer = setInterval(() => { if (!this.paused) this.setState(s => ({ slide: (s.slide + 1) % SLIDES.length })); }, 6500);
+  }
+  goSlide(i) { this.setState({ slide: (i + SLIDES.length) % SLIDES.length }); this.startTimer(); }
+  saveCart(cart) { this.setState({ cart }); try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) {} }
+  addLine(line, n) {
+    const q = n || 1;
+    const cart = [...this.state.cart];
+    const i = cart.findIndex(l => l.key === line.key);
+    if (i >= 0) cart[i] = { ...cart[i], qty: cart[i].qty + q }; else cart.push({ ...line, qty: q });
+    this.saveCart(cart);
+    this.showAdded(line, q);
+  }
+  guessImg(t) {
+    t = t.toLowerCase();
+    if (/juice|lassi|sugarcane|coconut/.test(t)) return 'assets/menu/juice-mix.png';
+    if (/gelato|shake|scoop|cone/.test(t)) return 'assets/menu/gelato.jpg';
+    if (/pasta|penne|spaghetti|alfredo|ros[eé]|momo/.test(t)) return 'assets/menu/pasta.jpg';
+    if (/pizza|combo|crust|small|medium|large|paneer|pepperoni|meat|veg/.test(t)) return 'assets/pizza-base.png';
+    return '';
+  }
+  showAdded(line, q) {
+    clearTimeout(this.at); this.setState({ toast: null, added: { img: 'img' in line ? line.img : this.guessImg(line.name + ' ' + (line.summary || '')), name: line.name, summary: line.summary || '', price: '$' + ((line.unit || 0) * q).toFixed(2), qty: q, n: (this.addN = (this.addN || 0) + 1) } });
+    this.at = setTimeout(() => this.setState({ added: null }), 3800);
+    const p = this.lastPt; if (!p || typeof document === 'undefined') return;
+    const dot = document.createElement('div'); dot.textContent = '+' + q;
+    Object.assign(dot.style, { position: 'fixed', left: p.x - 22 + 'px', top: p.y - 22 + 'px', width: '44px', height: '44px', borderRadius: '50%', background: '#D7192D', color: '#fff', font: "900 15px 'Figtree',system-ui,sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, pointerEvents: 'none', boxShadow: '0 10px 24px rgba(215,25,45,.4)' });
+    document.body.appendChild(dot);
+    const tx = window.innerWidth - 140 - p.x, ty = window.innerHeight - 44 - p.y;
+    const an = dot.animate([{ transform: 'translate(0,0) scale(.4)', opacity: 0 }, { transform: 'translate(' + tx * .15 + 'px,' + (ty * .15 - 90) + 'px) scale(1.15)', opacity: 1, offset: .25 }, { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(.5)', opacity: .9 }], { duration: 750, easing: 'cubic-bezier(.5,0,.75,1)' });
+    an.onfinish = () => dot.remove();
+  }
+  addedEnter = el => { if (el && el.dataset.n !== String(this.addN)) { el.dataset.n = String(this.addN); el.animate([{ transform: 'translateY(24px) scale(.96)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(.2,.9,.25,1.1)' }); const bar = el.querySelector('[data-bar]'); if (bar) bar.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: 4200, easing: 'linear', fill: 'forwards' }); const ck = el.querySelector('[data-ck]'); if (ck) ck.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.2)', offset: .6 }, { transform: 'scale(1)' }], { duration: 480, delay: 120, fill: 'both', easing: 'ease-out' }); } };
+  changeQty(key, d) { this.saveCart(this.state.cart.map(l => l.key === key ? { ...l, qty: l.qty + d } : l).filter(l => l.qty > 0)); }
+  showToast(msg, withCart) {
+    clearTimeout(this.tt);
+    this.setState({ toast: msg, toastCart: !!withCart });
+    this.tt = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+  scrollToId(id) {
+    const el = document.getElementById(id);
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 84, behavior: 'smooth' });
+  }
+  isOpen() {
+    const o = this.props.openState ?? 'auto';
+    if (o === 'open') return true;
+    if (o === 'closed') return false;
+    try {
+      const h = +new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Toronto', hour: 'numeric', hourCycle: 'h23' }).format(new Date());
+      return h >= 11 || h < 2;
+    } catch (e) { return true; }
+  }
+  addItem() {
+    const it = this.state.item; if (!it) return;
+    const p = SPECIALS.find(x => x.id === it.id); if (!p) return;
+    this.setState({ item: null });
+    this.addLine({ key: [p.id, it.size, it.crust, it.bake].join('-'), name: SIZE_NAMES[it.size] + ' ' + p.name, summary: it.crust + ' crust · ' + it.bake, unit: pricesFor(p.id)[it.size] }, it.qty);
+  }
+  setItem(patch) { this.setState(s => ({ item: s.item ? { ...s.item, ...patch } : s.item })); }
+  heroAct(a, pickup) {
+    if (a === 'deal') return this.addDeal(DEALS[0], pickup);
+    this.scrollToId(a === 'menu' ? 'menu' : a === 'best' ? 'bestsellers' : 'deals');
+  }
+  addDeal(d, pickup) {
+    this.setState({ combo: d.id });
+  }
+
+  renderVals() {
+    if (!this._byoT) this._byoT = setInterval(() => this.setState(st => ({ byoSet: ((st.byoSet || 0) + 1) % BYO_SETS.length })), 2600);
+    const byoSi = this.state.byoSet || 0;
+    const mode = this.state.mode || this.props.defaultMode || 'pickup';
+    const pickup = true;
+    const open = this.isOpen();
+    const w = this.state.w;
+    const si = this.state.slide; const S = SLIDES[si];
+    const isWide = w >= 900;
+    const nav = id => e => { if (e && e.preventDefault) e.preventDefault(); this.scrollToId(id); };
+    const count = this.state.cart.reduce((a, l) => a + l.qty, 0);
+    const total = this.state.cart.reduce((a, l) => a + l.qty * l.unit, 0);
+    const onShadow = '0 1px 3px rgba(26,20,20,.16)';
+    const credit = o => o.creditText ? { credit: o.creditText, creditHref: o.creditHref || '' } : ({ credit: o.by ? 'Photo by ' + o.by + ' on Unsplash' : '', creditHref: o.h ? 'https://unsplash.com/@' + o.h : '' });
+
+    const specials = SPECIALS.map(p => {
+      const size = this.state.sizes[p.id] || 'L';
+      return {
+        ...p, ...credit(p), slotId: 'v2-special-' + p.id,
+        vegColor: p.veg ? '#1F8A4C' : '#A3301A', vegLabel: p.veg ? 'Veg' : 'Non-veg',
+        hasTag: !!p.tag, priceText: money(pricesFor(p.id)[size]),
+        meta: [p.veg ? 'Vegetarian' : null, p.tag || null].filter(Boolean).join(' · '), hasMeta: !!(p.veg || p.tag), metaColor: p.veg ? '#12663A' : '#C11425',
+        fromText: 'From ' + money(pricesFor(p.id).S), addLabel: 'Customize ' + p.name,
+        open: () => this.setState({ item: { id: p.id, size: 'L', crust: 'Thin', bake: 'Wood-fired', qty: 1 } }), sizeName: SIZE_NAMES[size] + ' · wood-fired',
+        sizeOpts: ['S', 'M', 'L', 'XL'].map(k => ({
+          k, price: money(pricesFor(p.id)[k]), pressed: k === size, bg: k === size ? '#1A1414' : '#fff', fg: k === size ? '#fff' : '#1A1414', border: k === size ? '#1A1414' : '#E3E3E6',
+          pick: () => this.setState(s => ({ sizes: { ...s.sizes, [p.id]: k } })),
+        })),
+        add: () => this.addLine({ key: p.id + '-' + size, name: SIZE_NAMES[size] + ' ' + p.name, summary: 'Wood-fired · thin crust', unit: pricesFor(p.id)[size] }),
+      };
+    });
+
+    return {
+      byoToppings: byoLayer(byoSi), byoNames: BYO_SETS[byoSi].map(x => x[0]).join(' · '),
+      isWide, isNarrow: !isWide,
+      showNav: w >= 1180, showWordmark: w >= 560, showCartLabel: w >= 480,
+      modeLabel: w < 480 ? 'Pickup' : (this.state.when === 'asap' ? 'Pickup · ' + (open ? 'ASAP' : '11 AM') : 'Pickup · ' + this.state.when),
+      welcomeOpen: this.state.welcome,
+      welcomeSub: 'Choose pickup or delivery.',
+      wCols: w >= 520 ? '1fr 1fr' : '1fr',
+      wIsPickup: this.state.wMode === 'pickup', wIsDelivery: this.state.wMode === 'delivery',
+      wOpts: ['pickup', 'delivery'].map(id => {
+        const on = this.state.wMode === id;
+        return { id, on, isPickup: id === 'pickup', isDelivery: id === 'delivery', name: id === 'pickup' ? 'Pickup' : 'Delivery',
+          sub: id === 'pickup' ? (open ? 'Ready as soon as possible' : 'Ready from 11 AM') : 'Through DoorDash or Uber Eats',
+          border: on ? '#D7192D' : '#E7E7EA', bg: on ? '#FFF6F6' : '#fff', iconBg: on ? '#D7192D' : '#F0F0F3', iconFg: on ? '#fff' : '#1A1414', checkBg: on ? '#D7192D' : '#fff',
+          pick: () => this.setState({ wMode: id, addrErr: '' }) };
+      }),
+      addr: this.state.addr, hasAddrErr: !!this.state.addrErr, addrErr: this.state.addrErr, addrBorder: this.state.addrErr ? '#D7192D' : '#E3E3E6',
+      onAddr: e => this.setState({ addr: e.target.value, addrErr: '' }),
+      onAddrKey: e => { if (e.key === 'Enter') this.confirmWelcome(); },
+      whenOpts: (open ? ['asap'] : []).concat(this.timeSlots(open)).map(t => {
+        const sel = this.state.when === t || (!open && this.state.when === 'asap' && t === this.timeSlots(open)[0]);
+        return { label: t === 'asap' ? 'ASAP' : t, bg: sel ? '#1A1414' : '#fff', fg: sel ? '#fff' : '#1A1414', border: sel ? '#1A1414' : '#E3E3E6', pick: () => this.setState({ when: t }) };
+      }),
+      confirmLabel: 'Start pickup order',
+      confirmWelcome: () => this.confirmWelcome(),
+      skipWelcome: () => this.setState({ welcome: false }),
+      ...(() => {
+        const st = this.state.item; const p = st && SPECIALS.find(x => x.id === st.id);
+        if (!p) return { itemOpen: false, it: {} };
+        const fg = on => on ? '#1A1414' : '#818184';
+        return {
+          itemOpen: true, itemW: w < 560 ? '100%' : 'min(520px,100%)', itemMaxH: w < 560 ? '92vh' : 'calc(100vh - 48px)',
+          it: {
+            ...p, ...credit(p), slotId: 'v2-item-' + p.id, qty: st.qty, totalText: money(pricesFor(p.id)[st.size] * st.qty),
+            meta: [p.veg ? 'Vegetarian' : null, p.tag || null].filter(Boolean).join(' · '), hasMeta: !!(p.veg || p.tag), metaColor: p.veg ? '#12663A' : '#C11425',
+            sizes: ['S', 'M', 'L', 'XL'].map((k, i) => ({ name: SIZE_NAMES[k], price: money(pricesFor(p.id)[k]), on: st.size === k, fw: st.size === k ? '800' : '600', bg: st.size === k ? '#F8F8FB' : '#fff', divider: i ? '1px solid #E7E7EA' : '0', pick: () => this.setItem({ size: k }) })),
+            crustLeft: st.crust === 'Thin' ? '4px' : '50%', thinFg: fg(st.crust === 'Thin'), thickFg: fg(st.crust === 'Thick'),
+            bakeLeft: st.bake === 'Wood-fired' ? '4px' : '50%', woodFg: fg(st.bake === 'Wood-fired'), convFg: fg(st.bake === 'Conventional'),
+          },
+        };
+      })(),
+      closeItem: () => this.setState({ item: null }),
+      addedOn: !!this.state.added, addedEnter: this.addedEnter, addedName: this.state.added ? (this.state.added.qty > 1 ? this.state.added.qty + ' × ' : '') + this.state.added.name : '', addedSub: this.state.added ? (this.state.added.summary || '') : '', addedPrice: this.state.added ? this.state.added.price : '', addedImg: this.state.added ? this.state.added.img : '', addedBg: this.state.added && this.state.added.img ? 'url("' + this.state.added.img + '")' : '', addedHasImg: !!(this.state.added && this.state.added.img), addedNoImg: !(this.state.added && this.state.added.img), addedRight: this.state.w < 560 ? '16px' : '24px',
+      closeAdded: () => { clearTimeout(this.at); this.setState({ added: null }); }, addedView: () => { clearTimeout(this.at); this.setState({ added: null, cartOpen: true }); },
+      comboOpen: !!this.state.combo, comboDeal: DEALS.find(d => d.id === this.state.combo) || null,
+      closeCombo: () => this.setState({ combo: null }),
+      menuDeal: id => this.addDeal(DEALS.find(d => d.id === id), pickup),
+      comboAdd: (line, qty) => { this.setState({ combo: null }); this.addLine(line, qty); },
+      itemOpen: !!this.state.item,
+      sizePrices: SIZE_PRICES,
+      builderItem: (() => { const st = this.state.item; if (!st) return null; if (st.custom) return st.custom; if (st.id === 'byo') return { ...BYO, ...credit(BYO) }; const p = SPECIALS.find(x => x.id === st.id); return p ? { ...p, ...credit(p), img: p.img.replace('w=900', 'w=1000'), tops: BASE_TOPS[p.id] || [] } : null; })(),
+      builderAdd: (line, qty) => { this.setState({ item: null }); this.addLine(line, qty); },
+      addItem: () => this.addItem(),
+      setThin: () => this.setItem({ crust: 'Thin' }), setThick: () => this.setItem({ crust: 'Thick' }),
+      setWood: () => this.setItem({ bake: 'Wood-fired' }), setConv: () => this.setItem({ bake: 'Conventional' }),
+      incQty: () => this.setState(s => ({ item: s.item ? { ...s.item, qty: Math.min(20, s.item.qty + 1) } : s.item })),
+      decQty: () => this.setState(s => ({ item: s.item ? { ...s.item, qty: Math.max(1, s.item.qty - 1) } : s.item })),
+      ...(() => {
+        const sheet = w < 560;
+        const slots = this.timeSlots(open);
+        const later = this.state.when !== 'asap' || !open;
+        const selC = { border: '#1A1414', bg: '#fff' }, offC = { border: '#E7E7EA', bg: '#F9F9FC' };
+        return {
+          sheetAlign: sheet ? 'flex-end' : 'center', sheetPad: sheet ? '0' : '16px', sheetW: sheet ? '100%' : 'min(460px,100%)',
+          sheetRadius: sheet ? '28px 28px 0 0' : '28px', sheetAnim: sheet ? 'pkpUp .32s cubic-bezier(.2,.8,.2,1) both' : 'pkpIn .26s cubic-bezier(.2,.8,.2,1) both',
+          segLeft: this.state.wMode === 'pickup' ? '4px' : '50%',
+          pickFg: this.state.wMode === 'pickup' ? '#1A1414' : '#818184', delFg: this.state.wMode === 'delivery' ? '#1A1414' : '#818184',
+          setWPickup: () => this.setState({ wMode: 'pickup', addrErr: '' }), setWDelivery: () => this.setState({ wMode: 'delivery', addrErr: '' }),
+          noAddrErr: !this.state.addrErr,
+          isLater: later, isAsap: !later,
+          wGridCols: w >= 820 ? 'minmax(0,.92fr) minmax(0,1fr)' : 'minmax(0,1fr)',
+          wImgMinH: w >= 820 ? '100%' : '150px',
+          wModalW: w >= 820 ? 'min(960px,100%)' : (sheet ? '100%' : 'min(540px,100%)'),
+          wPad: w >= 820 ? '34px 34px 30px' : '22px 20px 24px',
+          wCloseBg: w >= 820 ? '#EFEFF2' : '#fff',
+          asapRowBg: later ? '#fff' : '#F8F8FB', laterRowBg: later ? '#F8F8FB' : '#fff',
+          asapTitle: open ? 'As soon as possible' : 'Next available',
+          asapSub: open ? '' : '11:00 AM',
+          laterSub: later && this.state.when !== 'asap' ? this.state.when : 'Pick a time',
+          asapBorder: later ? offC.border : selC.border, asapBg: later ? offC.bg : selC.bg,
+          laterBorder: later ? selC.border : offC.border, laterBg: later ? selC.bg : offC.bg,
+          setAsap: () => this.setState({ when: 'asap' }),
+          setLater: () => this.setState(st => ({ when: st.when === 'asap' ? (slots[0] || 'asap') : st.when })),
+          timeOpts: slots.map(t => { const on = this.state.when === t; return { label: t, border: on ? '#1A1414' : '#E0E0E3', bg: on ? '#1A1414' : '#fff', fg: on ? '#fff' : '#1A1414', pick: () => this.setState({ when: t }) }; }),
+        };
+      })(),
+      welcomeSub: 'Choose pickup or delivery.',
+      modeMenuOpen: this.state.modeMenu,
+      toggleModeMenu: () => this.setState({ welcome: true, wMode: 'pickup', modeMenu: false }),
+      modeOpts: [
+        { name: 'Pickup', sub: 'Ready as soon as possible', on: pickup, bg: pickup ? '#F2F2F5' : '#fff', pick: () => this.setState({ mode: 'pickup', modeMenu: false }) },
+        { name: 'Delivery', sub: 'Through DoorDash or Uber Eats', on: !pickup, bg: !pickup ? '#F2F2F5' : '#fff', pick: () => this.setState({ welcome: true, wMode: 'delivery', modeMenu: false }) },
+      ],
+      slide: { ...S, ctaLabel: S.cta === '$cta' ? (open ? 'Start your order' : 'Order for later') : S.cta, primary: () => this.heroAct(S.primaryAct, pickup), secondary: () => this.heroAct(S.secondaryAct, pickup) },
+      slides: SLIDES.map((s, i) => ({ ...credit(s), slotId: 'v2-hero-' + s.id, img: s.img, opacity: i === si ? 1 : 0, pe: i === si ? 'auto' : 'none', barW: i === si ? '34px' : '12px', barBg: i === si ? S.fg : S.barOff, label: 'Show slide ' + (i + 1), pick: () => this.goSlide(i) })),
+      nextSlide: () => this.goSlide(si + 1), prevSlide: () => this.goSlide(si - 1),
+      pauseHero: () => { this.paused = true; }, resumeHero: () => { this.paused = false; },
+      statusColor: open ? '#12663A' : '#B5121F',
+      statusLong: '',
+      footCols: w >= 900 ? 'minmax(0,1.4fr) repeat(3,minmax(0,1fr))' : (w >= 560 ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)'),
+      pickupTop: e => { e.preventDefault(); this.setState({ mode: 'pickup' }); window.scrollTo({ top: 0, behavior: 'smooth' }); },
+      deliveryTop: e => { e.preventDefault(); this.setState({ welcome: true, wMode: 'delivery' }); },
+      heroCols: w >= 1000 ? 'minmax(0,1.05fr) minmax(0,1fr)' : 'minmax(0,1fr)',
+      perkCols: w >= 760 ? 'repeat(3,minmax(0,1fr))' : 'minmax(0,1fr)',
+      statusDot: open ? '#3DD68C' : '#FF6B6B',
+      statusShort: '',
+      etaText: '',
+      ctaText: open ? 'Start your order' : 'Order for later',
+      pickupBg: pickup ? '#fff' : 'transparent', deliveryBg: pickup ? 'transparent' : '#fff',
+      pickupShadow: pickup ? onShadow : 'none', deliveryShadow: pickup ? 'none' : onShadow,
+      pickupBgHero: pickup ? '#fff' : 'transparent', pickupFgHero: pickup ? '#1A1414' : S.fg,
+      deliveryBgHero: pickup ? 'transparent' : '#fff', deliveryFgHero: pickup ? S.fg : '#1A1414',
+      setPickup: () => this.setState({ mode: 'pickup' }),
+      setDelivery: () => this.setState({ welcome: true, wMode: 'delivery' }),
+      goTop: e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
+      ...(() => { const viaHome = fn => e => { if (this.state.view !== 'home' && this.state.view) { if (e && e.preventDefault) e.preventDefault(); this.setState({ view: 'home' }, () => setTimeout(() => fn({ preventDefault() {} }), 60)); } else fn(e); }; const openMenu = e => { if (e && e.preventDefault) e.preventDefault(); this.setState({ view: 'menu' }); window.scrollTo({ top: 0 }); }; return { navMenu: openMenu, openMenu, navBest: viaHome(nav('bestsellers')), navDeals: viaHome(nav('deals')), navOven: viaHome(nav('oven')), navVisit: viaHome(nav('visit')), goHome: e => { if (e && e.preventDefault) e.preventDefault(); this.setState({ view: 'home' }); window.scrollTo({ top: 0, behavior: 'smooth' }); }, homeView: !this.state.view || this.state.view === 'home', pastaView: this.state.view === 'pasta', wingsView: this.state.view === 'wings', juiceView: this.state.view === 'juice', gelatoView: this.state.view === 'gelato', menuView: this.state.view === 'menu', meatView: this.state.view === 'meat', openCustom: item => this.setState({ item: { id: item.id, custom: item } }), openByo: () => this.setState({ item: { id: 'byo' } }), backToTiles: () => this.setState({ view: 'home' }, () => setTimeout(() => this.scrollToId('menu'), 60)), menuAdd: (line, qty) => this.addLine(line, qty) }; })(),
+      bentoCols: w >= 1000 ? '1.55fr 1fr 1fr' : (w >= 600 ? '1fr 1fr' : '1fr'),
+      bentoRows: w >= 1000 ? 'minmax(0,1fr) minmax(0,1fr)' : (w >= 600 ? '560px 320px 300px' : '540px 330px 290px 290px'),
+      bentoAreas: w >= 1000 ? '"hero deal deal" "hero byo pasta"' : (w >= 600 ? '"hero hero" "deal deal" "byo pasta"' : '"hero" "deal" "byo" "pasta"'),
+      bentoH: w >= 1000 ? 'clamp(640px,calc(100vh - 110px),800px)' : 'auto',
+      bentoFont: w >= 1000 ? 'clamp(64px,6.8vw,96px)' : (w >= 600 ? '84px' : '15vw'),
+      dealSecondPizza: w >= 600 ? 'block' : 'none',
+      dealExtras: w >= 600 ? 'flex' : 'none',
+      openShahi: () => this.setState({ item: { id: 'shahi-paneer' } }),
+      openPasta: () => { this.setState({ view: 'pasta' }); window.scrollTo({ top: 0 }); },
+      heroRowDir: w >= 1000 ? 'row' : 'column', heroRowAlign: w >= 1000 ? 'center' : (w < 600 ? 'stretch' : 'flex-start'), heroFont: w < 600 ? '9.2vw' : 'clamp(42px,8vw,112px)', heroWrap: w < 600 ? 'normal' : 'nowrap', chipImg: w >= 480, chipDesc: w >= 480 ? '4 toppings each, 2 dips, 2 drinks' : '2 dips, 2 drinks', chipGap: w >= 480 ? '16px' : '12px', chipH: w >= 480 ? '80px' : '68px', chipPadL: w >= 480 ? '10px' : '22px', chipPrice: w >= 480 ? '26px' : '22px', chipBtn: w >= 480 ? '60px' : '52px', headGap: w >= 560 ? '24px' : '12px', cartPadR: w >= 480 ? '18px' : '10px', heroChipW: w >= 1000 ? '440px' : 'min(100%,480px)',
+      heroLayers: HERO.map((b, i) => React.createElement('img', { key: i, src: b.img, alt: '', style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '60% 40%', opacity: i === si ? 1 : 0, transform: 'scale(' + (i === si ? 1.08 : 1) + ')', transition: i === si ? 'opacity 1.2s ease, transform 7.5s linear' : 'opacity 1.2s ease, transform 0s linear 1.2s' } })),
+      heroBgs: HERO.map((b, i) => ({ ready: true, img: b.img, opacity: i === si ? 1 : 0, scale: i === si ? 1.08 : 1, trans: i === si ? 'opacity 1.2s ease, transform 7.5s linear' : 'opacity 1.2s ease, transform 0s linear 1.2s' })),
+      heroCredit: 'Photo: ' + HERO[si % 3].by + ' / Unsplash', heroCreditHref: 'https://unsplash.com/@' + HERO[si % 3].h,
+      ...[0, 1, 2].reduce((o, i) => ({ ...o, ['heroO' + i]: i === si ? 1 : 0, ['heroY' + i]: i === si ? '0%' : (i === (si + 2) % 3 ? '-110%' : '110%'), ['heroH' + i]: i !== si }), {}),
+      addTwoLarge: () => this.addDeal(DEALS.find(d => d.id === 'two-large'), pickup),
+      deals: DEALS.map(d => ({ ...d, ...credit(d), priceText: money(d.price), slotId: 'v2-deal-' + d.id, aria: 'Customize ' + d.name + ' combo', add: () => this.addDeal(d, pickup) })),
+      tiles: TILES.map(t => ({ ...t, ...credit(t), hasImg: !!t.img, noImg: !t.img, slotId: 'v2-tile-' + t.id, go: () => t.id === 'byo' ? this.setState({ item: { id: 'byo' } }) : ['meat', 'pasta', 'wings', 'juice', 'gelato'].includes(t.id) ? (this.setState({ view: t.id }), window.scrollTo({ top: 0 })) : (t.target ? this.scrollToId(t.target) : this.showToast(t.name + ' opens on the full menu page')) })),
+      tileCols: w >= 1000 ? 'repeat(4,minmax(0,1fr))' : 'repeat(2,minmax(0,1fr))',
+      specials,
+      specialCols: w >= 1100 ? 'repeat(4,minmax(0,1fr))' : (w >= 620 ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)'),
+      dealCols: w >= 1100 ? 'repeat(4,minmax(0,1fr))' : (w >= 560 ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)'),
+      ovenCols: w >= 960 ? 'minmax(0,1fr) minmax(0,1fr)' : 'minmax(0,1fr)',
+      ovenImgMinH: w >= 960 ? '460px' : '0', ovenImgAR: w >= 960 ? 'auto' : (w >= 600 ? '16/9' : '4/3'),
+      cartCount: count, cartCountText: count + (count === 1 ? ' item' : ' items'), cartTotalText: money(total),
+      hasItems: count > 0, cartEmpty: count === 0, footPadB: count > 0 ? '124px' : '28px',
+      showBottomBar: !isWide && count > 0 && !this.state.cartOpen,
+      cartOpen: this.state.cartOpen,
+      checkoutBg: '#FFFFFF',
+      ccLines: this.state.cart, ccMode: 'pickup', ccQty: (key, d) => this.changeQty(key, d), ccAdd: line => this.addLine(line), ccMode2: m => this.setState({ mode: m }), ccPlaced: () => { this.saveCart([]); this.setState({ cartOpen: false }); },
+      openCart: () => this.setState({ cartOpen: true, toast: null }),
+      closeCart: () => this.setState({ cartOpen: false }),
+      stop: e => e.stopPropagation(),
+      shopFromCart: () => { this.setState({ cartOpen: false }); setTimeout(() => this.scrollToId('bestsellers'), 50); },
+      modeLine: 'Pickup · 10-511 Ray Lawson Blvd',
+      lines: this.state.cart.map(l => ({ ...l, totalText: money(l.unit * l.qty), inc: () => this.changeQty(l.key, 1), dec: () => this.changeQty(l.key, -1) })),
+      showUpsell: count > 0 && !this.state.cart.some(l => l.key === 'fruit-juice'),
+      addJuice: () => this.addLine({ key: 'fruit-juice', name: 'Fresh fruit juice', summary: 'Per mug', unit: 6.81 }),
+      soonCheckout: () => this.showToast('Checkout is the next screen to build'),
+      toastOn: !!this.state.toast, toast: this.state.toast, toastHasCart: this.state.toastCart && !this.state.cartOpen,
+      toastBottom: count > 0 ? '100px' : '24px',
+    };
+  }
+}
+</script>
+</body>
+</html>

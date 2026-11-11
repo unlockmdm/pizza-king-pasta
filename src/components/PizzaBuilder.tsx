@@ -1,5 +1,5 @@
-// Live pizza builder. Port of design_handoff_pizza_king_website/prototype/PizzaBuilder.dc.html.
-import { useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
+// Live pizza builder. Port of design_handoff_pizza_king_website 2/prototype/PizzaBuilder.dc.html.
+import { Fragment, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import type { Half, NewLine, PizzaBuilderProps, PizzaConfig, SizeKey, SizePrices } from '../lib/types';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
@@ -49,9 +49,9 @@ interface Topping {
 // [id, name, category, ingredient photo, weight]
 const TOP_ROWS: [string, string, TopCat, string | null, number?][] = [
   ['mushrooms', 'Mushrooms', 'Veggie', 'mushrooms.png'], ['green-peppers', 'Green pepper', 'Veggie', 'green-peppers.png'], ['red-pepper', 'Red pepper', 'Veggie', 'red-pepper.png'], ['tomatoes', 'Tomatoes', 'Veggie', 'tomatoes.png'],
-  ['green-olives', 'Green olives', 'Veggie', 'olives.png'], ['soya-champ', 'Soya champ', 'Veggie', null], ['olives', 'Black olives', 'Veggie', 'olives.png'], ['red-onions', 'Onions', 'Veggie', 'red-onions.png'],
+  ['green-olives', 'Green olives', 'Veggie', 'olives.png'], ['soya-champ', 'Soya champ', 'Veggie', 'soya-champ.jpg'], ['olives', 'Black olives', 'Veggie', 'olives.png'], ['red-onions', 'Onions', 'Veggie', 'red-onions.png'],
   ['hot-peppers', 'Hot pepper', 'Veggie', 'chilli.png'], ['pineapple', 'Pineapple', 'Veggie', 'pineapple.png'], ['jalapenos', 'Jalapeño pepper', 'Veggie', 'jalapenos.png'], ['sun-dried', 'Sun dried tomatoes', 'Veggie', 'sun-dried.png'],
-  ['broccoli', 'Broccoli', 'Veggie', 'broccoli.png'], ['corn', 'Sweet corn', 'Veggie', 'corn.jpg'], ['shahi-paneer', 'Shahi paneer', 'Veggie', 'paneer.jpg'], ['paneer', 'Tandoori paneer', 'Veggie', 'paneer.jpg'],
+  ['broccoli', 'Broccoli', 'Veggie', 'broccoli.png'], ['corn', 'Sweet corn', 'Veggie', 'corn.jpg'], ['shahi-paneer', 'Shahi paneer', 'Veggie', 'shahi-paneer-y.jpg'], ['paneer', 'Tandoori paneer', 'Veggie', 'paneer.jpg'],
   ['veg-pepperoni', 'Veggie pepperoni', 'Veggie', 'pepperoni.jpg'], ['extra-mozz', 'Extra cheese', 'Veggie', 'extra-mozz.png', 2], ['feta', 'Feta cheese', 'Veggie', 'feta.jpg'], ['zucchini', 'Zucchini', 'Veggie', 'zucchini.png'], ['eggplant', 'Eggplant', 'Veggie', 'eggplant.png'],
   ['pepperoni', 'Pepperoni', 'Meat', 'pepperoni.jpg'], ['anchovies', 'Anchovies', 'Meat', null], ['bacon', 'Bacon', 'Meat', 'bacon.png'], ['ham', 'Ham', 'Meat', 'ham.png'], ['sausage', 'Hot Italian sausage', 'Meat', 'sausage.png'],
   ['grilled-chicken', 'Grilled chicken', 'Meat', 'shawarma-chicken.png', 2], ['tandoori-chicken', 'Tandoori chicken', 'Meat', 'tandoori-chicken.png', 2], ['butter-chicken', 'Butter chicken', 'Meat', 'butter-chicken.png'],
@@ -69,15 +69,26 @@ const TOPS: Topping[] = TOP_ROWS.map(([id, name, cat, f, wt]) => ({
 const TOPMAP: Record<string, Topping> = Object.fromEntries(TOPS.map((t) => [t.id, t]));
 
 const FREE = ['Ginger', 'Garlic', 'Coriander', 'Red chilli', 'Green chilli', 'Oregano', 'Italian spice'] as const;
-const FREE_IMG: Record<string, string> = { Ginger: 'ginger.png', Garlic: 'sauce-garlic.png', Coriander: 'coriander.png', 'Red chilli': 'red-chilli.png', 'Green chilli': 'chilli.png' };
+const FREE_IMG: Record<string, string> = { Ginger: 'ginger.png', Garlic: 'sauce-garlic.png', Coriander: 'coriander.png', 'Red chilli': 'red-chilli.png', 'Green chilli': 'chilli.png', Oregano: 'oregano.png', 'Italian spice': 'italian-spice.png' };
 
-// [value, label, photo, swatch colour]
-const SAUCES: [string, string, string | null, string?][] = [['Regular', 'Regular pizza sauce', 'sauce-tomato.png'], ['Butter chicken', 'Butter chicken', null, '#E07A2E'], ['Shahi paneer', 'Shahi paneer', null, '#E9A23B'], ['Garlic', 'Garlic', 'sauce-garlic.png'], ['Hot', 'Hot sauce', null, '#C0281C'], ['BBQ', 'BBQ', null, '#5A2A1A'], ['Pesto', 'Pesto', null, '#5F8A3A'], ['Honey garlic', 'Honey garlic', null, '#C98B2B']];
-/** Colour used to tint the sauce layer on the live pizza. Regular shows the photo's own sauce. */
-const SAUCE_TINT: Record<string, string> = { Garlic: '#F1E4C3', ...Object.fromEntries(SAUCES.filter((x) => x[3]).map((x) => [x[0], x[3] as string])) };
+// [value, display label, file under assets/sauces/ without .png]. 'Regular' is shown as "Marinara".
+const SAUCES: [string, string, string][] = [['Regular', 'Marinara', 'tomato'], ['Butter chicken', 'Butter chicken', 'butter-chicken'], ['Shahi paneer', 'Shahi paneer', 'shahi-paneer'], ['Garlic', 'Garlic', 'garlic'], ['Hot', 'Hot sauce', 'hot'], ['BBQ', 'BBQ', 'bbq'], ['Pesto', 'Pesto', 'pesto'], ['Honey garlic', 'Honey garlic', 'honey-garlic']];
+const sauceImg = (f: string) => 'assets/sauces/' + f + '.png';
+/** Live pizza base image per sauce. Regular (marinara) keeps the plain base photo. */
+const SAUCE_BASE: Record<string, string> = { 'Butter chicken': 'assets/sauce-base/butter-chicken.png', 'Shahi paneer': 'assets/sauce-base/shahi-paneer.png', Garlic: 'assets/sauce-base/garlic.png', Hot: 'assets/sauce-base/hot.png', BBQ: 'assets/sauce-base/bbq.png', Pesto: 'assets/sauce-base/pesto.png', 'Honey garlic': 'assets/sauce-base/honey-garlic.png' };
 
-const CRUSTS: [string, string][] = [['Regular', BASE_IMG], ['Thin', IMG + 'crust-thin.jpg'], ['Thick', IMG + 'crust-thick.jpg']];
-const OVENS = ['Wood-fired', 'Conventional'];
+/** Crust cards: [value, subtitle, stacked-disc layer count]. */
+const CRUSTS: [string, string, number][] = [['Regular', 'Classic hand-tossed', 9], ['Thin', 'Light and crispy', 3], ['Thick', 'Soft and bready', 13]];
+/** Brown gradient discs stacked under the top photo (darkest at the bottom). */
+const crustLayers = (t: number) => Array.from({ length: t }, (_, j) => {
+  const k = j / Math.max(1, t - 1);
+  return { z: j - t + 'px', bg: 'rgb(' + Math.round(150 + 60 * k) + ',' + Math.round(96 + 52 * k) + ',' + Math.round(48 + 34 * k) + ')' };
+});
+interface OvenCard { v: string; desc: string; img: string; bg: string; r: string; b: string; w: string; h: string; fit: string; pos: string; ar: string }
+const OVENS: OvenCard[] = [
+  { v: 'Wood-fired', desc: 'Smoky, blistered crust. Our default.', img: 'assets/oven-wood-fired.png', bg: '#120B08', r: '0', b: '0', w: '100%', h: '100%', fit: 'cover', pos: '40% 45%', ar: 'auto' },
+  { v: 'Conventional', desc: 'Even bake, softer crust. Same price.', img: BASE_IMG, bg: 'radial-gradient(120% 100% at 75% 15%,#5A4F4A 0%,#2A2321 60%,#1A1514 100%)', r: '-6%', b: '-34%', w: '64%', h: 'auto', fit: 'contain', pos: 'center', ar: '1 / 1' },
+];
 const CHEESES = ['Light', 'Regular', 'None'];
 /** Cheese level: [meter bars, photo width]. */
 const CL: Record<string, [number, string | null]> = { Light: [1, '58%'], Regular: [2, '74%'], Extra: [3, '92%'], None: [0, null] };
@@ -90,7 +101,7 @@ const TOP_PRICE: Record<SizeKey, number> = { S: 1.15, M: 2.25, L: 2.5, XL: 3.5 }
 const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
 const EXTRA_CHEESE = 0;
 
-const SECS: [SecKey, string][] = [['crust', 'Crust'], ['sauce', 'Sauce'], ['cheese', 'Cheese'], ['tops', 'Toppings'], ['notes', 'Instructions']];
+const SECS: [SecKey, string][] = [['crust', 'Oven & crust'], ['sauce', 'Base sauce'], ['cheese', 'Cheese'], ['tops', 'Toppings'], ['notes', 'Instructions']];
 type SecKey = 'crust' | 'sauce' | 'cheese' | 'tops' | 'notes';
 const HV: [Half, string, string][] = [['left', 'Left half', 'M12 3.5a8.5 8.5 0 0 0 0 17z'], ['whole', 'Whole pizza', 'M12 3.5a8.5 8.5 0 1 1 0 17a8.5 8.5 0 1 1 0-17z'], ['right', 'Right half', 'M12 3.5a8.5 8.5 0 0 1 0 17z']];
 
@@ -176,15 +187,10 @@ function buildPieces(tops: Record<string, Half>): Piece[] {
   return pieces;
 }
 
-const rgba = (hex: string, a: number) => {
-  const n = parseInt(hex.slice(1), 16);
-  return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
-};
-
-/** Layers of the live pizza: base photo, sauce tint, topping cut-outs, knife lines. */
+/** Layers of the live pizza: base photo (swapped per sauce), topping cut-outs, knife lines. */
 function PizzaLayers({ pieces, label, sauce, doneness, cut }: { pieces: Piece[]; label?: string; sauce: string; doneness: string; cut: string }) {
   const tone = DONENESS_FILTER[doneness] || 'none';
-  const tint = SAUCE_TINT[sauce];
+  const base = SAUCE_BASE[sauce] || BASE_IMG;
   const cuts = CUT_PATH[cut] || '';
   return (
     <>
@@ -192,15 +198,7 @@ function PizzaLayers({ pieces, label, sauce, doneness, cut }: { pieces: Piece[];
         role={label ? 'img' : undefined}
         aria-label={label}
         aria-hidden={label ? undefined : true}
-        style={{ display: 'block', flex: 'none', backgroundImage: "url('" + BASE_IMG + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', width: '100%', height: '100%', backgroundSize: 'cover', transform: 'scale(1)', filter: (tone === 'none' ? '' : tone + ' ') + 'drop-shadow(0 22px 28px rgba(26,20,20,.22))', transition: 'filter .2s' }}
-      />
-      <span
-        aria-hidden="true"
-        style={{
-          position: 'absolute', inset: 0, borderRadius: '50%', pointerEvents: 'none', mixBlendMode: 'color',
-          background: tint ? 'radial-gradient(circle closest-side, ' + rgba(tint, 0.2) + ' 0%, ' + rgba(tint, 0.3) + ' 68%, ' + rgba(tint, 0.85) + ' 83%, ' + rgba(tint, 0.85) + ' 90%, ' + rgba(tint, 0) + ' 94%)' : 'none',
-          opacity: tint ? 1 : 0, transition: 'opacity .3s',
-        }}
+        style={{ display: 'block', flex: 'none', backgroundImage: "url('" + base + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', width: '100%', height: '100%', backgroundSize: 'cover', transform: 'scale(1)', filter: (tone === 'none' ? '' : tone + ' ') + 'drop-shadow(0 22px 28px rgba(26,20,20,.22))', transition: 'filter .2s' }}
       />
       {pieces.map((pc) => (
         <span
@@ -264,7 +262,6 @@ function SectionHead({ title, st }: { title: string; st: Status }) {
 
 const sectionStyle = (first: boolean): CSSProperties => ({ display: 'flex', flexDirection: 'column', gap: 18, padding: '20px 0 40px', ...(first ? {} : { borderTop: '1px solid #E9E9EC' }) });
 const tile = (on: boolean) => ({ border: on ? '2px solid #D7192D' : '1.5px solid #E6E6E9', bg: on ? '#FAFAFD' : '#fff' });
-const pill = (on: boolean) => ({ border: on ? '#1A1414' : '#DFDFE2', bg: on ? '#1A1414' : '#fff', fg: on ? '#fff' : '#1A1414' });
 const photoSpan = (img: string, w: string, fit: string, extra?: CSSProperties): CSSProperties => ({ display: 'block', flex: 'none', backgroundImage: "url('" + img + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', width: w, height: w, backgroundSize: fit, mixBlendMode: 'multiply', ...extra });
 
 // ---------------------------------------------------------------------------
@@ -355,7 +352,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   const lh = keys.filter((k) => s.tops[k] === 'left').map((k) => topOf(k).name);
   const rh = keys.filter((k) => s.tops[k] === 'right').map((k) => topOf(k).name);
   const freeOn = FREE.filter((f) => s.free[f]);
-  let ingredientLine = [s.crust + ' crust', s.bake.toLowerCase(), s.sauce === 'None' ? 'no sauce' : s.sauce.toLowerCase() + ' sauce', s.cheese === 'None' ? 'no cheese' : s.cheese === 'Regular' ? 'mozzarella' : s.cheese.toLowerCase() + ' mozzarella'].join(', ');
+  let ingredientLine = [s.crust + ' crust', s.bake.toLowerCase(), s.sauce === 'None' ? 'no sauce' : s.sauce === 'Regular' ? 'marinara sauce' : s.sauce.toLowerCase() + ' sauce', s.cheese === 'None' ? 'no cheese' : s.cheese === 'Regular' ? 'mozzarella' : s.cheese.toLowerCase() + ' mozzarella'].join(', ');
   if (whole.length) ingredientLine += ', ' + whole.join(', ');
   if (lh.length) ingredientLine += '. Left half: ' + lh.join(', ');
   if (rh.length) ingredientLine += '. Right half: ' + rh.join(', ');
@@ -363,12 +360,12 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   ingredientLine = ingredientLine.charAt(0).toUpperCase() + ingredientLine.slice(1) + '.';
 
   const pieces = useMemo(() => buildPieces(s.tops), [s.tops]);
+  const curStep = Math.max(0, SECS.findIndex((x) => x[0] === s.sec));
 
   // ----- section status pills -----
   const url = (u: string | null) => (u ? 'url("' + u + '")' : 'none');
   const slot = (im: string | null, fill?: string | null, sz?: string): Slot => ({ bg: url(im), fill: fill || '#fff', sz: sz || 'cover', bs: im || fill ? 'solid' : 'dashed', bc: im || fill ? '#fff' : '#C7C7CC', sh: im || fill ? '0 2px 8px rgba(26,20,20,.16)' : 'none' });
   const done = (text: string, slots: Slot[]): Status => ({ done: true, text, aria: text + ' selected', bg: '#E8F5EC', fg: '#1E7A3C', slots });
-  const crImg = CRUSTS.find((c) => c[0] === s.crust)?.[1] || BASE_IMG;
   const sa = SAUCES.find((x) => x[0] === s.sauce) || SAUCES[0];
   const chNone = s.cheese === 'None';
   const topImgs = keys.map((k) => topOf(k)).map((t) => (t.hasImg ? t.img : null));
@@ -386,8 +383,8 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   } else {
     tp = { done: false, text: money(TOP_PRICE[s.size]) + ' each', aria: keys.length + ' toppings chosen', bg: '#F2F2F5', fg: '#1A1414', slots: keys.length ? keys.map((_, i) => slot(topImgs[i], '#E6E6EA', '82%')) : [slot(null)] };
   }
-  const crT = done(s.crust, [slot(crImg, null, 'cover')]);
-  const saT = done(sa[1], [slot(sa[2] ? IMG + sa[2] : null, sa[3] || '#fff', '92%')]);
+  const crT = done(s.crust, [slot(BASE_IMG, '#fff', '92%')]);
+  const saT = done(sa[1], [slot(sauceImg(sa[2]), '#fff', '100%')]);
   const chT = done(chNone ? 'No cheese' : s.cheese + ' mozzarella', [chNone ? slot(null) : slot(IMG + 'extra-mozz.png', '#fff', '92%')]);
 
   // ----- actions -----
@@ -459,7 +456,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
       onScroll={spy}
       style={{ position: 'fixed', inset: 0, zIndex: combo ? 130 : 80, background: '#fff', overflow: 'auto', animation: 'pbIn .25s ease both', fontFamily: "'Figtree',system-ui,sans-serif", color: '#1A1414' }}
     >
-      <header style={{ position: 'sticky', top: 0, zIndex: 6, background: '#fff', borderBottom: '1px solid #E9E9EC' }}>
+      <header style={{ position: 'sticky', top: 0, zIndex: 21, background: '#fff', borderBottom: '1px solid #E9E9EC' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', height: 64, padding: '0 clamp(16px,3vw,32px)', display: 'grid', gridTemplateColumns: 'minmax(max-content,1fr) minmax(0,max-content) minmax(max-content,1fr)', alignItems: 'center', gap: w < 420 ? 8 : 16 }}>
           <Hov as="button" onClick={onClose} style={{ justifySelf: 'start', display: 'flex', alignItems: 'center', gap: 6, border: 0, background: 'transparent', height: 44, padding: '0 8px 0 0', fontFamily: 'inherit', fontWeight: 700, fontSize: 15, color: '#1A1414', cursor: 'pointer' }} hover={{ color: '#D7192D' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>
@@ -482,64 +479,78 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
             </div>
           ) : null}
 
-          <nav className="pb-nav" style={{ position: 'sticky', top: 64, zIndex: 5, background: '#fff', display: 'flex', gap: 6, padding: '16px 0 14px', overflowX: 'auto', scrollbarWidth: 'none' }}>
-            {SECS.map(([k, label]) => {
-              const p = pill(s.sec === k);
+          <nav className="pb-nav" aria-label="Steps" style={{ position: 'sticky', top: 64, zIndex: 20, transform: 'translateZ(40px)', background: '#fff', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 0', borderBottom: '1px solid #EFEFF2', boxShadow: '-8px 0 0 #fff,8px 0 0 #fff', overflowX: 'auto', scrollbarWidth: 'none' }}>
+            {SECS.map(([k, label], i) => {
+              const on = i === curStep, dn = i < curStep;
               return (
-                <button key={k} onClick={() => goSec(k)} aria-current={s.sec === k ? 'true' : undefined} style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 8, height: 40, padding: '0 16px', borderRadius: 999, border: '1.5px solid ' + p.border, background: p.bg, color: p.fg, fontWeight: 700, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'background .2s,color .2s,border-color .2s' }}>
-                  {label}
-                </button>
+                <Fragment key={k}>
+                  <button onClick={() => goSec(k)} aria-current={on ? 'step' : 'false'} style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 10, height: 44, padding: '0 2px', border: 0, background: 'transparent', fontFamily: 'inherit', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    <span style={{ width: 28, height: 28, borderRadius: '50%', background: on ? '#D7192D' : dn ? '#1A1414' : '#fff', color: on || dn ? '#fff' : '#8E8E93', boxShadow: 'inset 0 0 0 1.5px ' + (on ? '#D7192D' : dn ? '#1A1414' : '#D5D5D9'), fontWeight: 800, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .25s,color .25s,box-shadow .25s' }}>{i + 1}</span>
+                    <span style={{ fontWeight: on ? 900 : 700, fontSize: 15, color: on || dn ? '#1A1414' : '#8E8E93', transition: 'color .25s' }}>{label}</span>
+                  </button>
+                  {i < SECS.length - 1 ? <span aria-hidden="true" style={{ flex: '1 0 20px', minWidth: 20, maxWidth: 64, height: 2, borderRadius: 2, background: dn ? '#1A1414' : '#E3E3E7', transition: 'background .25s' }} /> : null}
+                </Fragment>
               );
             })}
           </nav>
 
-          {/* ----- Crust ----- */}
+          {/* ----- Oven & crust ----- */}
           <section ref={refCrust} style={sectionStyle(true)}>
-            <SectionHead title="Crust" st={crT} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 12 }}>
-              {CRUSTS.map(([val, img]) => {
-                const on = s.crust === val;
-                return (
-                  <button key={val} onClick={() => set({ crust: val })} aria-pressed={on} style={{ position: 'relative', aspectRatio: '16/10', border: 0, padding: 0, borderRadius: 20, overflow: 'hidden', cursor: 'pointer', background: '#F1F1F4', outline: on ? '3px solid #D7192D' : '3px solid transparent', outlineOffset: 3, transition: 'outline-color .15s' }}>
-                    <span aria-hidden="true" style={{ display: 'block', flex: 'none', backgroundImage: "url('" + img + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'absolute', inset: 0, width: '100%', height: '100%', backgroundSize: 'cover', transform: 'scale(' + (on ? 1.06 : 1) + ')', transition: 'transform .6s cubic-bezier(.3,.8,.3,1)' }} />
-                    <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(20,12,10,0) 45%,rgba(20,12,10,.72) 100%)' }} />
-                    <span style={{ position: 'absolute', left: 18, right: 18, bottom: 16, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8, color: '#fff', textAlign: 'left' }}>
-                      <span style={{ fontWeight: 900, fontSize: 'clamp(18px,2vw,24px)', lineHeight: 1, letterSpacing: '-.03em' }}>{val}</span>
-                    </span>
-                    {on ? <Badge size={30} inset={14} icon={15} iconStroke={3.6} extra={{ boxShadow: '0 4px 12px rgba(0,0,0,.25)', animation: 'pbPop .3s ease both' }} /> : null}
-                  </button>
-                );
-              })}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 14, fontWeight: 700 }}>Oven</span>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {OVENS.map((v) => {
-                  const on = s.bake === v, p = pill(on);
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingBottom: 18 }}>
+              <h2 style={h2Style}>Oven</h2>
+              <div role="radiogroup" aria-label="Oven" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: 12 }}>
+                {OVENS.map((o) => {
+                  const on = s.bake === o.v;
                   return (
-                    <button key={v} onClick={() => set({ bake: v })} aria-pressed={on} style={{ height: 44, padding: '0 18px', borderRadius: 999, border: '1.5px solid ' + p.border, background: p.bg, color: p.fg, fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'background .15s,color .15s' }}>
-                      {v}
+                    <button key={o.v} role="radio" aria-checked={on} onClick={() => set({ bake: o.v })} style={{ position: 'relative', width: '100%', aspectRatio: '16/9', minHeight: 150, minWidth: 0, border: 0, padding: 0, borderRadius: 24, overflow: 'hidden', cursor: 'pointer', background: o.bg, outline: on ? '3px solid #D7192D' : '3px solid transparent', outlineOffset: 3, transition: 'outline-color .15s', fontFamily: 'inherit', color: '#fff', textAlign: 'left' }}>
+                      <span aria-hidden="true" style={{ position: 'absolute', right: o.r, bottom: o.b, width: o.w, height: o.h, aspectRatio: o.ar, backgroundImage: "url('" + o.img + "')", backgroundSize: o.fit, backgroundPosition: o.pos, backgroundRepeat: 'no-repeat', transform: 'scale(' + (on ? 1.05 : 1) + ')', transition: 'transform .6s cubic-bezier(.3,.8,.3,1)' }} />
+                      <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(18,11,8,0) 35%,rgba(18,11,8,.85) 100%)' }} />
+                      <span style={{ position: 'absolute', left: 18, right: 18, bottom: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <span style={{ fontWeight: 900, fontSize: 'clamp(20px,2.2vw,26px)', lineHeight: 1, letterSpacing: '-.03em' }}>{o.v}</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>{o.desc}</span>
+                      </span>
+                      {on ? <Badge size={30} inset={14} icon={15} iconStroke={3.6} extra={{ boxShadow: '0 4px 12px rgba(0,0,0,.25)', animation: 'pbPop .3s ease both' }} /> : null}
                     </button>
                   );
                 })}
               </div>
             </div>
+            <SectionHead title="Crust" st={crT} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 12 }}>
+              {CRUSTS.map(([val, sub, t]) => {
+                const on = s.crust === val;
+                return (
+                  <button key={val} onClick={() => set({ crust: val })} aria-pressed={on} style={{ position: 'relative', aspectRatio: '16/11', border: 0, padding: 0, borderRadius: 20, overflow: 'hidden', cursor: 'pointer', background: '#F4EFEA', outline: on ? '3px solid #D7192D' : '3px solid transparent', outlineOffset: 3, transition: 'outline-color .15s', fontFamily: 'inherit', textAlign: 'left' }}>
+                    <span aria-hidden="true" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '72%', display: 'flex', alignItems: 'center', justifyContent: 'center', perspective: 520, isolation: 'isolate', zIndex: 0 }}>
+                      <span style={{ position: 'absolute', left: '50%', top: '62%', width: '66%', height: '26%', transform: 'translateX(-50%)', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(60,30,10,.32),rgba(60,30,10,0))' }} />
+                      <span style={{ position: 'relative', width: '58%', aspectRatio: '1/1', transformStyle: 'preserve-3d', transform: 'rotateX(64deg) rotateZ(-10deg) scale(' + (on ? 1.06 : 1) + ')', transition: 'transform .6s cubic-bezier(.3,.8,.3,1)' }}>
+                        {crustLayers(t).map((l, j) => (
+                          <span key={j} style={{ position: 'absolute', inset: '3%', borderRadius: '50%', background: l.bg, transform: 'translateZ(' + l.z + ')' }} />
+                        ))}
+                        <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', backgroundImage: "url('" + BASE_IMG + "')", backgroundSize: 'cover', backgroundPosition: 'center', transform: 'translateZ(0px)' }} />
+                      </span>
+                    </span>
+                    <span style={{ position: 'absolute', left: 16, right: 16, bottom: 14, display: 'flex', flexDirection: 'column', gap: 2, color: '#1A1414' }}>
+                      <span style={{ fontWeight: 900, fontSize: 'clamp(17px,1.9vw,22px)', lineHeight: 1, letterSpacing: '-.03em' }}>{val}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#6E6E73', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</span>
+                    </span>
+                    {on ? <Badge size={28} inset={12} icon={14} iconStroke={3.6} extra={{ boxShadow: '0 4px 12px rgba(0,0,0,.2)', animation: 'pbPop .3s ease both' }} /> : null}
+                  </button>
+                );
+              })}
+            </div>
           </section>
 
           {/* ----- Sauce ----- */}
           <section ref={refSauce} style={sectionStyle(false)}>
-            <SectionHead title="Sauce" st={saT} />
+            <SectionHead title="Base sauce" st={saT} />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,150px),1fr))', gap: 12 }}>
-              {SAUCES.map(([v, label, f, sw]) => {
+              {SAUCES.map(([v, label, f]) => {
                 const on = s.sauce === v, t = tile(on);
                 return (
                   <Hov as="button" key={v} onClick={() => set({ sauce: v })} aria-pressed={on} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '18px 12px 16px', borderRadius: 20, border: t.border, background: t.bg, cursor: 'pointer', fontFamily: 'inherit', color: '#1A1414', transition: 'background .15s,border-color .15s' }} hover={{ borderColor: '#1A1414' }}>
                     <span style={{ width: 92, height: 92, borderRadius: '50%', background: '#F1F1F4', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {f ? (
-                        <span aria-hidden="true" style={photoSpan(IMG + f, '80%', 'contain')} />
-                      ) : (
-                        <span style={{ width: 64, height: 64, borderRadius: '50%', background: sw || 'transparent', boxShadow: 'inset 0 -6px 12px rgba(0,0,0,.18),inset 0 4px 8px rgba(255,255,255,.25)' }} />
-                      )}
+                      <span aria-hidden="true" style={photoSpan(sauceImg(f), '100%', 'contain')} />
                     </span>
                     <span style={{ fontSize: 15, fontWeight: 700 }}>{label}</span>
                     {on ? <Badge size={24} inset={12} icon={12} iconStroke={3.6} extra={{ animation: 'pbPop .3s ease both' }} /> : null}
@@ -677,11 +688,11 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
               <span style={{ fontSize: 15, fontWeight: 800 }}>Spice level</span>
               <div role="radiogroup" aria-label="Spice level" style={{ display: 'grid', gridTemplateColumns: w < 520 ? 'repeat(2,minmax(0,1fr))' : 'repeat(4,minmax(0,1fr))', gap: 10 }}>
                 {SPICES.map((v, i) => {
-                  const on = s.spice === v, t = tile(on);
+                  const on = s.spice === v;
                   return (
-                    <Hov as="button" key={v} role="radio" aria-checked={on} onClick={() => set({ spice: v })} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 54, padding: '0 10px', borderRadius: 16, border: t.border, background: t.bg, cursor: 'pointer', color: '#1A1414', fontFamily: 'inherit', fontWeight: 700, fontSize: 14, transition: 'background .15s,border-color .15s' }} hover={{ borderColor: '#1A1414' }}>
-                      <span aria-hidden="true" style={{ display: 'flex', gap: 2 }}>
-                        {[0, 1, 2].map((d) => <span key={d} style={{ width: 6, height: 14, borderRadius: 3, background: d < i ? '#D7192D' : '#E1E1E5' }} />)}
+                    <Hov as="button" key={v} role="radio" aria-checked={on} onClick={() => set({ spice: v })} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 54, padding: '0 10px', borderRadius: 16, border: on ? '2px solid #1A1414' : '1px solid #E6E6EA', background: '#fff', cursor: 'pointer', color: '#1A1414', fontFamily: 'inherit', fontWeight: 700, fontSize: 14, whiteSpace: 'nowrap', transition: 'border-color .15s' }} hover={{ borderColor: '#1A1414' }}>
+                      <span aria-hidden="true" style={{ display: 'flex', gap: 3 }}>
+                        {[0, 1, 2].map((d) => <span key={d} style={{ width: 6, height: 6, borderRadius: '50%', background: d < i ? '#D7192D' : '#E3E3E7' }} />)}
                       </span>
                       {v}
                     </Hov>

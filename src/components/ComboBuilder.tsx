@@ -243,7 +243,7 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
   const solo = sp.pizzas === 1 && !sp.dips && !sp.pops && !sp.side;
   const tw = (n: number) => n + (n > 1 ? ' toppings' : ' topping');
 
-  const dipImgs = DIPS.flatMap(([id]) => Array<string>(dips[id] || 0).fill('assets/dips/' + id + '.png'));
+  const dipImgs = DIPS.flatMap(([id]) => Array<string>(dips[id] || 0).fill('assets/dips/top-' + id + '.png'));
   const popImgs = POPS.flatMap((n) => Array<string>(pops[n] || 0).fill('assets/pops/' + POP_IMG[n]));
   const pzImgs = pz.filter((i) => pizzas[i]).map(() => 'assets/pizza-base.png');
   const sideImgs = side ? [SIDES.find((x) => x[0] === side)![2]] : [];
@@ -279,9 +279,9 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
     };
   });
 
-  // Extra dips beyond the included count cost $1.33 each, up to 8 dips in total (README "4. Combo builder").
-  const dipItems = step(dips, setDips, MAX_DIPS, DIPS.map(([id, n]) => [id, n, 'assets/dips/' + id + '.png']));
-  const dipNote = sp.dips + ' included. Extra dips ' + money(EXTRA_DIP) + ' each, up to ' + MAX_DIPS + '.';
+  // Pick up to the included number of dips; extras are added separately from the menu (README "4. Combo builder").
+  const dipItems = step(dips, setDips, sp.dips, DIPS.map(([id, n]) => [id, n, 'assets/dips/top-' + id + '.png']));
+  const dipNote = 'Want more? Add extra dips from the menu.';
   const popItems = step(pops, setPops, sp.pops, POPS.map((n) => [n, n, 'assets/pops/' + POP_IMG[n]]));
 
   const sides = SIDES.map(([id, name, img, worth, desc]) => {
@@ -445,10 +445,9 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
                         backgroundImage: "url('" + d.img + "')",
                         backgroundPosition: 'center',
                         backgroundRepeat: 'no-repeat',
-                        width: 96,
-                        height: 96,
+                        width: 112,
+                        height: 112,
                         backgroundSize: 'contain',
-                        filter: 'drop-shadow(0 8px 12px rgba(0,0,0,.14))',
                       }}
                     />
                     <span style={{ fontWeight: 800, fontSize: 15, textAlign: 'center', lineHeight: 1.2, minHeight: 36, display: 'flex', alignItems: 'center' }}>{d.name}</span>

@@ -66,7 +66,7 @@ export interface PayRequest {
   pickupAt?: string;
   expectedTotal: number;
 }
-export interface PayResponse { ok: boolean; message?: string; orderNumber?: string; receiptUrl?: string | null; total?: number }
+export interface PayResponse { ok: boolean; message?: string; orderNumber?: string; receiptUrl?: string | null; total?: number; cardBrand?: string | null; cardLast4?: string | null }
 
 export async function submitPayment(body: PayRequest): Promise<PayResponse> {
   try {

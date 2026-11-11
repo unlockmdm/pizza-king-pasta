@@ -54,7 +54,7 @@ const SIZES3 = (m: number, l: number, xl: number): Opt[] => [
   o('XL', 'XL', { price: xl, long: 'X-Large' }),
 ];
 /** Spice level, same options as the shop's Square spice lists. */
-const SPICE: Group = { id: 'spice', label: 'Spice level', opts: ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'].map((v) => o(v.toLowerCase().replace(/\s+/g, '-'), v)) };
+const SPICE: Group = { id: 'spice', label: 'Spice level', chips: true, opts: ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'].map((v) => o(v.toLowerCase().replace(/\s+/g, '-'), v)) };
 const GELATO: Opt[] = ['Vanilla', 'Mango', 'Strawberry', 'Banana', 'Pistachio', 'Black cherry', 'Cappuccino', 'Chocolate', 'Red velvet', 'Rum & raisin'].map((f) =>
   o(f.toLowerCase().replace(/[^a-z]+/g, '-'), f),
 );
@@ -65,7 +65,7 @@ const CATS: Record<CategoryId, Category> = {
     filters: [['all', 'All'], ['tandoor', 'Wings & tandoori'], ['sides', 'Sides & salads']],
     items: [
       {
-        id: 'wings', f: 'tandoor', name: 'Tandoori wings', desc: 'Wood oven. Extra dip $1.25.', tag: 'Wood oven', img: '1608039755401-742074f0548d', def: { n: '12' },
+        id: 'wings', f: 'tandoor', name: 'Tandoori wings', desc: 'Wood oven. Extra dip $1.33.', tag: 'Wood oven', img: '1608039755401-742074f0548d', def: { n: '12' },
         groups: [
           { id: 'flav', label: 'Flavour', opts: [o('hot', 'Hot', { img: '1608039755401-742074f0548d' }), o('honey', 'Honey garlic', { img: '1567620832903-9fc6debc209f' }), o('bbq', 'BBQ', { img: '1527477396000-e27163b481c2' })] },
           { id: 'n', label: 'Wings', opts: ([[8, 10], [12, 12], [16, 14], [24, 22], [34, 31], [48, 42]] as const).map(([n, p]) => o(String(n), String(n), { price: p, long: n + ' wings' })) },

@@ -8,6 +8,7 @@ import { money } from '../lib/format';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
 import './CartCheckout.css';
+import OrderConfirmation, { type Confirmation } from './OrderConfirmation';
 
 // ---------- Data (from the prototype) ----------
 
@@ -46,15 +47,7 @@ type FieldKey = 'name' | 'phone' | 'email' | 'street' | 'unit' | 'note' | 'card'
 type Form = Record<FieldKey, string>;
 const EMPTY_FORM: Form = { name: '', phone: '', email: '', street: '', unit: '', note: '', card: '', exp: '', cvc: '', zip: '' };
 
-interface Done {
-  receiptUrl?: string;
-  no: string;
-  when: string;
-  where: string;
-  total: string;
-  pickup: boolean;
-  name: string;
-}
+type Done = Confirmation;
 
 // ---------- Shared styles ----------
 const FONT = "'Figtree',system-ui,sans-serif";
@@ -264,7 +257,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
         return;
       }
       const via = method === 'gpay' ? ' · Google Pay' : method === 'apple' ? ' · Apple Pay' : '';
-      setDone({ no: 'Order #' + String(r.orderNumber || '').toUpperCase(), when: doneWhen, where, total: money((r.total ?? Math.round(grand * 100)) / 100) + via, pickup, name: firstName, receiptUrl: r.receiptUrl || undefined });
+      setDone({ no: 'Order #' + String(r.orderNumber || '').toUpperCase(), items: lines.map((l) => ({ ...l })), email: f.email.trim(), phone: f.phone.trim(), name: firstName, when: doneWhen, pay: method, cardBrand: r.cardBrand || undefined, last4: r.cardLast4 || undefined, receiptUrl: r.receiptUrl || undefined });
       setStep('cart');
       setTried(false);
       setTriedX(false);
@@ -283,7 +276,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
       setTriedX(true);
       return;
     }
-    setDone({ no: newOrderNo(), when: doneWhen, where, total: money(grand) + ' · ' + method, pickup, name: firstName });
+    setDone({ no: newOrderNo(), items: lines.map((l) => ({ ...l })), email: f.email.trim(), phone: f.phone.trim(), name: firstName, when: doneWhen, pay: method === 'Apple Pay' ? 'apple' : 'gpay' });
     setStep('cart');
     setTried(false);
     setTriedX(false);
@@ -296,7 +289,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
       setTried(true);
       return;
     }
-    setDone({ no: newOrderNo(), when: doneWhen, where, total: money(grand), pickup, name: firstName });
+    setDone({ no: newOrderNo(), items: lines.map((l) => ({ ...l })), email: f.email.trim(), phone: f.phone.trim(), name: firstName, when: doneWhen, pay: pay === 'store' ? 'store' : 'card', cardBrand: f.card.replace(/\D/g, '') });
     setStep('cart');
     setTried(false);
     p.onPlaced();
@@ -628,78 +621,8 @@ export default function CartCheckout(p: CartCheckoutProps) {
 
               {/* Pickup or delivery (no time picker: timing comes from the start sheet) */}
               <section>
-                <h2 style={h2}>Pickup or delivery</h2>
+                <h2 style={h2}>Pickup</h2>
                 <div style={card}>
-                  <div role="radiogroup" aria-label="Order type" style={{ display: 'grid', gridTemplateColumns: w < 480 ? 'minmax(0,1fr)' : 'repeat(2,minmax(0,1fr))', gap: 10 }}>
-                    {modeCards.map((m) => {
-                      const on = mode === m.id;
-                      return (
-                        <button
-                          key={m.id}
-                          role="radio"
-                          aria-checked={on}
-                          onClick={() => setMode(m.id)}
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            gap: 14,
-                            minHeight: 76,
-                            padding: '14px 16px',
-                            border: 0,
-                            borderRadius: 20,
-                            background: on ? '#fff' : '#F6F6F7',
-                            boxShadow: 'inset 0 0 0 ' + (on ? '2px' : '0px') + ' ' + (on ? '#1A1414' : 'transparent'),
-                            fontFamily: 'inherit',
-                            textAlign: 'left',
-                            color: '#1A1414',
-                            cursor: 'pointer',
-                            transition: 'box-shadow .2s',
-                          }}
-                        >
-                          <span style={{ width: 44, height: 44, flex: 'none', borderRadius: 14, background: on ? '#D7192D' : '#F4F4F5', color: on ? '#fff' : '#1A1414', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .2s' }}>
-                            {m.id === 'pickup' ? (
-                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M4 9.5 5.5 4h13L20 9.5" />
-                                <path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0" />
-                                <path d="M5 12v8h14v-8" />
-                                <path d="M10 20v-5h4v5" />
-                              </svg>
-                            ) : (
-                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="6" cy="17" r="2.5" />
-                                <circle cx="18" cy="17" r="2.5" />
-                                <path d="M8.5 17h7M15 7h2.5l3 7.5M12 17l-2-8H6" />
-                                <path d="M15 7l-2 10" />
-                              </svg>
-                            )}
-                          </span>
-                          <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <span style={{ fontWeight: 800, fontSize: 17 }}>{m.label}</span>
-                            <span style={{ fontSize: 13, color: '#818184' }}>{m.sub}</span>
-                          </span>
-                          <span
-                            style={{
-                              marginLeft: 'auto',
-                              flex: 'none',
-                              width: 22,
-                              height: 22,
-                              borderRadius: '50%',
-                              background: on ? '#1A1414' : '#fff',
-                              boxShadow: 'inset 0 0 0 ' + (on ? '0 #1A1414' : '1.5px #D9D3CE'),
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: '#fff',
-                            }}
-                          >
-                            <CheckSvg size={12} stroke={3.4} />
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
                   {pickup ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '0 18px', minHeight: 64 }}>
                       <span style={{ width: lblW, flex: 'none', fontSize: 15, fontWeight: 700, color: '#1A1414' }}>Store</span>
@@ -708,19 +631,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
                         <span style={{ fontSize: 13, color: '#818184' }}>Brampton · {SHOP.phoneText}</span>
                       </span>
                     </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '6px 6px 4px' }}>
-                      <span style={{ fontSize: 15, lineHeight: 1.5, color: '#636366' }}>Delivery is handled by DoorDash and Uber Eats. You{'\u2019'}ll finish your order in their app.</span>
-                      <div style={{ display: 'grid', gridTemplateColumns: twoCols, gap: 10 }}>
-                        <Hov as="a" href={SHOP.doordash} target="_blank" rel="noreferrer" style={{ height: 54, borderRadius: 16, background: '#1A1414', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 15, textDecoration: 'none' }} hover={{ background: '#D7192D', color: '#fff' }}>
-                          Order delivery on DoorDash
-                        </Hov>
-                        <Hov as="a" href={SHOP.ubereats} target="_blank" rel="noreferrer" style={{ height: 54, borderRadius: 16, background: '#fff', color: '#1A1414', boxShadow: 'inset 0 0 0 1.5px #1A1414', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 15, textDecoration: 'none' }} hover={{ background: '#F2F2F5', color: '#1A1414' }}>
-                          Order delivery on Uber Eats
-                        </Hov>
-                      </div>
-                    </div>
-                  )}
+                  ) : null}
                 </div>
                 {err.street ? <span style={errText}>Enter a delivery address.</span> : null}
               </section>
@@ -1056,51 +967,8 @@ export default function CartCheckout(p: CartCheckoutProps) {
         </div>
       ) : null}
 
-      {/* ---------- Order placed ---------- */}
-      {done ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Order placed"
-          style={{ position: 'fixed', inset: 0, zIndex: 90, background: '#F8F8FB', overflow: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, animation: 'ccFade .25s ease both', fontFamily: FONT, color: '#1A1414' }}
-        >
-          <div style={{ width: 'min(520px,100%)', background: '#fff', borderRadius: 32, padding: 'clamp(24px,5vw,40px)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18, textAlign: 'center', animation: 'ccUp .4s cubic-bezier(.2,.8,.2,1) both' }}>
-            <span style={{ width: 72, height: 72, borderRadius: '50%', background: '#1E8A4C', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CheckSvg size={32} stroke={3} />
-            </span>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase', color: '#818184' }}>{done.no}</span>
-              <span style={{ fontWeight: 900, fontSize: 'clamp(30px,5vw,40px)', letterSpacing: '-.045em', lineHeight: 1 }}>Order placed</span>
-              <span style={{ fontSize: 16, color: '#636366', lineHeight: 1.5, textWrap: 'pretty' } as CSSProperties}>
-                {'Thanks, ' + (done.name || 'friend') + '. We’ll text you ' + (done.pickup ? 'when it’s ready.' : 'when your driver is on the way.')}
-              </span>
-            </div>
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10, padding: 16, borderRadius: 20, background: '#F4F4F7', textAlign: 'left', boxSizing: 'border-box' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-                <span style={{ color: '#636366' }}>{done.pickup ? 'Ready for pickup' : 'Arriving'}</span>
-                <span style={{ fontWeight: 800 }}>{done.when}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-                <span style={{ color: '#636366' }}>{done.pickup ? 'Pick up at' : 'Delivering to'}</span>
-                <span style={{ fontWeight: 800, textAlign: 'right' }}>{done.where}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-                <span style={{ color: '#636366' }}>Total</span>
-                <span style={{ fontWeight: 800 }}>{done.total}</span>
-              </div>
-            </div>
-            {done.receiptUrl ? (
-              <a href={done.receiptUrl} target="_blank" rel="noreferrer" style={{ fontWeight: 800, fontSize: 15, color: '#D7192D', textDecoration: 'none' }}>View your receipt</a>
-            ) : null}
-            <button
-              onClick={() => setDone(null)}
-              style={{ width: '100%', height: 56, border: 0, borderRadius: 999, background: '#1A1414', color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
-            >
-              Back to menu
-            </button>
-          </div>
-        </div>
-      ) : null}
+      {/* ---------- Order placed (approved confirmation design) ---------- */}
+      {done ? <OrderConfirmation done={done} thumbFor={thumbFor} onClose={() => setDone(null)} /> : null}
     </>
   );
 }

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap">
+<style>
+@keyframes pbIn{from{opacity:0}to{opacity:1}}
+@keyframes pbPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+@keyframes pbRise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" onScroll="{{ onScroll }}" style="position:fixed;inset:0;z-index:80;background:#fff;overflow:auto;animation:pbIn .25s ease both;font-family:'Figtree',system-ui,sans-serif;color:#1A1414">
+  <header style="position:sticky;top:0;z-index:21;background:#fff;border-bottom:1px solid #E9E9EC">
+    <div style="max-width:1280px;margin:0 auto;height:64px;padding:0 clamp(16px,3vw,32px);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px">
+      <button onClick="{{ close }}" style="justify-self:start;display:flex;align-items:center;gap:6px;border:0;background:transparent;height:44px;padding:0 8px 0 0;font-family:inherit;font-weight:700;font-size:15px;color:#1A1414;cursor:pointer" style-hover="color:#D7192D"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>{{ backText }}</button>
+      <span style="font-weight:900;font-size:18px;white-space:nowrap;letter-spacing:-.03em">{{ name }}</span>
+      <button onClick="{{ reset }}" aria-label="Reset pizza to default" style="justify-self:end;display:flex;align-items:center;gap:8px;border:0;background:#F2F2F5;height:44px;padding:0 18px 0 14px;border-radius:999px;font-family:inherit;font-weight:800;font-size:15px;color:#1A1414;white-space:nowrap;cursor:pointer;transition:background .2s,color .2s" style-hover="background:#1A1414;color:#fff"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>Start over</button>
+    </div>
+  </header>
+
+  <div style="max-width:1280px;margin:0 auto;padding:0 clamp(16px,3vw,32px) {{ bottomPad }};display:grid;grid-template-columns:{{ cols }};gap:56px;align-items:start">
+    <div style="display:flex;flex-direction:column;min-width:0">
+
+      <sc-if value="{{ isNarrow }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:24px">
+          <div style="position:relative;width:min(280px,72vw);aspect-ratio:1/1;transform:scale({{ scale }});transition:transform .5s cubic-bezier(.3,.8,.3,1);border-radius:50%;overflow:{{ imgClip }};box-shadow:{{ imgShadowN }}"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ img }}');background-position:center;background-repeat:no-repeat;width:100%;height:100%;background-size:cover;transform:scale({{ imgZoom }});filter:{{ imgFilter }}"></span><sc-for list="{{ pieces }}" as="pc" hint-placeholder-count="0"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ pc.src }}');background-position:center;background-repeat:no-repeat;position:absolute;left:{{ pc.x }};top:{{ pc.y }};width:{{ pc.w }};aspect-ratio:1/1;background-size:contain;transform:{{ pc.tf }};filter:drop-shadow(0 1px 1.2px rgba(60,20,0,.35));pointer-events:none"></span></sc-for></div>
+          <span style="font-size:14px;color:#636366;text-align:center;max-width:420px;line-height:1.5">{{ ingredientLine }}</span>
+        </div>
+      </sc-if>
+
+      <nav aria-label="Steps" style="position:sticky;top:64px;z-index:20;transform:translateZ(40px);background:#fff;display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #EFEFF2;overflow-x:auto;scrollbar-width:none">
+        <sc-for list="{{ steps }}" as="st" hint-placeholder-count="5">
+          <button onClick="{{ st.go }}" aria-current="{{ st.aria }}" style="flex:none;display:flex;align-items:center;gap:10px;height:44px;padding:0 2px;border:0;background:transparent;font-family:inherit;cursor:pointer;white-space:nowrap">
+            <span style="width:28px;height:28px;border-radius:50%;background:{{ st.numBg }};color:{{ st.numFg }};box-shadow:inset 0 0 0 1.5px {{ st.numRing }};font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;transition:background .25s,color .25s,box-shadow .25s">{{ st.n }}</span>
+            <span style="font-weight:{{ st.fw }};font-size:15px;color:{{ st.lblFg }};transition:color .25s">{{ st.label }}</span>
+          </button>
+          <sc-if value="{{ st.line }}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="flex:1 0 20px;min-width:20px;max-width:64px;height:2px;border-radius:2px;background:{{ st.lineBg }};transition:background .25s"></span></sc-if>
+        </sc-for>
+      </nav>
+
+      <section ref="{{ refCrust }}" style="display:flex;flex-direction:column;gap:18px;padding:20px 0 40px">
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:18px">
+          <h2 style="margin:0;font-weight:900;font-size:24px;letter-spacing:-.03em">Oven</h2>
+          <div role="radiogroup" aria-label="Oven" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+            <sc-for list="{{ ovens }}" as="o" hint-placeholder-count="2">
+              <button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.pick }}" style="position:relative;aspect-ratio:16/9;min-height:150px;border:0;padding:0;border-radius:24px;overflow:hidden;cursor:pointer;background:{{ o.bg }};outline:{{ o.outline }};outline-offset:3px;transition:outline-color .15s;font-family:inherit;color:#fff;text-align:left">
+                <span aria-hidden="true" style="position:absolute;right:{{ o.r }};bottom:{{ o.b }};width:{{ o.w }};height:{{ o.h }};aspect-ratio:{{ o.ar }};background-image:url('{{ o.img }}');background-size:{{ o.fit }};background-position:{{ o.pos }};background-repeat:no-repeat;transform:scale({{ o.zoom }});transition:transform .6s cubic-bezier(.3,.8,.3,1)"></span>
+                <span style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,11,8,0) 35%,rgba(18,11,8,.85) 100%)"></span>
+                <span style="position:absolute;left:18px;right:18px;bottom:16px;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-weight:900;font-size:clamp(20px,2.2vw,26px);line-height:1;letter-spacing:-.03em">{{ o.label }}</span>
+                  <span style="font-size:14px;font-weight:600;color:#E2D7D1;text-wrap:pretty">{{ o.desc }}</span>
+                </span>
+                <sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:#D7192D;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25);animation:pbPop .3s ease both"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap"><h2 style="margin:0;font-weight:900;font-size:24px;letter-spacing:-.03em">Crust</h2><div role="status" aria-label="{{ crTAria }}" style="flex:none;display:flex;align-items:center;gap:12px;height:44px;padding:0 6px 0 16px;border-radius:999px;background:{{ crTBg }};color:{{ crTFg }};transition:background .25s,color .25s"><span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;white-space:nowrap"><sc-if value="{{ crTDone }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>{{ crTText }}</span><span style="display:flex;padding-left:8px"><sc-for list="{{ crTSlots }}" as="t" hint-placeholder-count="1"><span style="width:34px;height:34px;box-sizing:border-box;margin-left:-8px;border-radius:50%;border:2px {{ t.bs }} {{ t.bc }};background-color:{{ t.fill }};background-image:{{ t.bg }};background-position:center;background-repeat:no-repeat;background-size:{{ t.sz }};box-shadow:{{ t.sh }};transition:border-color .2s"></span></sc-for></span></div></div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+          <sc-for list="{{ crusts }}" as="o" hint-placeholder-count="2">
+            <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="position:relative;aspect-ratio:16/11;border:0;padding:0;border-radius:20px;overflow:hidden;cursor:pointer;background:#F4EFEA;outline:{{ o.outline }};outline-offset:3px;transition:outline-color .15s;font-family:inherit;text-align:left">
+              <span aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:72%;display:flex;align-items:center;justify-content:center;perspective:520px;isolation:isolate;z-index:0">
+                <span style="position:absolute;left:50%;top:62%;width:66%;height:26%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(60,30,10,.32),rgba(60,30,10,0))"></span>
+                <span style="position:relative;width:58%;aspect-ratio:1/1;transform-style:preserve-3d;transform:rotateX(64deg) rotateZ(-10deg) scale({{ o.zoom }});transition:transform .6s cubic-bezier(.3,.8,.3,1)">
+                  <sc-for list="{{ o.layers }}" as="l" hint-placeholder-count="0"><span style="position:absolute;inset:3%;border-radius:50%;background:{{ l.bg }};transform:translateZ({{ l.z }})"></span></sc-for>
+                  <span style="position:absolute;inset:0;border-radius:50%;background-image:url('assets/pizza-base.png');background-size:cover;background-position:center;transform:translateZ({{ o.topZ }})"></span>
+                </span>
+              </span>
+              <span style="position:absolute;left:16px;right:16px;bottom:14px;display:flex;flex-direction:column;gap:2px;color:#1A1414">
+                <span style="font-weight:900;font-size:clamp(17px,1.9vw,22px);line-height:1;letter-spacing:-.03em">{{ o.label }}</span>
+                <span style="font-size:13px;font-weight:600;color:#6E6E73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.sub }}</span>
+              </span>
+              <sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:#D7192D;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.2);animation:pbPop .3s ease both"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></sc-if>
+            </button>
+          </sc-for>
+        </div>
+        
+      </section>
+
+      <section ref="{{ refSauce }}" style="display:flex;flex-direction:column;gap:18px;padding:20px 0 40px;border-top:1px solid #E9E9EC">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap"><h2 style="margin:0;font-weight:900;font-size:24px;letter-spacing:-.03em">Base sauce</h2><div role="status" aria-label="{{ saTAria }}" style="flex:none;display:flex;align-items:center;gap:12px;height:44px;padding:0 6px 0 16px;border-radius:999px;background:{{ saTBg }};color:{{ saTFg }};transition:background .25s,color .25s"><span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;white-space:nowrap"><sc-if value="{{ saTDone }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>{{ saTText }}</span><span style="display:flex;padding-left:8px"><sc-for list="{{ saTSlots }}" as="t" hint-placeholder-count="1"><span style="width:34px;height:34px;box-sizing:border-box;margin-left:-8px;border-radius:50%;border:2px {{ t.bs }} {{ t.bc }};background-color:{{ t.fill }};background-image:{{ t.bg }};background-position:center;background-repeat:no-repeat;background-size:{{ t.sz }};box-shadow:{{ t.sh }};transition:border-color .2s"></span></sc-for></span></div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:12px">
+          <sc-for list="{{ sauces }}" as="t" hint-placeholder-count="3">
+            <button onClick="{{ t.pick }}" aria-pressed="{{ t.on }}" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 12px 16px;border-radius:20px;border:{{ t.border }};background:{{ t.bg }};cursor:pointer;font-family:inherit;color:#1A1414;transition:background .15s,border-color .15s" style-hover="border-color:#1A1414">
+              <span style="width:92px;height:92px;border-radius:50%;background:#F1F1F4;overflow:hidden;display:flex;align-items:center;justify-content:center">
+                <sc-if value="{{ t.hasImg }}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ t.img }}');background-position:center;background-repeat:no-repeat;width:{{ t.iw }};height:{{ t.iw }};background-size:{{ t.fit }};mix-blend-mode:multiply"></span></sc-if>
+                <sc-if value="{{ t.noImg }}" hint-placeholder-val="{{ false }}"><span style="width:64px;height:64px;border-radius:50%;background:{{ t.swatch }};box-shadow:inset 0 -6px 12px rgba(0,0,0,.18),inset 0 4px 8px rgba(255,255,255,.25)"></span></sc-if>
+              </span>
+              <span style="font-size:15px;font-weight:700">{{ t.label }}</span>
+              <sc-if value="{{ t.on }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:#D7192D;display:flex;align-items:center;justify-content:center;animation:pbPop .3s ease both"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+
+      <section ref="{{ refCheese }}" style="display:flex;flex-direction:column;gap:18px;padding:20px 0 40px;border-top:1px solid #E9E9EC">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap"><h2 style="margin:0;font-weight:900;font-size:24px;letter-spacing:-.03em">Cheese</h2><div role="status" aria-label="{{ chTAria }}" style="flex:none;display:flex;align-items:center;gap:12px;height:44px;padding:0 6px 0 16px;border-radius:999px;background:{{ chTBg }};color:{{ chTFg }};transition:background .25s,color .25s"><span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;white-space:nowrap"><sc-if value="{{ chTDone }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>{{ chTText }}</span><span style="display:flex;padding-left:8px"><sc-for list="{{ chTSlots }}" as="t" hint-placeholder-count="1"><span style="width:34px;height:34px;box-sizing:border-box;margin-left:-8px;border-radius:50%;border:2px {{ t.bs }} {{ t.bc }};background-color:{{ t.fill }};background-image:{{ t.bg }};background-position:center;background-repeat:no-repeat;background-size:{{ t.sz }};box-shadow:{{ t.sh }};transition:border-color .2s"></span></sc-for></span></div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:12px">
+          <sc-for list="{{ cheeses }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.pick }}" aria-pressed="{{ t.on }}" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 12px 16px;border-radius:20px;border:{{ t.border }};background:{{ t.bg }};cursor:pointer;font-family:inherit;color:#1A1414;transition:background .15s,border-color .15s" style-hover="border-color:#1A1414">
+              <span style="width:92px;height:92px;border-radius:50%;background:#F1F1F4;overflow:hidden;display:flex;align-items:center;justify-content:center">
+                <sc-if value="{{ t.hasImg }}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ t.img }}');background-position:center;background-repeat:no-repeat;width:{{ t.iw }};height:{{ t.iw }};background-size:contain;mix-blend-mode:multiply;transition:width .3s,height .3s"></span></sc-if>
+                <sc-if value="{{ t.noImg }}" hint-placeholder-val="{{ false }}"><span style="width:56px;height:56px;border-radius:50%;border:2px dashed #CFC6BF"></span></sc-if>
+              </span>
+              <span style="display:flex;gap:4px" aria-hidden="true">
+                <sc-for list="{{ t.meter }}" as="m" hint-placeholder-count="3"><span style="width:16px;height:4px;border-radius:2px;background:{{ m.c }}"></span></sc-for>
+              </span>
+              <span style="display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font-size:15px;font-weight:700">{{ t.label }}</span><span style="font-size:13px;font-weight:600;color:#636366;min-height:17px">{{ t.price }}</span></span>
+              <sc-if value="{{ t.on }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:#D7192D;display:flex;align-items:center;justify-content:center;animation:pbPop .3s ease both"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+
+      <section ref="{{ refTops }}" style="display:flex;flex-direction:column;gap:18px;padding:20px 0 40px;border-top:1px solid #E9E9EC">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap"><h2 style="margin:0;font-weight:900;font-size:24px;letter-spacing:-.03em">Toppings</h2><div role="status" aria-label="{{ tpTAria }}" style="flex:none;display:flex;align-items:center;gap:12px;height:44px;padding:0 6px 0 16px;border-radius:999px;background:{{ tpTBg }};color:{{ tpTFg }};transition:background .25s,color .25s"><span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;white-space:nowrap"><sc-if value="{{ tpTDone }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>{{ tpTText }}</span><span style="display:flex;padding-left:8px"><sc-for list="{{ tpTSlots }}" as="t" hint-placeholder-count="1"><span style="width:34px;height:34px;box-sizing:border-box;margin-left:-8px;border-radius:50%;border:2px {{ t.bs }} {{ t.bc }};background-color:{{ t.fill }};background-image:{{ t.bg }};background-position:center;background-repeat:no-repeat;background-size:{{ t.sz }};box-shadow:{{ t.sh }};transition:border-color .2s"></span></sc-for></span></div></div>
+        <div role="tablist" style="display:flex;gap:24px;border-bottom:1px solid #E9E9EC;overflow-x:auto;scrollbar-width:none">
+          <sc-for list="{{ cats }}" as="c" hint-placeholder-count="4">
+            <button onClick="{{ c.pick }}" role="tab" aria-selected="{{ c.on }}" style="flex:none;display:flex;align-items:center;gap:8px;border:0;background:transparent;padding:10px 0 12px;font-weight:700;font-size:15px;color:{{ c.fg }};box-shadow:inset 0 -2.5px 0 {{ c.line }};cursor:pointer;white-space:nowrap;transition:color .15s">
+              {{ c.label }}
+              <sc-if value="{{ c.hasCount }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#D7192D;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ c.count }}</span></sc-if>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,156px),1fr));gap:12px">
+          <sc-for list="{{ tops }}" as="t" hint-placeholder-count="8">
+            <div style="position:relative;display:flex;flex-direction:column;border-radius:20px;border:{{ t.border }};background:{{ t.bg }};transition:background .15s,border-color .15s;animation:pbRise .25s ease both">
+              <button onClick="{{ t.toggle }}" aria-pressed="{{ t.on }}" style="display:flex;flex-direction:column;align-items:center;gap:10px;border:0;background:transparent;padding:18px 10px 8px;cursor:pointer;font-family:inherit;color:#1A1414">
+                <span style="width:96px;height:96px;border-radius:50%;background:#F1F1F4;overflow:hidden;display:flex;align-items:center;justify-content:center;transform:scale({{ t.zoom }});transition:transform .3s cubic-bezier(.3,.8,.3,1)"><sc-if value="{{ t.hasImg }}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ t.img }}');background-position:center;background-repeat:no-repeat;width:{{ t.iw }};height:{{ t.iw }};background-size:{{ t.fit }};mix-blend-mode:multiply"></span></sc-if><sc-if value="{{ t.noImg }}" hint-placeholder-val="{{ false }}"><span style="font-weight:900;font-size:26px;color:#B8ACA4;letter-spacing:-.03em">{{ t.initials }}</span></sc-if></span>
+                <span style="display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center"><span style="font-size:15px;font-weight:700;line-height:1.25">{{ t.name }}</span><span style="font-size:13px;font-weight:600;color:{{ t.priceColor }}">{{ t.priceText }}</span></span>
+              </button>
+              <div style="height:46px;display:flex;align-items:center;justify-content:center;padding:0 10px 12px">
+                <sc-if value="{{ t.on }}" hint-placeholder-val="{{ false }}">
+                  <div role="group" aria-label="Placement" style="display:flex;background:#fff;border:1px solid #DFDFE2;border-radius:999px;padding:3px;gap:2px;animation:pbRise .2s ease both">
+                    <sc-for list="{{ t.halves }}" as="hv" hint-placeholder-count="3">
+                      <button onClick="{{ hv.pick }}" title="{{ hv.label }}" aria-label="{{ hv.label }}" aria-pressed="{{ hv.on }}" style="width:40px;height:40px;border:0;border-radius:999px;background:{{ hv.bg }};color:{{ hv.fg }};cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="{{ hv.path }}" fill="currentColor"></path></svg></button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ t.off }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ t.toggle }}" tabindex="-1" style="display:flex;align-items:center;gap:6px;height:40px;padding:0 16px;border-radius:999px;border:1.5px solid #DFDFE2;background:#fff;font-weight:700;font-size:13px;color:#1A1414;cursor:pointer" style-hover="border-color:#1A1414"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Add</button>
+                </sc-if>
+              </div>
+              <sc-if value="{{ t.on }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:#D7192D;display:flex;align-items:center;justify-content:center;animation:pbPop .3s ease both;pointer-events:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;padding-top:10px">
+          <div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:15px;font-weight:700">Free add-ons</span><span style="font-size:13px;font-weight:600;color:#12663A">No charge</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px">
+            <sc-for list="{{ freeOpts }}" as="o" hint-placeholder-count="7">
+              <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px 12px;border-radius:18px;border:{{ o.border }};background:{{ o.bg }};cursor:pointer;color:#1A1414;transition:background .15s,border-color .15s" style-hover="border-color:#1A1414">
+                <span style="width:60px;height:60px;border-radius:50%;background:#F1F1F4;overflow:hidden;display:flex;align-items:center;justify-content:center"><sc-if value="{{ o.hasImg }}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ o.img }}');background-position:center;background-repeat:no-repeat;width:80%;height:80%;background-size:contain;mix-blend-mode:multiply"></span></sc-if><sc-if value="{{ o.noImg }}" hint-placeholder-val="{{ false }}"><span style="font-weight:900;font-size:18px;color:#B8ACA4">{{ o.initials }}</span></sc-if></span>
+                <span style="font-size:13px;font-weight:700;text-align:center;line-height:1.2">{{ o.label }}</span>
+                <sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:#D7192D;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section ref="{{ refNotes }}" style="display:flex;flex-direction:column;gap:20px;padding:20px 0 24px;border-top:1px solid #E9E9EC">
+        <h2 style="margin:0;font-weight:900;font-size:24px;letter-spacing:-.03em">Instructions</h2>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span style="font-size:15px;font-weight:800">Spice level</span>
+          <div role="radiogroup" aria-label="Spice level" style="display:grid;grid-template-columns:{{ spiceCols }};gap:10px">
+            <sc-for list="{{ spiceOpts }}" as="v" hint-placeholder-count="4">
+              <button role="radio" aria-checked="{{ v.on }}" onClick="{{ v.pick }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:54px;padding:0 10px;border-radius:16px;border:{{ v.border }};background:#fff;cursor:pointer;color:#1A1414;font-family:inherit;font-weight:700;font-size:14px;white-space:nowrap;transition:border-color .15s" style-hover="border-color:#1A1414"><span aria-hidden="true" style="display:flex;gap:3px"><sc-for list="{{ v.dots }}" as="d" hint-placeholder-count="3"><span style="width:6px;height:6px;border-radius:50%;background:{{ d.bg }}"></span></sc-for></span>{{ v.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <sc-for list="{{ chipGroups }}" as="g" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <span style="font-size:15px;font-weight:800">{{ g.label }}</span>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+              <sc-for list="{{ g.opts }}" as="o" hint-placeholder-count="3">
+                <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 8px 14px;border-radius:18px;border:{{ o.border }};background:{{ o.bg }};cursor:pointer;color:#1A1414;transition:background .15s,border-color .15s" style-hover="border-color:#1A1414">
+                  <span style="position:relative;width:76px;height:76px;display:block"><img src="assets/pizza-base.png" alt="" style="width:100%;height:100%;object-fit:contain;filter:{{ o.filter }};transition:filter .2s"><svg width="76" height="76" viewBox="0 0 76 76" style="position:absolute;inset:0"><path d="{{ o.cuts }}" stroke="rgba(70,35,10,.55)" stroke-width="1.6" fill="none" stroke-linecap="round"></path><path d="{{ o.cuts }}" stroke="rgba(255,240,215,.55)" stroke-width=".7" fill="none" stroke-linecap="round" transform="translate(.6,.6)"></path></svg></span>
+                  <span style="font-size:14px;font-weight:700">{{ o.label }}</span>
+                  <sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:#D7192D;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></sc-if>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <div style="display:flex;flex-direction:column;gap:10px;background:#F4F4F7;border-radius:20px;padding:18px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><span style="font-size:15px;font-weight:800">Note for the kitchen</span><span style="font-size:13px;font-weight:600;color:#818184">{{ noteCount }}/140</span></div>
+          <textarea value="{{ notes }}" onChange="{{ onNotes }}" rows="3" maxlength="140" placeholder="Allergies or special requests" aria-label="Note for the kitchen" style="border:0;border-radius:14px;padding:14px 16px;min-height:96px;background:#fff;font-family:inherit;font-size:15px;line-height:1.5;resize:vertical;outline:none;color:#1A1414;box-shadow:inset 0 0 0 1.5px #E6E6E9" style-focus="box-shadow:inset 0 0 0 2px #1A1414"></textarea>
+        </div>
+      </section>
+    </div>
+
+    <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
+      <aside style="position:sticky;top:88px;display:flex;flex-direction:column;gap:18px;padding-top:24px">
+        <div style="position:relative;width:100%;aspect-ratio:1/1">
+          <div style="position:absolute;inset:4%;transform:scale({{ scale }});transition:transform .5s cubic-bezier(.3,.8,.3,1);border-radius:50%;overflow:{{ imgClip }};box-shadow:{{ imgShadowW }}"><span role="img" aria-label="{{ name }}" style="display:block;flex:none;background-image:url('{{ img }}');background-position:center;background-repeat:no-repeat;width:100%;height:100%;background-size:cover;transform:scale({{ imgZoom }});filter:{{ imgFilter }}"></span><sc-for list="{{ pieces }}" as="pc" hint-placeholder-count="0"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ pc.src }}');background-position:center;background-repeat:no-repeat;position:absolute;left:{{ pc.x }};top:{{ pc.y }};width:{{ pc.w }};aspect-ratio:1/1;background-size:contain;transform:{{ pc.tf }};filter:drop-shadow(0 1px 1.2px rgba(60,20,0,.35));pointer-events:none"></span></sc-for></div>
+        </div>
+        <sc-if value="{{ hasPicked }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;justify-content:center;gap:12px">
+            <div style="display:flex">
+              <sc-for list="{{ picked }}" as="p" hint-placeholder-count="0">
+                <span title="{{ p.name }}" style="position:relative;width:38px;height:38px;margin-left:-8px;border-radius:50%;border:2.5px solid #fff;background:#F1F1F4;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(26,20,20,.12);animation:pbPop .3s ease both"><span role="img" aria-label="{{ p.name }}" style="display:block;flex:none;background-image:url('{{ p.img }}');background-position:center;background-repeat:no-repeat;width:{{ p.iw }};height:{{ p.iw }};background-size:{{ p.fit }};mix-blend-mode:multiply"></span></span>
+              </sc-for>
+            </div>
+            <span style="font-size:13px;font-weight:700;color:#636366">{{ pickedText }}</span>
+          </div>
+        </sc-if>
+        <span style="font-size:14px;line-height:1.5;color:#636366;text-align:center;min-height:42px">{{ ingredientLine }}</span>
+        <div style="display:grid;grid-template-columns:{{ sizeCols }};border:1px solid #E3E3E6;border-radius:18px;overflow:hidden;background:#fff">
+          <sc-for list="{{ sizes }}" as="o" hint-placeholder-count="4">
+            <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="border:0;border-left:{{ o.divider }};background:{{ o.bg }};box-shadow:{{ o.ring }};padding:14px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;color:#1A1414;transition:background .15s">
+              <span style="height:40px;display:flex;align-items:center"><svg width="{{ o.px }}" height="{{ o.px }}" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="{{ o.fill }}"></circle><path d="M20 1v38M1 20h38M6.6 6.6l26.8 26.8M33.4 6.6L6.6 33.4" stroke="#fff" stroke-width="1.6"></path></svg></span>
+              <span style="font-size:13px;font-weight:700">{{ o.label }}</span>
+              <span style="font-size:12px;font-weight:600;color:#636366">{{ o.price }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ showQtyRow }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <sc-if value="{{ comboExtra }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;font-weight:700;color:#636366">Extra charge</span></sc-if>
+          <sc-if value="{{ notCombo }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;border:1px solid #E3E3E6;border-radius:999px;height:48px;padding:0 4px">
+            <button onClick="{{ dec }}" aria-label="Decrease quantity" style="width:40px;height:40px;border:0;border-radius:50%;background:transparent;font-size:20px;font-weight:600;cursor:pointer;color:#1A1414" style-hover="background:#F0F0F3">−</button>
+            <span style="min-width:24px;text-align:center;font-weight:800;font-size:17px">{{ qty }}</span>
+            <button onClick="{{ inc }}" aria-label="Increase quantity" style="width:40px;height:40px;border:0;border-radius:50%;background:transparent;font-size:20px;font-weight:600;cursor:pointer;color:#1A1414" style-hover="background:#F0F0F3">+</button>
+          </div></sc-if>
+          <span style="font-weight:900;font-size:32px;letter-spacing:-.03em">{{ totalText }}</span>
+        </div></sc-if>
+        <button onClick="{{ add }}" style="height:58px;border:0;border-radius:16px;background:#D7192D;color:#fff;font-weight:900;font-size:16px;cursor:pointer;transition:background .15s;letter-spacing:-.03em" style-hover="background:#B5121F">{{ addText }}</button>
+        <sc-if value="{{ hasExtras }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#636366;text-align:center">{{ extrasLine }}</span></sc-if>
+      </aside>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ isNarrow }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:0;right:0;bottom:0;z-index:7;background:#fff;border-top:1px solid #E9E9EC;padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 -10px 30px rgba(26,20,20,.08)">
+      <div style="display:grid;grid-template-columns:{{ sizeCols }};gap:6px">
+        <sc-for list="{{ sizes }}" as="o" hint-placeholder-count="4">
+          <button onClick="{{ o.pick }}" style="border:1.5px solid {{ o.mBorder }};background:#fff;border-radius:12px;height:44px;font-size:13px;font-weight:700;cursor:pointer;color:#1A1414">{{ o.short }}</button>
+        </sc-for>
+      </div>
+      <button onClick="{{ add }}" style="height:54px;border:0;border-radius:14px;background:#D7192D;color:#fff;font-weight:900;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 20px;letter-spacing:-.03em"><span>{{ addText }}</span><span>{{ mobileTotal }}</span></button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1280px&quot;,&quot;height&quot;:&quot;860px&quot;},&quot;item&quot;:{&quot;editor&quot;:null,&quot;default&quot;:{&quot;id&quot;:&quot;byo&quot;,&quot;name&quot;:&quot;Build Your Own&quot;,&quot;tops&quot;:[],&quot;included&quot;:4},&quot;tsType&quot;:&quot;object&quot;},&quot;sizePrices&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;onClose&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onAdd&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(line: object, qty: number) =&gt; void&quot;}}">
+const IMG = 'assets/ingredients/';
+const TSCALE = { pineapple: 0.62, tomatoes: 0.7, broccoli: 0.68, zucchini: 0.68, eggplant: 0.68, mushrooms: 0.75, 'hot-peppers': 0.7, 'sun-dried': 0.72, corn: 1, olives: 0.9, 'green-olives': 0.9, pepperoni: 0.62, 'veg-pepperoni': 0.62, 'hot-salami': 0.62, anchovies: 0.55, bacon: 0.5, ham: 0.5, sausage: 0.6, 'tandoori-chicken': 0.55, 'butter-chicken': 0.75, 'grilled-chicken': 0.5, 'shawarma-chicken': 0.6, shrimp: 0.7, 'seafood-mix': 0.6, 'chicken-kabab': 0.5 };
+const SPR = {"mushrooms":[["pz/mushroom-0",16.5],["pz/mushroom-1",13.8]],"green-peppers":[["pz/gp-0",20.1],["pz/gp-1",15.1],["pz/gp-2",9.1],["pz/gp-3",11.1]],"red-pepper":[["pz/rp-0",15.6],["pz/rp-1",8.6],["pz/rp-2",12.1]],"tomatoes":[["pz/tomato-0",18.5]],"green-olives":[["pz/gol-0",8]],"olives":[["pz/bol-0",9.6]],"hot-peppers":[["pz/hotp-0",17.1]],"pineapple":[["pz/pine-0",14.3]],"jalapenos":[["pz/jal-0",13.2]],"sun-dried":[["pz/sund-0",15.1]],"broccoli":[["pz/broc-0",18.5]],"corn":[["pz/corn-0",6],["pz/corn-1",6],["pz/corn-2",6],["pz/corn-3",6],["pz/corn-4",6],["pz/corn-5",6],["pz/corn-6",6],["pz/corn-7",6],["pz/corn-8",6]],"pepperoni":[["pz/mpep-0",19.6],["pz/mpep-1",19]],"veg-pepperoni":[["pz/mpep-0",19.6],["pz/mpep-1",19]],"hot-salami":[["pz/mpep-0",19.6],["pz/mpep-1",19]],"zucchini":[["pz/zuc-0",18.5]],"eggplant":[["pz/egg-0",17]],"red-onions":[["pz/onion-0",15],["pz/onion-1",10.2]],"paneer":[["pz/tpan-0",10.5],["pz/tpan-1",9.3],["pz/tpan-2",15.3]],"shahi-paneer":[["pz/shahi-0",12.3],["pz/shahi-1",12.3]],"soya-champ":[["pz/paneer-1",12.3],["pz/paneer-2",9.3]],"sausage":[["pz/isaus-0",16]],"shrimp":[["pz/shrimp-0",14.2]],"seafood-mix":[["pz/shrimp-0",14.2],["pz/anch-0",21.5]],"anchovies":[["pz/anch-0",21.5]],"bacon":[["pz/bacon-0",23]],"ham":[["pz/ham-0",23]],"tandoori-chicken":[["pz/tand-0",19],["pz/tand-1",16.5]],"butter-chicken":[["pz/butter-0",11.5],["pz/butter-1",13],["pz/butter-2",10]],"grilled-chicken":[["pz/grilled-0",25.5],["pz/grilled-1",17]],"shawarma-chicken":[["pz/shaw-0",17]],"chicken-kabab":[["pz/kabab-0",22]]};
+const hash = s => { let x = 2166136261; for (let i = 0; i < s.length; i++) x = Math.imul(x ^ s.charCodeAt(i), 16777619); x ^= x >>> 16; x = Math.imul(x, 2246822507); x ^= x >>> 13; x = Math.imul(x, 3266489909); x ^= x >>> 16; return (x >>> 0) / 4294967296; };
+const TOPS = [
+  ['mushrooms', 'Mushrooms', 'Veggie', 'mushrooms.png'], ['green-peppers', 'Green pepper', 'Veggie', 'green-peppers.png'], ['red-pepper', 'Red pepper', 'Veggie', 'red-pepper.png'], ['tomatoes', 'Tomatoes', 'Veggie', 'tomatoes.png'],
+  ['green-olives', 'Green olives', 'Veggie', 'olives.png'], ['soya-champ', 'Soya champ', 'Veggie', 'soya-champ.jpg'], ['olives', 'Black olives', 'Veggie', 'olives.png'], ['red-onions', 'Onions', 'Veggie', 'red-onions.png'],
+  ['hot-peppers', 'Hot pepper', 'Veggie', 'chilli.png'], ['pineapple', 'Pineapple', 'Veggie', 'pineapple.png'], ['jalapenos', 'Jalapeño pepper', 'Veggie', 'jalapenos.png'], ['sun-dried', 'Sun dried tomatoes', 'Veggie', 'sun-dried.png'],
+  ['broccoli', 'Broccoli', 'Veggie', 'broccoli.png'], ['corn', 'Sweet corn', 'Veggie', 'corn.jpg'], ['shahi-paneer', 'Shahi paneer', 'Veggie', 'shahi-paneer-y.jpg'], ['paneer', 'Tandoori paneer', 'Veggie', 'paneer.jpg'],
+  ['veg-pepperoni', 'Veggie pepperoni', 'Veggie', 'pepperoni.jpg'], ['extra-mozz', 'Extra cheese', 'Veggie', 'extra-mozz.png', 2], ['feta', 'Feta cheese', 'Veggie', 'feta.jpg'], ['zucchini', 'Zucchini', 'Veggie', 'zucchini.png'], ['eggplant', 'Eggplant', 'Veggie', 'eggplant.png'],
+  ['pepperoni', 'Pepperoni', 'Meat', 'pepperoni.jpg'], ['anchovies', 'Anchovies', 'Meat', null], ['bacon', 'Bacon', 'Meat', 'bacon.png'], ['ham', 'Ham', 'Meat', 'ham.png'], ['sausage', 'Hot Italian sausage', 'Meat', 'sausage.png'],
+  ['grilled-chicken', 'Grilled chicken', 'Meat', 'shawarma-chicken.png', 2], ['tandoori-chicken', 'Tandoori chicken', 'Meat', 'tandoori-chicken.png', 2], ['butter-chicken', 'Butter chicken', 'Meat', 'butter-chicken.png'],
+  ['shawarma-chicken', 'Shawarma chicken', 'Meat', 'shawarma-chicken.png'], ['seafood-mix', 'Sea food mix', 'Meat', 'shrimp.png'], ['shrimp', 'Shrimp', 'Meat', 'shrimp.png'], ['chicken-kabab', 'Chicken kabab', 'Meat', null], ['hot-salami', 'Hot salami', 'Meat', 'pepperoni.jpg'],
+].map(([id, name, cat, f, wt]) => ({ id, name, cat, wt: wt || 1, img: f ? IMG + f : null, hasImg: !!f, fit: f && f.endsWith('.jpg') ? 'cover' : 'contain', iw: f && f.endsWith('.jpg') ? '100%' : '80%', initials: name.split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase() }));
+const TOPMAP = Object.fromEntries(TOPS.map(t => [t.id, t]));
+const FREE_IMG = { Ginger: 'ginger.png', Garlic: 'sauce-garlic.png', Coriander: 'coriander.png', 'Red chilli': 'red-chilli.png', 'Green chilli': 'chilli.png', Oregano: 'oregano.png', 'Italian spice': 'italian-spice.png' };
+const ICON = { Light: { crust: '#EBCB93', fill: '#F6E3B8', path: '' }, Regular: { crust: '#D69A55', fill: '#F0C77E', path: '' }, 'Well done': { crust: '#9A5A2A', fill: '#D79A52', path: '' }, Triangles: { crust: '#D69A55', fill: '#E8B56A', path: 'M32 9v46M9 32h46M15.7 15.7l32.6 32.6M48.3 15.7L15.7 48.3' }, Squares: { crust: '#D69A55', fill: '#E8B56A', path: 'M24 10v44M40 10v44M10 24h44M10 40h44' }, Uncut: { crust: '#D69A55', fill: '#E8B56A', path: '' } };
+const FREE = ['Ginger', 'Garlic', 'Coriander', 'Red chilli', 'Green chilli', 'Oregano', 'Italian spice'];
+const SAUCES = [['Regular', 'Marinara', 'tomato'], ['Butter chicken', 'Butter chicken', 'butter-chicken'], ['Shahi paneer', 'Shahi paneer', 'shahi-paneer'], ['Garlic', 'Garlic', 'garlic'], ['Hot', 'Hot sauce', 'hot'], ['BBQ', 'BBQ', 'bbq'], ['Pesto', 'Pesto', 'pesto'], ['Honey garlic', 'Honey garlic', 'honey-garlic']];
+const SAUCE_BASE = { 'Butter chicken': 'assets/sauce-base/butter-chicken.png', 'Shahi paneer': 'assets/sauce-base/shahi-paneer.png', Garlic: 'assets/sauce-base/garlic.png', Hot: 'assets/sauce-base/hot.png', BBQ: 'assets/sauce-base/bbq.png', Pesto: 'assets/sauce-base/pesto.png', 'Honey garlic': 'assets/sauce-base/honey-garlic.png' };
+const SIZES = [['S', 'Small', 24], ['M', 'Medium', 29], ['L', 'Large', 34], ['XL', 'X-Large', 40]];
+const SCALE = { S: .8, M: .87, L: .94, XL: 1 };
+const DEF_PRICES = { S: 12, M: 14.6, L: 16.5, XL: 22.8 };
+const PIZZA_PRICES = (() => { const D = { S: 13, M: 15.5, L: 17.3, XL: 23.8 }, C = { S: 12, M: 14.6, L: 16.5, XL: 22.5 }; return { 'butter-chicken': D, 'shahi-paneer': D, 'chicken-shawarma': D, 'tandoori-fish': D, pepperoni: D, bismark: C, 'non-veg': C, 'sea-food': C }; })();
+const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
+
+const TOP_PRICE = { S: 1.15, M: 2.25, L: 2.5, XL: 3.5 };
+const EXTRA_CHEESE = 0;
+const money = n => '$' + n.toFixed(2);
+const DEFAULTS = { size: 'L', crust: 'Regular', bake: 'Wood-fired', sauce: 'Regular', cheese: 'Regular', spice: 'No spice', doneness: 'Regular', cut: 'Triangles', notes: '', qty: 1 };
+const SECS = [['crust', 'Oven & crust'], ['sauce', 'Base sauce'], ['cheese', 'Cheese'], ['tops', 'Toppings'], ['notes', 'Instructions']];
+const HV = [['left', 'Left half', 'M12 3.5a8.5 8.5 0 0 0 0 17z'], ['whole', 'Whole pizza', 'M12 3.5a8.5 8.5 0 1 1 0 17a8.5 8.5 0 1 1 0-17z'], ['right', 'Right half', 'M12 3.5a8.5 8.5 0 0 1 0 17z']];
+
+const isByoCheck = item => !item.id || item.id === 'byo' || /build your own/i.test(item.name || '');
+class Component extends DCLogic {
+  state = { w: typeof window !== 'undefined' ? window.innerWidth : 1200, ...DEFAULTS, tops: {}, free: {}, cat: 'Veggie', sec: 'crust', touched: {} };
+  rootRef = React.createRef();
+  secRefs = Object.fromEntries(SECS.map(([k]) => [k, React.createRef()]));
+
+  baseTops() { const t = {}; ((this.props.item && this.props.item.tops) || []).forEach(id => { t[id] = 'whole'; }); return t; }
+  componentDidMount() {
+    if (this.props.combo) Promise.resolve().then(() => this.setState({ size: this.props.combo.size, qty: 1, ...(this.props.combo.init || {}) }));
+    this.setState({ tops: this.baseTops() });
+    this.onResize = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onResize);
+    this.onKey = e => { if (e.key === 'Escape' && this.props.onClose) this.props.onClose(); };
+    document.addEventListener('keydown', this.onKey);
+    this.prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); document.removeEventListener('keydown', this.onKey); document.body.style.overflow = this.prevOverflow || ''; }
+  secTop(k) { const r = this.rootRef.current, el = this.secRefs[k].current; return el.getBoundingClientRect().top - r.getBoundingClientRect().top + r.scrollTop; }
+  goSec(k) { const r = this.rootRef.current; if (!r || !this.secRefs[k].current) return; this.lock = Date.now(); this.setState({ sec: k }); r.scrollTo({ top: Math.max(0, this.secTop(k) - 128), behavior: 'smooth' }); }
+  spy() {
+    if (this.lock && Date.now() - this.lock < 700) return;
+    const r = this.rootRef.current; if (!r) return;
+    let cur = SECS[0][0];
+    for (const [k] of SECS) { const el = this.secRefs[k].current; if (el && this.secTop(k) - r.scrollTop <= 160) cur = k; }
+    if (r.scrollTop + r.clientHeight >= r.scrollHeight - 4) cur = SECS[SECS.length - 1][0];
+    if (cur !== this.state.sec) this.setState({ sec: cur });
+  }
+  pick(key, val, sec) { this.setState(s => ({ [key]: val, touched: { ...s.touched, [sec]: true } })); }
+  toggleTop(id) { this.setState(s => { const t = { ...s.tops }; if (t[id]) delete t[id]; else t[id] = 'whole'; return { tops: t, touched: { ...s.touched, tops: true } }; }); }
+
+  renderVals() {
+    const item = this.props.item || {};
+    const P = PIZZA_PRICES[item.id] || this.props.sizePrices || DEF_PRICES;
+    const s = this.state, w = s.w, wide = w >= 960;
+    const included = item.included != null ? item.included : Math.max(4, (item.tops || []).reduce((a, k) => a + ((TOPMAP[k] || {}).wt || 1), 0));
+    const keys = Object.keys(s.tops);
+    const wOf = k => (TOPMAP[k] || {}).wt || 1; const used = keys.reduce((a, k) => a + wOf(k), 0); const cumOf = {}; keys.reduce((a, k) => (cumOf[k] = a + wOf(k)), 0);
+    const extraCount = Math.max(0, used - included);
+    const topCost = extraCount * TOP_PRICE[s.size];
+    const cheeseCost = s.cheese === 'Extra' ? EXTRA_CHEESE : 0;
+    const unit = P[s.size] + topCost + cheeseCost;
+    const sizeName = SIZES.find(x => x[0] === s.size)[1];
+    const topOf = id => TOPS.find(t => t.id === id) || { name: id };
+    const tile = on => ({ border: on ? '2px solid #D7192D' : '1.5px solid #E6E6E9', bg: on ? '#FAFAFD' : '#fff' });
+    const pill = (on) => ({ border: on ? '#1A1414' : '#DFDFE2', bg: on ? '#1A1414' : '#fff', fg: on ? '#fff' : '#1A1414' });
+
+    const whole = keys.filter(k => s.tops[k] === 'whole').map(k => topOf(k).name), lh = keys.filter(k => s.tops[k] === 'left').map(k => topOf(k).name), rh = keys.filter(k => s.tops[k] === 'right').map(k => topOf(k).name);
+    const base = [s.crust + ' crust', s.bake.toLowerCase(), s.sauce === 'None' ? 'no sauce' : s.sauce === 'Regular' ? 'marinara sauce' : s.sauce.toLowerCase() + ' sauce', s.cheese === 'None' ? 'no cheese' : (s.cheese === 'Regular' ? 'mozzarella' : s.cheese.toLowerCase() + ' mozzarella')];
+    let ingredientLine = base.join(', ');
+    if (whole.length) ingredientLine += ', ' + whole.join(', ');
+    if (lh.length) ingredientLine += '. Left half: ' + lh.join(', ');
+    if (rh.length) ingredientLine += '. Right half: ' + rh.join(', ');
+    const freeOn = FREE.filter(f => s.free[f]); if (freeOn.length) ingredientLine += '. Free: ' + freeOn.join(', ').toLowerCase();
+    ingredientLine = ingredientLine.charAt(0).toUpperCase() + ingredientLine.slice(1) + '.';
+
+    const CL = { Light: [1, '58%'], Regular: [2, '74%'], Extra: [3, '92%'], None: [0, null] };
+    const baseTops = [];
+    const pieces = [];
+    const want = [];
+    keys.forEach((k, ti) => { const sp = SPR[k]; if (!sp || baseTops.indexOf(k) >= 0) return; const side = s.tops[k]; const avg = sp.reduce((t, x) => t + x[1], 0) / sp.length * (TSCALE[k] || 0.8);
+      const full = avg <= 6.5 ? 14 : avg <= 9 ? 10 : avg <= 12 ? 8 : 7; want.push({ k, ti, sp, side, n: side === 'whole' ? full : Math.ceil(full * 0.55) }); });
+    const cap = 0.42 * 0.42 * Math.PI * 0.42; let area = 0;
+    want.forEach(w => { const avg = w.sp.reduce((t, x) => t + x[1], 0) / w.sp.length * (TSCALE[w.k] || 0.8) / 100; area += w.n * avg * avg * 0.7; });
+    const fit = area > cap ? Math.sqrt(cap / area) : 1;
+    const items = [];
+    want.forEach(w => { const n = Math.max(w.side === 'whole' ? 3 : 2, Math.round(w.n * Math.min(1, fit * 1.15))); const shrink = Math.max(0.78, Math.min(1, fit * 1.25));
+      for (let i = 0; i < n; i++) { const pick = w.sp[(i + w.ti) % w.sp.length]; items.push({ k: w.k, i, side: w.side, src: pick[0], size: pick[1] * (TSCALE[w.k] || 0.8) * shrink * (0.88 + hash(w.k + 'z' + i) * 0.24) }); } });
+    items.sort((p, q) => q.size - p.size || (p.k < q.k ? -1 : 1));
+    const placed = [];
+    items.forEach((it, idx) => { const rr = it.size / 200; const maxR = 0.425 - rr * 0.9; let best = null, bestScore = -1e9;
+      for (let c = 0; c < 48; c++) { const u = hash(it.k + 'u' + it.i + '-' + c), v = hash(it.k + 'v' + it.i + '-' + c); let ang = u * Math.PI * 2; if (it.side === 'left') ang = Math.PI / 2 + u * Math.PI; if (it.side === 'right') ang = -Math.PI / 2 + u * Math.PI;
+        const rad = Math.sqrt(v) * maxR; const x = Math.cos(ang) * rad, y = Math.sin(ang) * rad; if (it.side === 'left' && x > -rr * 0.6) continue; if (it.side === 'right' && x < rr * 0.6) continue;
+        let score = 1e9; placed.forEach(p => { const d = Math.hypot(p.x - x, p.y - y) - (p.r + rr) * 0.92; const same = p.k === it.k ? 0.6 : 1; if (d * same < score) score = d * same; });
+        score = Math.min(score, (maxR - rad) * 1.4 + 0.02); if (score > bestScore) { bestScore = score; best = { x, y }; } }
+      if (!best) best = { x: 0, y: 0 }; placed.push({ k: it.k, x: best.x, y: best.y, r: rr });
+      const cx = 50 + best.x * 100, cy = 50 + best.y * 100;
+      pieces.push({ src: 'assets/toppings/' + it.src + '.png', x: (cx - it.size / 2).toFixed(2) + '%', y: (cy - it.size / 2).toFixed(2) + '%', w: it.size.toFixed(2) + '%', tf: 'rotate(' + Math.round(hash(it.k + 'r' + it.i) * 360) + 'deg)' + (hash(it.k + 'f' + it.i) > 0.5 ? ' scaleX(-1)' : '') }); });
+    const isByo = !item.id || item.id === 'byo' || /build your own/i.test(item.name || '');
+    return {
+      rootRef: this.rootRef, pieces,
+      refCrust: this.secRefs.crust, refSauce: this.secRefs.sauce, refCheese: this.secRefs.cheese, refTops: this.secRefs.tops, refNotes: this.secRefs.notes,
+      onScroll: () => this.spy(),
+      name: item.name || 'Build Your Own',
+      img: SAUCE_BASE[s.sauce] || 'assets/pizza-base.png', imgZoom: 1, imgClip: 'visible', imgShadowN: 'none', imgShadowW: 'none', imgFilter: 'drop-shadow(0 22px 28px rgba(26,20,20,.22))',
+      isWide: wide, isNarrow: !wide,
+      cols: wide ? 'minmax(0,1fr) 400px' : 'minmax(0,1fr)',
+      bottomPad: wide ? '64px' : '170px',
+      scale: SCALE[s.size],
+      ingredientLine,
+      close: () => this.props.onClose && this.props.onClose(),
+      reset: () => this.setState({ ...DEFAULTS, tops: this.baseTops(), free: {}, touched: {} }),
+      steps: (() => { const ci = Math.max(0, SECS.findIndex(x => x[0] === s.sec)); return SECS.map(([k, label], i) => { const on = i === ci, done = i < ci; return { label, n: String(i + 1), aria: on ? 'step' : 'false', numBg: on ? '#D7192D' : done ? '#1A1414' : '#fff', numFg: on || done ? '#fff' : '#8E8E93', numRing: on ? '#D7192D' : done ? '#1A1414' : '#D5D5D9', fw: on ? '900' : '700', lblFg: on || done ? '#1A1414' : '#8E8E93', line: i < SECS.length - 1, lineBg: i < ci ? '#1A1414' : '#E3E3E7', go: () => this.goSec(k) }; }); })(),
+      crusts: [['Regular', 'Classic hand-tossed', 9], ['Thin', 'Light and crispy', 3], ['Thick', 'Soft and bready', 13]].map(([val, sub, t]) => { const on = s.crust === val; const layers = Array.from({ length: t }, (_, j) => { const k = j / Math.max(1, t - 1); return { z: (j - t) + 'px', bg: 'rgb(' + Math.round(150 + 60 * k) + ',' + Math.round(96 + 52 * k) + ',' + Math.round(48 + 34 * k) + ')' }; }); return { label: val, sub, layers, topZ: '0px', on, zoom: on ? 1.06 : 1, outline: on ? '3px solid #D7192D' : '3px solid transparent', pick: () => this.pick('crust', val, 'crust') }; }),
+      ovens: [['Wood-fired', 'Smoky, blistered crust. Our default.', 'assets/oven-wood-fired.png', '#120B08', '0', '0', '100%', '100%', 'cover', '40% 45%', 'auto'], ['Conventional', 'Even bake, softer crust. Same price.', 'assets/pizza-base.png', 'radial-gradient(120% 100% at 75% 15%,#5A4F4A 0%,#2A2321 60%,#1A1514 100%)', '-6%', '-34%', '64%', 'auto', 'contain', 'center', '1 / 1']].map(([v, desc, img, bg, r, b, w2, h, fit, pos, ar]) => { const on = s.bake === v; return { label: v, desc, img, bg, r, b, w: w2, h, fit, pos, ar, on, zoom: on ? 1.05 : 1, outline: on ? '3px solid #D7192D' : '3px solid transparent', pick: () => this.pick('bake', v, 'crust') }; }),
+      sauces: SAUCES.map(([v, label, f]) => { const on = s.sauce === v; return { label, img: 'assets/sauces/' + f + '.png', hasImg: true, noImg: false, swatch: 'transparent', iw: '100%', fit: 'contain', on, ...tile(on), pick: () => this.pick('sauce', v, 'sauce') }; }),
+      cheeses: ['Light', 'Regular', 'None'].map(v => { const on = s.cheese === v, [lvl, iw] = CL[v]; return { label: v === 'None' ? 'No cheese' : v, price: v === 'Extra' ? '+' + money(EXTRA_CHEESE) : '', img: IMG + 'extra-mozz.png', hasImg: !!iw, noImg: !iw, iw: iw || '0', on, ...tile(on), meter: [1, 2, 3].map(i => ({ c: i <= lvl ? (on ? '#D7192D' : '#1A1414') : '#DFDFE2' })), pick: () => this.pick('cheese', v, 'cheese') }; }),
+      cats: ['Veggie', 'Meat'].map(c => { const n = keys.filter(k => topOf(k).cat === c).length; const on = s.cat === c; return { label: c, count: n, hasCount: n > 0, on, line: on ? '#1A1414' : 'transparent', fg: on ? '#1A1414' : '#818184', pick: () => this.setState({ cat: c }) }; }),
+      ...(() => {
+        const url = u => u ? 'url("' + u + '")' : 'none';
+        const slot = (im, fill, sz) => ({ bg: url(im), fill: fill || '#fff', sz: sz || 'cover', bs: im || fill ? 'solid' : 'dashed', bc: im || fill ? '#fff' : '#C7C7CC', sh: im || fill ? '0 2px 8px rgba(26,20,20,.16)' : 'none' });
+        const pre = (k, o) => Object.keys(o).reduce((a, x) => (a[k + x] = o[x], a), {});
+        const done = (text, slots) => ({ Done: true, Text: text, Aria: text + ' selected', Bg: '#E8F5EC', Fg: '#1E7A3C', Slots: slots });
+        const cr = 'assets/pizza-base.png';
+        const sa = SAUCES.find(x => x[0] === s.sauce) || SAUCES[0];
+        const chNone = s.cheese === 'None';
+        const topImgs = keys.map(k => topOf(k)).map(t => t.hasImg ? t.img : null);
+        let tp;
+        if (included) {
+          const n = Math.min(used, included), full = used >= included;
+          tp = { Done: full, Text: extraCount ? n + ' of ' + included + ' + ' + extraCount + ' extra' : full ? 'All set' : n + ' of ' + included + ' included', Aria: n + ' of ' + included + ' included toppings chosen' + (extraCount ? ', ' + extraCount + ' extra' : ''),
+            Bg: full ? '#E8F5EC' : '#F2F2F5', Fg: full ? '#1E7A3C' : '#1A1414',
+            Slots: Array.from({ length: Math.max(included, keys.length) }, (_, i) => i < keys.length ? slot(topImgs[i], topImgs[i] ? '#fff' : '#E6E6EA', '82%') : slot(null)) };
+        } else {
+          tp = { Done: false, Text: money(TOP_PRICE[s.size]) + ' each', Aria: keys.length + ' toppings chosen', Bg: '#F2F2F5', Fg: '#1A1414', Slots: keys.length ? keys.map((k, i) => slot(topImgs[i], '#E6E6EA', '82%')) : [slot(null)] };
+        }
+        return { ...pre('crT', done(s.crust, [slot(cr, '#fff', '92%')])), ...pre('saT', done(sa[1], [slot('assets/sauces/' + sa[2] + '.png', '#fff', '100%')])),
+          ...pre('chT', done(chNone ? 'No cheese' : s.cheese + ' mozzarella', [chNone ? slot(null) : slot(IMG + 'extra-mozz.png', '#fff', '92%')])), ...pre('tpT', tp) };
+      })(),
+      topCountText: included ? Math.min(used, included) + ' of ' + included + ' included' + (extraCount ? ' · ' + extraCount + ' extra' : '') : money(TOP_PRICE[s.size]) + ' each',
+      topCountColor: extraCount ? '#C11425' : '#636366',
+      tops: TOPS.filter(t => t.cat === s.cat).map(t => {
+        const on = !!s.tops[t.id]; const idx = keys.indexOf(t.id);
+        const free = on ? cumOf[t.id] <= included : used + t.wt <= included;
+        return {
+          hasImg: t.hasImg, noImg: !t.hasImg, initials: t.initials,
+          name: t.name, img: t.img, fit: t.fit, iw: t.iw, on, off: !on, zoom: on ? 1.06 : 1, ...tile(on),
+          priceText: free ? (t.wt > 1 ? 'Included · counts as 2' : 'Included') : '+' + money(TOP_PRICE[s.size] * (on ? Math.min(t.wt, cumOf[t.id] - included) : t.wt)), priceColor: free ? '#12663A' : '#636366',
+          toggle: () => this.toggleTop(t.id),
+          halves: HV.map(([k, label, path]) => { const a = s.tops[t.id] === k; return { label, path, on: a, bg: a ? '#D7192D' : 'transparent', fg: a ? '#fff' : '#818184', pick: () => this.setState(st => ({ tops: { ...st.tops, [t.id]: k } })) }; }),
+        };
+      }),
+      hasPicked: keys.length > 0,
+      picked: keys.filter(k => TOPMAP[k] && TOPMAP[k].img).slice(0, 8).map(k => { const t = topOf(k); return { name: t.name, img: t.img, fit: t.fit, iw: t.iw === '100%' ? '100%' : '86%' }; }),
+      pickedText: keys.length + ' topping' + (keys.length === 1 ? '' : 's') + (keys.length > 8 ? ' (+' + (keys.length - 8) + ')' : ''),
+      freeOpts: FREE.map(f => { const on = !!s.free[f]; return { label: f, on, ...pill(on), ...tile(on), img: FREE_IMG[f] ? IMG + FREE_IMG[f] : null, hasImg: !!FREE_IMG[f], noImg: !FREE_IMG[f], initials: f.split(' ').map(x => x[0]).join('').toUpperCase(), pick: () => this.setState(st => ({ free: { ...st.free, [f]: !st.free[f] } })) }; }),
+      spiceCols: w < 520 ? 'repeat(2,minmax(0,1fr))' : 'repeat(4,minmax(0,1fr))',
+      spiceOpts: SPICES.map((v, i) => { const on = s.spice === v; return { label: v, on, dots: [0, 1, 2].map(d => ({ bg: d < i ? '#D7192D' : '#E3E3E7' })), border: on ? '2px solid #1A1414' : '1px solid #E6E6EA', bg: on ? '#fff' : '#fff', pick: () => this.setState({ spice: v }) }; }),
+      chipGroups: [['doneness', 'Bake', ['Regular', 'Light', 'Well done']], ['cut', 'Cut', ['Triangles', 'Squares', 'Uncut']]].map(([key, label, opts]) => ({ label, opts: opts.map(v => ({ label: v, filter: v === 'Light' ? 'brightness(1.1) saturate(.7) contrast(.95)' : v === 'Well done' ? 'brightness(.78) saturate(1.25) contrast(1.12) sepia(.12)' : 'none', cuts: v === 'Triangles' ? 'M38 9V67M9 38H67M17.5 17.5L58.5 58.5M58.5 17.5L17.5 58.5' : v === 'Squares' ? 'M27 10V66M49 10V66M10 27H66M10 49H66' : '', on: s[key] === v, ...tile(s[key] === v), ...(ICON[v] || {}), pick: () => this.pick(key, v, 'notes') })) })),
+      noteCount: s.notes.length, notes: s.notes, onNotes: e => this.setState({ notes: e.target.value }),
+      backText: this.props.combo ? 'Combo' : 'Menu',
+      sizeCols: this.props.combo ? '1fr' : 'repeat(4,1fr)', addText: this.props.combo ? (this.props.combo.btn || 'Save pizza') : 'Add to order',
+      sizes: SIZES.filter(([k]) => !this.props.combo || k === this.props.combo.size).map(([k, nm, px], i) => { const on = s.size === k; return { label: nm, short: k, price: this.props.combo ? 'In combo' : money(P[k]), px, on, fill: this.props.combo ? '#1A1414' : on ? '#D7192D' : '#DCDCDF', bg: this.props.combo ? '#fff' : on ? '#FFF1F2' : '#fff', ring: 'none', divider: i ? '1px solid #E3E3E6' : '0', mBorder: on ? '#D7192D' : '#E3E3E6', pick: () => this.setState({ size: k }) }; }),
+      qty: s.qty, notCombo: !this.props.combo, comboExtra: !!this.props.combo && unit - P[s.size] > 0.001, showQtyRow: !this.props.combo || unit - P[s.size] > 0.001, mobileTotal: this.props.combo && !(unit - P[s.size] > 0.001) ? '' : (this.props.combo ? '+' + money(unit - P[s.size]) : money(unit * s.qty)),
+      inc: () => { if (!this.props.combo) this.setState(st => ({ qty: Math.min(20, st.qty + 1) })); },
+      dec: () => this.setState(st => ({ qty: Math.max(1, st.qty - 1) })),
+      totalText: this.props.combo ? (unit - P[s.size] > 0.001 ? '+' + money(unit - P[s.size]) : 'Included') : money(unit * s.qty),
+      hasExtras: !!(extraCount || cheeseCost),
+      extrasLine: [extraCount ? extraCount + ' extra topping' + (extraCount > 1 ? 's' : '') + ' ' + money(topCost) : '', cheeseCost ? 'extra cheese ' + money(cheeseCost) : ''].filter(Boolean).join(' · ') + ' included in price',
+      add: () => {
+        const tl = keys.map(k => k + ':' + s.tops[k]).sort().join(',');
+        const parts = [s.crust + ' crust', s.bake];
+    if (s.spice !== 'No spice') parts.push(s.spice.toLowerCase());
+        if (s.sauce !== 'Regular') parts.push(s.sauce === 'None' ? 'no sauce' : s.sauce === 'Regular' ? 'marinara sauce' : s.sauce.toLowerCase() + ' sauce');
+        if (s.cheese !== 'Regular') parts.push(s.cheese === 'None' ? 'no cheese' : s.cheese.toLowerCase() + ' cheese');
+        if (extraCount) parts.push('+' + extraCount + ' topping' + (extraCount > 1 ? 's' : ''));
+        if (lh.length || rh.length) parts.push('half & half');
+        if (s.doneness !== 'Regular') parts.push(s.doneness.toLowerCase());
+        if (s.cut !== 'Triangles') parts.push(s.cut.toLowerCase());
+        this.props.onAdd && this.props.onAdd({ key: [item.id, s.size, s.crust, s.bake, s.sauce, s.cheese, tl, s.spice, s.doneness, s.cut, FREE.filter(f => s.free[f]).join('+'), s.notes.trim()].join('|'), name: sizeName + ' ' + (item.name || 'Build your own'), summary: parts.join(' · '), unit }, s.qty, { tops: s.tops, free: s.free, crust: s.crust, bake: s.bake, sauce: s.sauce, cheese: s.cheese, spice: s.spice, doneness: s.doneness, cut: s.cut, notes: s.notes, extra: unit - P[s.size], topNames: keys.map(k => ((TOPMAP[k] || {}).name || k) + (s.tops[k] === 'left' ? ' (left half)' : s.tops[k] === 'right' ? ' (right half)' : '')), crustName: s.crust, sauceName: s.sauce, cheeseName: s.cheese });
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

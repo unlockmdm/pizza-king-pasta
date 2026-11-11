@@ -170,6 +170,8 @@ export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
       orderNumber: p?.receipt_number || String(o.id).slice(-6).toUpperCase(),
       receiptUrl: p?.receipt_url || null,
       total,
+      cardBrand: p?.card_details?.card?.card_brand || null,
+      cardLast4: p?.card_details?.card?.last_4 || null,
     },
   };
 }

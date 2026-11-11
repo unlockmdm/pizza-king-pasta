@@ -43,7 +43,6 @@ function ByoToppings({ si }: { si: number }) {
 export interface HomeHandlers {
   onStart: () => void;
   onMenu: (e?: MouseEvent) => void;
-  onShahi: () => void;
   onTwoLarge: () => void;
   onByo: () => void;
   onPasta: () => void;
@@ -82,15 +81,6 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
           <div style={{ gridArea: 'hero', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, overflow: 'hidden', color: '#fff', background: '#1A1414' }}>
             <img src={U('1565299624946-b28f40a0ae38', 1800).replace('q=72', 'q=75')} alt="Wood-fired pizza" {...{ fetchpriority: "high" }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: 'pkZoom 18s ease-in-out infinite alternate' }} />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(14,8,8,.9),rgba(14,8,8,.1) 62%)' }} />
-            <Hov
-              as="button"
-              onClick={h.onShahi}
-              style={{ position: 'absolute', left: 24, top: 24, height: 44, padding: '0 16px 0 7px', border: 0, borderRadius: 999, background: 'rgba(255,255,255,.16)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.25)', color: '#fff', display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'inherit', fontWeight: 800, fontSize: 15, whiteSpace: 'nowrap', cursor: 'pointer' }}
-              hover={{ background: 'rgba(255,255,255,.26)' }}
-            >
-              <img src={U('1655673654158-9f7285b7d1ea', 120)} alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover' }} />
-              Shahi Paneer
-            </Hov>
             <div style={{ position: 'absolute', left: 'clamp(22px,3vw,40px)', right: 'clamp(22px,3vw,40px)', bottom: 'clamp(22px,3vw,40px)', display: 'flex', flexDirection: 'column', gap: 24 }}>
               <h1 style={{ margin: 0, fontWeight: 900, fontSize: bentoFont, lineHeight: 0.86, letterSpacing: '-.065em' }}>
                 <span style={{ display: 'block', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) both' }}>Wood-fired.</span>
@@ -301,14 +291,14 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
       {/* ---------- Wood oven ---------- */}
       <section id="oven" style={{ ...SECTION, display: 'block' }}>
         <div style={{ display: 'grid', gridTemplateColumns: ovenCols, background: '#1A1414', color: '#fff', borderRadius: ph ? 28 : 32, overflow: 'hidden' }}>
-          <div style={{ position: 'relative', minHeight: ph ? 200 : 420 }}>
+          <div style={{ position: 'relative', minHeight: w >= 960 ? 460 : 0, aspectRatio: w >= 960 ? 'auto' : tab ? '16/9' : '4/3' }}>
             <Photo src={U('1651981075280-9a9e01acbff0', 1400)} alt="Wood-fired pizza oven" credit="Photo by Daniel on Unsplash" creditHref="https://unsplash.com/@unsplashbydan" />
           </div>
-          <div style={{ padding: ph ? '26px 20px 20px' : 'clamp(32px,5vw,64px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: ph ? 20 : 28 }}>
+          <div style={{ padding: 'clamp(28px,5vw,64px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 'clamp(24px,3vw,36px)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#FF7A85' }}>Our ovens</span>
-              <h2 style={{ margin: 0, fontWeight: 900, fontSize: 'clamp(36px,4.4vw,60px)', lineHeight: 0.98, letterSpacing: '-.04em', textWrap: 'balance' } as CSSProperties}>Wood-fired or conventional, on every pizza.</h2>
-              <p style={{ margin: 0, fontSize: ph ? 16 : 18, lineHeight: 1.55, color: '#CFC6C0', maxWidth: 460 }}>Pick the wood-fired oven or the conventional oven when you order. Same price either way.</p>
+              <h2 style={{ margin: 0, fontWeight: 900, fontSize: 'clamp(32px,4vw,54px)', lineHeight: 1, letterSpacing: '-.04em', textWrap: 'balance' } as CSSProperties}>Wood-fired or conventional, on every pizza.</h2>
+              <p style={{ margin: 0, fontSize: 'clamp(16px,1.4vw,18px)', lineHeight: 1.55, color: '#CFC6C0', maxWidth: 460, textWrap: 'pretty' } as CSSProperties}>Pick the wood-fired oven or the conventional oven when you order. Same price either way.</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: ph ? 'repeat(2,minmax(0,1fr))' : 'repeat(auto-fit,minmax(200px,1fr))', gap: ph ? 8 : 12 }}>
               <div style={{ background: '#D7192D', borderRadius: ph ? 18 : 22, padding: ph ? 14 : 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -338,6 +328,16 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
               <Hov as="a" href={SHOP.mapsSearch} target="_blank" rel="noreferrer" style={{ background: '#1A1414', color: '#fff', borderRadius: 999, padding: '15px 24px', fontWeight: 800, fontSize: 15, textDecoration: 'none' }} hover={{ background: '#D7192D', color: '#fff' }}>Get directions</Hov>
               <Hov as="a" href={SHOP.phoneHref} style={{ background: '#fff', color: '#1A1414', borderRadius: 999, padding: '15px 24px', fontWeight: 800, fontSize: 15, textDecoration: 'none', boxShadow: '0 0 0 1px rgba(26,20,20,.12)' }} hover={{ color: '#D7192D' }}>Call the shop</Hov>
             </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 24, borderTop: '1px solid rgba(26,20,20,.1)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: '#636366' }}>Delivery</span>
+                <span style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.45, textWrap: 'pretty' } as CSSProperties}>Available through DoorDash and Uber Eats.</span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                <AppPill href={SHOP.doordash} logo={SHOP.doordashLogo} name="DoorDash" h={14} />
+                <AppPill href={SHOP.ubereats} logo={SHOP.ubereatsLogo} name="Uber Eats" h={18} />
+              </div>
+            </div>
           </div>
           <div style={{ position: 'relative', borderRadius: 32, overflow: 'hidden', minHeight: 380, background: '#2A1E1A', display: ph ? 'none' : undefined }}>
             <Photo src={U('1555072956-7758afb20e8f', 1400)} alt="" credit="Photo by Pinar Kucuk on Unsplash" creditHref="https://unsplash.com/@pinarimsi" />
@@ -356,3 +356,17 @@ function InfoBlock({ label, children }: { label: string; children: React.ReactNo
     </div>
   );
 }
+
+/** White pill linking to the shop's page in a delivery app (Hours & location). */
+function AppPill({ href, logo, name, h }: { href: string; logo: string; name: string; h: number }) {
+  return (
+    <Hov as="a" href={href} target="_blank" rel="noopener noreferrer" aria-label={'Order delivery on ' + name} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 50, background: '#fff', color: '#1A1414', borderRadius: 999, padding: '0 20px', textDecoration: 'none', boxShadow: '0 0 0 1px rgba(26,20,20,.12)', transition: 'box-shadow .15s' }} hover={{ boxShadow: '0 0 0 2px #1A1414', color: '#1A1414' }}>
+      <img src={logo} alt={name} style={{ display: 'block', height: h, width: 'auto', flex: 'none' }} />
+      <IconArrowUpRight />
+    </Hov>
+  );
+}
+
+export const IconArrowUpRight = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flex: 'none' }} aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
+);

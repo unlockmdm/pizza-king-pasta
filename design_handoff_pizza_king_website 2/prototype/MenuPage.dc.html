@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap">
+<script src="./image-slot.js"></script>
+<style>
+body{margin:0;background:#fff}
+a{color:#1A1414}
+a:hover{color:#D7192D}
+button{font-family:inherit}
+@keyframes pkmUp{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes pkmFade{from{opacity:0}to{opacity:1}}
+@keyframes pkmIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="font-family:'Figtree',system-ui,sans-serif;color:#1A1414;background:#fff;min-height:100vh">
+  <header style="position:sticky;top:68px;z-index:60;background:rgba(255,255,255,.96);backdrop-filter:saturate(1.6) blur(16px);-webkit-backdrop-filter:saturate(1.6) blur(16px)">
+    <nav style="border-bottom:1px solid #E9E9EC">
+      <div style="max-width:1200px;margin:0 auto;padding:0 clamp(16px,3vw,32px);display:flex;gap:28px;overflow-x:auto;scrollbar-width:none">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="7">
+          <a href="{{ n.href }}" onClick="{{ n.go }}" style="flex:none;padding:14px 0 13px;font-weight:700;font-size:15px;color:{{ n.fg }};text-decoration:none;white-space:nowrap;box-shadow:inset 0 -2.5px 0 {{ n.line }};transition:color .2s">{{ n.label }}</a>
+        </sc-for>
+      </div>
+    </nav>
+  </header>
+
+  <main style="max-width:1200px;margin:0 auto;padding:0 clamp(16px,3vw,32px) 96px;display:flex;flex-direction:column">
+    <h1 style="margin:0;padding:clamp(36px,5vw,64px) 0 0;font-weight:900;font-size:clamp(44px,6vw,72px);line-height:1;letter-spacing:-.045em">Menu</h1>
+
+    <section id="walkin" data-screen-label="Walk-in specials" style="padding-top:32px;scroll-margin-top:124px">
+      <div style="background:#1A1414;color:#fff;border-radius:28px;padding:clamp(24px,4vw,40px);display:flex;flex-direction:column;gap:24px">
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <h2 style="margin:0;font-weight:900;font-size:clamp(28px,3vw,36px);letter-spacing:-.035em">Walk-in specials</h2>
+          <span style="height:26px;display:flex;align-items:center;padding:0 10px;border-radius:999px;background:#D7192D;font-weight:800;font-size:12px;letter-spacing:.06em;white-space:nowrap;text-transform:uppercase">Pickup only</span>
+        </div>
+        <div style="display:grid;grid-template-columns:{{ walkCols }};gap:12px">
+          <sc-for list="{{ walkins }}" as="d" hint-placeholder-count="4">
+            <div style="background:#2A2020;border-radius:22px;overflow:hidden;display:flex;flex-direction:column;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)">
+              <span role="img" aria-label="{{ d.alt }}" style="position:relative;z-index:0;isolation:isolate;aspect-ratio:16/10;overflow:hidden;background:radial-gradient(110% 90% at 50% 38%,#4A3833 0%,#2E2321 58%,#211918 100%)"><sc-for list="{{ d.layers }}" as="L" hint-placeholder-count="0"><span style="position:absolute;left:{{ L.l }};top:{{ L.t }};width:{{ L.w }};z-index:{{ L.z }};transform:translate(-50%,-50%) rotate({{ L.r }});filter:{{ L.f }}"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ L.src }}');background-position:center;background-repeat:no-repeat;width:100%;aspect-ratio:{{ L.ar }};background-size:contain"></span><sc-for list="{{ L.tops }}" as="t" hint-placeholder-count="0"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ t.src }}');background-position:center;background-repeat:no-repeat;position:absolute;left:{{ t.x }};top:{{ t.y }};width:{{ t.w }};aspect-ratio:1/1;background-size:contain;transform:translate(-50%,-50%) rotate({{ t.r }}) scaleX({{ t.fx }});filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))"></span></sc-for></span></sc-for><span style="position:absolute;z-index:20;left:12px;bottom:12px;height:38px;padding:0 14px;border-radius:999px;background:#D7192D;color:#fff;font-weight:900;font-size:19px;letter-spacing:-.02em;display:flex;align-items:center;box-shadow:0 6px 16px rgba(0,0,0,.25)">{{ d.priceText }}</span></span>
+              <span style="padding:18px 20px 20px;display:flex;flex-direction:column;gap:16px;flex:1">
+                <span style="display:flex;flex-direction:column;gap:4px;flex:1"><span style="font-weight:800;font-size:18px">{{ d.name }}</span><span style="font-size:14px;line-height:1.45;color:#CFC6C0">{{ d.desc }}</span></span>
+                <button onClick="{{ d.add }}" style="height:46px;border:0;border-radius:14px;background:#fff;color:#1A1414;font-weight:800;font-size:15px;cursor:pointer;transition:background .15s,color .15s" style-hover="background:#D7192D;color:#fff">Customize</button>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="6">
+      <section id="{{ sec.id }}" data-screen-label="{{ sec.title }}" style="padding-top:72px;display:flex;flex-direction:column;gap:20px;scroll-margin-top:124px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span style="width:44px;height:6px;border-radius:3px;background:{{ sec.accent }}"></span>
+          <h2 style="margin:0;font-weight:900;font-size:clamp(30px,3.4vw,42px);letter-spacing:-.04em">{{ sec.title }}</h2>
+        </div>
+        <sc-if value="{{ sec.isTile }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:16px">
+            <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="6">
+              <button onClick="{{ r.act }}" style="display:flex;flex-direction:column;border:0;padding:0;border-radius:24px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px #E9E9EC;text-align:left;color:#1A1414;cursor:pointer;transition:box-shadow .3s,transform .3s" style-hover="transform:translateY(-4px);box-shadow:0 0 0 1px #DFDFE2,0 22px 44px rgba(26,20,20,.14)">
+                <span style="position:relative;aspect-ratio:4/3;overflow:hidden;background:#F2F2F5"><sc-if value="{{ r.hasImg }}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ r.img }}');background-position:center;background-repeat:no-repeat;width:100%;height:100%;background-size:cover"></span></sc-if><sc-if value="{{ r.noImg }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 28% 22%,rgba(255,255,255,.32),rgba(255,255,255,0) 58%),{{ r.accent }}"><span style="font-weight:900;font-size:clamp(56px,6vw,84px);letter-spacing:-.06em;color:#fff;text-shadow:0 8px 24px rgba(0,0,0,.18)">{{ r.initial }}</span></span></sc-if><span style="position:absolute;left:12px;top:12px;display:flex;gap:6px"><sc-if value="{{ r.veg }}" hint-placeholder-val="{{ false }}"><span title="Vegetarian" style="width:15px;height:15px;border:1.5px solid #12663A;border-radius:3px;display:flex;align-items:center;justify-content:center;flex:none;background:#fff"><span style="width:6px;height:6px;border-radius:50%;background:#12663A"></span></span></sc-if></span></span>
+                <span style="display:flex;flex-direction:column;gap:6px;padding:16px 18px 18px;flex:1">
+                  <span style="font-weight:800;font-size:18px;letter-spacing:-.01em">{{ r.name }}</span>
+                  <span style="font-size:14px;line-height:1.45;color:#636366;flex:1">{{ r.desc }}</span>
+                  <span style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px"><span style="font-weight:800;font-size:15px">{{ r.priceText }}</span><span style="height:42px;padding:0 16px;border-radius:999px;background:{{ r.btnBg }};color:{{ r.btnFg }};font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px">{{ r.cta }}</span></span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ sec.isRow }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:{{ twoCols }};gap:12px">
+            <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="4">
+              <button onClick="{{ r.act }}" style="display:flex;align-items:center;gap:16px;min-height:124px;padding:14px 18px 14px 14px;border:0;border-radius:22px;background:{{ r.cardBg }};color:{{ r.cardFg }};box-shadow:0 0 0 1px {{ r.ring }};text-align:left;cursor:pointer;transition:box-shadow .3s,transform .3s" style-hover="transform:translateY(-3px);box-shadow:0 18px 38px rgba(26,20,20,.16)">
+                <span style="flex:none;width:96px;height:96px;border-radius:16px;overflow:hidden;background:{{ r.tileBg }}"><sc-if value="{{ r.hasImg }}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="display:block;flex:none;background-image:url('{{ r.img }}');background-position:center;background-repeat:no-repeat;width:100%;height:100%;background-size:cover"></span></sc-if><sc-if value="{{ r.noImg }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 28% 22%,rgba(255,255,255,.32),rgba(255,255,255,0) 58%),{{ r.accent }}"><span style="font-weight:900;font-size:clamp(56px,6vw,84px);letter-spacing:-.06em;color:#fff;text-shadow:0 8px 24px rgba(0,0,0,.18)">{{ r.initial }}</span></span></sc-if></span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                  <span style="display:flex;align-items:center;gap:8px"><span style="font-weight:800;font-size:17px">{{ r.name }}</span><sc-if value="{{ r.veg }}" hint-placeholder-val="{{ false }}"><span title="Vegetarian" style="width:15px;height:15px;border:1.5px solid #12663A;border-radius:3px;display:flex;align-items:center;justify-content:center;flex:none;background:#fff"><span style="width:6px;height:6px;border-radius:50%;background:#12663A"></span></span></sc-if></span>
+                  <sc-if value="{{ r.hasDesc }}" hint-placeholder-val="{{ true }}"><span style="font-size:14px;line-height:1.45;color:{{ r.muted }}">{{ r.desc }}</span></sc-if>
+                </span>
+                <span style="flex:none;font-weight:800;font-size:16px">{{ r.priceText }}</span>
+                <span style="flex:none;width:42px;height:42px;border-radius:50%;background:{{ r.btnBg }};color:{{ r.btnFg }};display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </section>
+    </sc-for>
+  </main>
+
+  
+
+  <sc-if value="{{ pickerOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:16px">
+      <div onClick="{{ closePicker }}" style="position:absolute;inset:0;background:rgba(26,20,20,.45);animation:pkmFade .2s ease both"></div>
+      <div role="dialog" aria-label="{{ pickerName }}" style="position:relative;width:min(420px,100%);background:#fff;border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:6px;box-shadow:0 24px 60px rgba(26,20,20,.25);animation:pkmIn .22s ease both">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:10px">
+          <span style="display:flex;flex-direction:column;gap:3px"><span style="font-weight:900;font-size:22px;letter-spacing:-.03em">{{ pickerName }}</span><span style="font-size:14px;color:#636366">{{ pickerSub }}</span></span>
+          <button onClick="{{ closePicker }}" aria-label="Close" style="width:42px;height:42px;border:0;border-radius:50%;background:#F2F2F5;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1A1414;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+        <sc-if value="{{ pickerSpicy }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px;padding:2px 0 10px">
+            <span style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#636366">Spice level</span>
+            <div role="radiogroup" aria-label="Spice level" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">
+              <sc-for list="{{ spiceOpts }}" as="v" hint-placeholder-count="4">
+                <button role="radio" aria-checked="{{ v.on }}" onClick="{{ v.pick }}" style="display:flex;align-items:center;gap:8px;height:46px;padding:0 12px;border:0;border-radius:12px;background:{{ v.bg }};color:{{ v.fg }};font-family:inherit;font-weight:700;font-size:14px;white-space:nowrap;cursor:pointer;transition:background .15s,color .15s"><span aria-hidden="true" style="display:flex;gap:3px"><sc-for list="{{ v.dots }}" as="d" hint-placeholder-count="3"><span style="width:6px;height:6px;border-radius:50%;background:{{ d.bg }}"></span></sc-for></span>{{ v.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-for list="{{ pickerOpts }}" as="o" hint-placeholder-count="3">
+          <button onClick="{{ o.add }}" style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px;padding:0 16px;border:0;border-radius:14px;background:#F2F2F5;cursor:pointer;color:#1A1414;transition:background .15s" style-hover="background:#E9E9EC">
+            <span style="font-weight:700;font-size:16px">{{ o.label }}</span>
+            <span style="display:flex;align-items:center;gap:12px"><span style="font-weight:800;font-size:16px">{{ o.priceText }}</span><span style="width:30px;height:30px;border-radius:50%;background:#D7192D;color:#fff;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span></span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:fixed;left:50%;bottom:24px;z-index:75;transform:translateX(-50%);display:flex;align-items:center;gap:14px;background:#1A1414;color:#fff;border-radius:16px;padding:12px 12px 12px 18px;box-shadow:0 12px 32px rgba(26,20,20,.3);animation:pkmUp .25s ease both;max-width:calc(100vw - 32px)">
+      <span style="font-weight:700;font-size:15px">{{ toast }}</span>
+      <a href="Pizza King Home v2.dc.html" style="flex:none;height:36px;display:flex;align-items:center;padding:0 14px;border-radius:999px;background:#D7192D;color:#fff;font-weight:800;font-size:14px;text-decoration:none" style-hover="color:#fff;background:#B5121F">View cart</a>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ builderOpen }}" hint-placeholder-val="{{ false }}">
+    <dc-import name="PizzaBuilder" item="{{ builderItem }}" on-close="{{ closeBuilder }}" on-add="{{ builderAdd }}" hint-size="100%,100%" style="position:fixed;inset:0;z-index:80"></dc-import>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CART_KEY = 'pkp-home-v2-cart';
+const PIZZA_IMG = 'https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?fm=jpg&q=72&w=1000&auto=format&fit=crop';
+const UI = id => 'https://images.unsplash.com/photo-' + id + '?fm=jpg&q=70&w=600&auto=format&fit=crop';
+const PIZZA_PICS = ['1593560708920-61dd98c46a4e', '1655673654158-9f7285b7d1ea', '1604382354936-07c5d9983bd3', '1590947132387-155cc02f3212', '1692737580547-b45bb4a02356', '1565299624946-b28f40a0ae38', '1611915365928-565c527a0590', '1594007654729-407eedc4be65'].map(UI);
+const PIZZA_PHOTO = { napoli: '1571066811602-716837d681de', 'four-seasons': '1559978137-8c560d91e9e1', 'italian-veg': '1617470702892-e01504297e84', 'non-veg': '1600628421055-4d30de868b8f', bismark: '1595708684082-a173bb3a06c5', 'sea-food': '1552539618-7eec9b4d1796', 'chicken-shawarma': '1565299624946-b28f40a0ae38', 'butter-chicken': 'assets/pizzas/butter-chicken.png', 'shahi-paneer': 'assets/pizzas/shahi-paneer.png', greek: '1573821663912-6df460f9c684', hawaiian: '1576458088443-04a19bb13da6', 'meat-lover': '1628840042765-356cda07504e', canadian: '1534308983496-4fabb1a015ee', 'tandoori-fish': '1589187151053-5ec8818e661b' };
+const ROW_PIC = { 'fruit-juice': 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?fm=jpg&q=70&w=600&auto=format&fit=crop', 'espresso': 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?fm=jpg&q=70&w=600&auto=format&fit=crop', 'hot': 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?fm=jpg&q=70&w=600&auto=format&fit=crop', 'beer': 'https://images.unsplash.com/photo-1608270586620-248524c67de9?fm=jpg&q=70&w=600&auto=format&fit=crop', 'shake': 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?fm=jpg&q=70&w=600&auto=format&fit=crop', 'momos': 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?fm=jpg&q=70&w=600&auto=format&fit=crop', 'chaat': 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?fm=jpg&q=70&w=600&auto=format&fit=crop', 'sub': 'https://images.unsplash.com/photo-1509722747041-616f39b57569?fm=jpg&q=70&w=600&auto=format&fit=crop', 'nv-salad': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?fm=jpg&q=70&w=600&auto=format&fit=crop', 'v-salad': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?fm=jpg&q=70&w=600&auto=format&fit=crop', 'wedges': 'https://images.unsplash.com/photo-1623238913973-21e45cced554?fm=jpg&q=70&w=600&auto=format&fit=crop', 'leg': 'https://images.unsplash.com/photo-1617692855027-33b14f061079?fm=jpg&q=70&w=600&auto=format&fit=crop', 'dip-garlic': 'assets/dips/menu-garlic.png', 'dip-ranch': 'assets/dips/menu-ranch.png', 'dip-chipotle': 'assets/dips/menu-chipotle.png', 'dip-jalapeno': 'assets/dips/menu-jalapeno-cheddar.png', 'dip-marinara': 'assets/dips/menu-marinara.png', wings: 'assets/ingredients/tandoori-chicken.png', 'pasta-rose': 'assets/menu/pasta-rose.png', 'pasta-alfredo': 'assets/menu/pasta-alfredo.png', 'veg-pasta-rose': 'assets/menu/pasta-rose.png', 'veg-pasta-alfredo': 'assets/menu/pasta-alfredo.png', 'ch-pasta-rose': 'assets/menu/pasta-rose.png', 'ch-pasta-alfredo': 'assets/menu/pasta-alfredo.png', 'veg-pasta-tomato': 'assets/menu/pasta.jpg', 'ch-pasta-tomato': 'assets/menu/pasta.jpg', cone: 'assets/menu/gelato.jpg', scoop: 'assets/menu/gelato.jpg', lassi: 'assets/menu/juice.jpg', corn: 'assets/ingredients/corn.jpg' };
+const THEME = {
+  pizzas: { accent: '#D7192D', btnBg: '#D7192D', btnFg: '#fff' },
+  tandoori: { accent: '#C2511F', cardBg: '#1A1414', cardFg: '#fff', muted: '#CFC6C0', ring: 'transparent', tileBg: '#2A2020', btnBg: '#D7192D', btnFg: '#fff' },
+  sides: { accent: '#6E8B3D', cardBg: '#F1F4E8', cardFg: '#1A1414', muted: '#5A6150', ring: 'transparent', tileBg: '#E3E9D3', btnBg: '#1A1414', btnFg: '#fff' },
+  dips: { accent: '#D7192D', cardBg: '#F5F5F7', cardFg: '#1A1414', muted: '#646467', ring: 'transparent', tileBg: '#EDEDF0', btnBg: '#1A1414', btnFg: '#fff' },
+  pasta: { accent: '#E0A526', cardBg: '#EEEEF1', cardFg: '#1A1414', muted: '#6E5E45', ring: 'transparent', tileBg: '#F3E3BF', btnBg: '#1A1414', btnFg: '#fff' },
+  gelato: { accent: '#E46A92', cardBg: '#FCE9EE', cardFg: '#1A1414', muted: '#7A5560', ring: 'transparent', tileBg: '#F7D3DE', btnBg: '#C2335F', btnFg: '#fff' },
+  drinks: { accent: '#1E6E6A', cardBg: '#E5F2EF', cardFg: '#1A1414', muted: '#4B6560', ring: 'transparent', tileBg: '#CFE6E1', btnBg: '#1E6E6A', btnFg: '#fff' },
+};
+const money = n => '$' + n.toFixed(2);
+const PZ = n => 'assets/toppings/pz/' + n + '.png';
+const RECIPES = {
+  pep: [[['pep-0', 'pep-1'], 14, 11]],
+  veg: [[['mushroom-0', 'mushroom-1'], 16, 5], [['gp-0', 'gp-1', 'gp-2', 'gp-3'], 16, 5], [['onion-0', 'onion-1'], 15, 4], [['bol-0'], 8.5, 6]],
+  meat: [[['pep-0', 'pep-1'], 14, 6], [['bacon-0'], 17, 3], [['isaus-0'], 11, 5], [['gp-0', 'gp-2'], 15, 3]],
+  tand: [[['tand-0', 'tand-1'], 15, 5], [['rp-0', 'rp-1'], 15, 4], [['onion-0', 'onion-1'], 15, 4], [['jal-0'], 9.5, 4]],
+};
+const scatter = (recipe, seed) => {
+  let a = seed * 9973 + 7; const rnd = () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const pts = [], out = [];
+  recipe.forEach(([srcs, w, n]) => { for (let k = 0; k < n; k++) {
+    let best = null, bd = -1;
+    for (let tries = 0; tries < 40; tries++) { const ang = rnd() * Math.PI * 2, rad = Math.sqrt(rnd()) * 0.33; const x = .5 + Math.cos(ang) * rad, y = .5 + Math.sin(ang) * rad; const d = pts.reduce((m, p) => Math.min(m, Math.hypot(p[0] - x, p[1] - y) - (p[2] + w / 100) / 2), 9); if (d > bd) { bd = d; best = [x, y]; } if (d > .015) break; }
+    pts.push([best[0], best[1], w / 100]);
+    out.push({ src: PZ(srcs[k % srcs.length]), x: (best[0] * 100).toFixed(1) + '%', y: (best[1] * 100).toFixed(1) + '%', w: (w * (.9 + rnd() * .2)).toFixed(1) + '%', r: Math.round(rnd() * 360) + 'deg', fx: rnd() > .5 ? -1 : 1 });
+  } });
+  return out;
+};
+Object.assign(RECIPES, {
+  byo: [],
+  napoli: [[['anch-0'], 14, 5], [['gol-0'], 8.5, 7]],
+  'four-seasons': [[['ham-0'], 15, 4], [['mushroom-0', 'mushroom-1'], 15, 5], [['bol-0'], 8.5, 6]],
+  'italian-veg': [[['zuc-0'], 15, 4], [['rp-0', 'rp-1'], 15, 4], [['egg-0'], 15, 3], [['onion-0', 'onion-1'], 15, 4]],
+  'non-veg': [[['grilled-0', 'grilled-1'], 16, 3], [['isaus-0'], 11, 4], [['pep-0', 'pep-1'], 14, 4], [['ham-0'], 15, 2]],
+  bismark: [[['sund-0'], 13, 5], [['grilled-0', 'grilled-1'], 16, 3], [['isaus-0'], 11, 4]],
+  'sea-food': [[['shrimp-0'], 15, 6], [['anch-0'], 14, 3]],
+  'chicken-shawarma': [[['shaw-0'], 16, 5], [['hotp-0'], 10, 5], [['onion-0', 'onion-1'], 15, 4]],
+  'butter-chicken': [[['butter-0', 'butter-1', 'butter-2'], 13, 6], [['gp-0', 'gp-1', 'gp-2', 'gp-3'], 15, 4], [['onion-0', 'onion-1'], 15, 4]],
+  'shahi-paneer': [[['shahi-0', 'shahi-1', 'shahi-2'], 11, 6], [['gp-0', 'gp-1', 'gp-2'], 15, 3], [['onion-0', 'onion-1'], 15, 3], [['jal-0'], 9.5, 4]],
+  greek: [[['paneer-0', 'paneer-1', 'paneer-2', 'paneer-3'], 10, 6], [['bol-0'], 8.5, 6], [['tomato-0'], 16, 4]],
+  hawaiian: [[['pine-0'], 13, 6], [['bacon-0'], 17, 3], [['ham-0'], 15, 3]],
+  'meat-lover': [[['pep-0', 'pep-1'], 14, 5], [['ham-0'], 15, 2], [['bacon-0'], 17, 2], [['isaus-0'], 11, 4]],
+  canadian: [[['pep-0', 'pep-1'], 14, 6], [['mushroom-0', 'mushroom-1'], 15, 5], [['bacon-0'], 17, 3]],
+  'tandoori-fish': [[['tand-0', 'tand-1'], 14, 5], [['mushroom-0', 'mushroom-1'], 15, 4], [['onion-0', 'onion-1'], 15, 3], [['gp-0', 'gp-2'], 15, 3]],
+});
+const SH = 'drop-shadow(0 14px 18px rgba(0,0,0,.5))', SH2 = 'drop-shadow(0 8px 10px rgba(0,0,0,.45))';
+const pizza = (cx, cy, w, recipe, seed, z) => ({ src: 'assets/pizza-base.png', ar: '1/1', l: cx + '%', t: cy + '%', w: w + '%', z: z || 1, r: (seed * 37 % 40) + 'deg', f: SH, tops: scatter(RECIPES[recipe], seed) });
+const prop = (src, cx, cy, w, r, z) => ({ src, ar: /coke/.test(src) ? '174/330' : /dips/.test(src) ? '600/470' : '1/1', l: cx + '%', t: cy + '%', w: w + '%', z: z || 5, r: (r || 0) + 'deg', f: SH2, tops: [] });
+const CAN = 'assets/combo/coke.png', DIP = n => 'assets/dips/' + n + '.png';
+const comboScene = (w, sauces, pops, seed, recipes) => [
+  pizza(33, 44, w, recipes[0], seed, 1), pizza(63, 57, w, recipes[1], seed + 3, 2),
+  ...(pops ? [prop(CAN, 82, 52, 8.5, -6, 4), prop(CAN, 90.5, 57, 8.5, 5, 5)] : []),
+  prop(DIP(sauces[0]), pops ? 76 : 84, 84, 13, -4, 6), prop(DIP(sauces[1]), pops ? 91 : 88, pops ? 87 : 66, 13, 5, pops ? 7 : 5),
+];
+const SCENES = [
+  [pizza(50, 50, 56, 'pep', 2), prop(DIP('garlic'), 86, 82, 12, 6, 5)].slice(0, 1),
+  comboScene(50, ['garlic', 'marinara'], true, 5, ['pep', 'veg']),
+  comboScene(43, ['ranch', 'chipotle'], true, 8, ['meat', 'tand']),
+  comboScene(36, ['jalapeno-cheddar', 'garlic'], false, 11, ['veg', 'pep']),
+];
+const SCENE_ALT = ['One large pepperoni pizza', 'Two large pizzas with two dips and two pops', 'Two medium pizzas with two dips and two pops', 'Two small pizzas with two dips'];
+const WALKINS = [
+  ['walkin-1l', '1 Large, 1 topping', 11.99, 'Wood-fired or conventional oven'],
+  ['walkin-2l', '2 Large combo', 36, '4 toppings each, 2 dips, 2 drinks or sweet corn'],
+  ['walkin-2m', '2 Medium combo', 32, '4 toppings each, 2 dips, 2 drinks or sweet corn'],
+  ['walkin-2s', '2 Small combo', 25.99, '4 toppings each, 2 dips'],
+];
+const PIZZAS = [
+  ['napoli', 'Napoli', 'Anchovies, capers, green olives, oregano', ['anchovies', 'green-olives']],
+  ['four-seasons', 'Four Seasons', 'Ham, mushrooms, artichokes, black olives', ['ham', 'mushrooms', 'olives']],
+  ['italian-veg', 'Italian Vegetarian', 'Grilled zucchini, red pepper, eggplant, onion', ['zucchini', 'red-pepper', 'eggplant', 'red-onions'], true],
+  ['non-veg', 'Non-Vegetarian', 'Grilled chicken, sausage, hot salami, ham', ['grilled-chicken', 'sausage', 'hot-salami', 'ham']],
+  ['bismark', 'Bismark', 'Sun dried tomatoes, grilled chicken, sausage', ['sun-dried', 'grilled-chicken', 'sausage']],
+  ['sea-food', 'Sea Food', 'Shrimp, gambari, calamari, salmon', ['shrimp', 'seafood-mix']],
+  ['chicken-shawarma', 'Shawarma Chicken', 'Garlic base, shawarma chicken, hot peppers, onions', ['shawarma-chicken', 'hot-peppers', 'red-onions']],
+  ['butter-chicken', 'Butter Chicken', 'Tandoori chicken, green pepper, onion', ['tandoori-chicken', 'green-peppers', 'red-onions']],
+  ['shahi-paneer', 'Shahi Paneer', 'Tandoori paneer, green pepper, onion, jalapeño', ['paneer', 'green-peppers', 'red-onions', 'jalapenos'], true],
+  ['greek', 'Greek', 'Feta cheese, black olive, tomato', ['feta', 'olives', 'tomatoes'], true],
+  ['hawaiian', 'Hawaiian', 'Pineapple, bacon, ham', ['pineapple', 'bacon', 'ham']],
+  ['meat-lover', 'Meat Lover', 'Pepperoni, ham, bacon, sausages', ['pepperoni', 'ham', 'bacon', 'sausage']],
+  ['canadian', 'Canadian', 'Pepperoni, mushroom, bacon', ['pepperoni', 'mushrooms', 'bacon']],
+  ['tandoori-fish', 'Tandoori Fish', 'Tandoori fish, mushroom, onion, green pepper', ['mushrooms', 'red-onions', 'green-peppers']],
+  ['pepperoni', 'Pepperoni', 'Pepperoni and mozzarella', ['pepperoni']],
+];
+const PIZZA_PRICES = (() => { const D = { S: 13, M: 15.5, L: 17.3, XL: 23.8 }, C = { S: 12, M: 14.6, L: 16.5, XL: 22.5 }; return { 'butter-chicken': D, 'shahi-paneer': D, 'chicken-shawarma': D, 'tandoori-fish': D, pepperoni: D, bismark: C, 'non-veg': C, 'sea-food': C }; })();
+const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
+
+const SIZES3 = p => [['Medium', p[0]], ['Large', p[1]], ['X-Large', p[2]]];
+const SECTIONS = [
+  { id: 'tandoori', title: 'Wings & tandoori', rows: [
+    ['wings', 'Tandoori wings', 'Hot, honey garlic or BBQ', [['8 wings', 10], ['12 wings', 12], ['16 wings', 14], ['24 wings', 22], ['34 wings', 31], ['48 wings', 42]], true],
+    ['leg', 'Tandoori chicken leg', 'Per piece', [['', 5]]],
+    ['fish', 'Tandoori fish', 'Per pound', [['1 lb', 12.5], ['1.5 lb', 18.75], ['2 lb', 25]], true],
+  ] },
+  { id: 'sides', title: 'Sides & salads', rows: [
+    ['wedges', 'Potato wedges', '', [['Medium', 8], ['Large', 10]]],
+    ['garlic-bread', 'Garlic bread', 'With or without cheese', [['With cheese', 8.01], ['Without cheese', 6.99]]],
+    ['sub', 'Sub', 'One foot, veggie or non-veggie', [['Veggie', 10.18], ['Non-veggie', 11.06]], true],
+    ['nv-salad', 'Non-veg salad', '', [['', 8.99]]],
+    ['v-salad', 'Veg salad', '', [['', 7.99]]],
+    ['corn', 'Sweet corn', 'Cooked in the wood oven', [['', 5]]],
+    ['chaat', 'Fruit chaat', 'With sweet potatoes', [['', 8.01]]],
+  ] },
+  { id: 'pasta', title: 'Pasta & momos', rows: [
+    ['pasta-rose', 'Rosé sauce pasta', 'Tomato sauce, cream, parmesan, ginger, parsley', [['', 12.5]], true],
+    ['pasta-alfredo', 'Alfredo sauce pasta', 'Cream, parmesan, ginger, parsley', [['', 13]], true],
+    ['veg-pasta-rose', 'Veggie pasta, rosé', 'Green pepper, onion, broccoli, mushroom', [['', 13.27]], true],
+    ['veg-pasta-tomato', 'Veggie pasta, tomato', 'Green pepper, onion, broccoli, mushroom', [['', 12.5]], true],
+    ['veg-pasta-alfredo', 'Veggie pasta, Alfredo', 'Green pepper, onion, broccoli, mushroom', [['', 13.72]], true],
+    ['ch-pasta-rose', 'Chicken pasta, rosé', 'Green pepper, onion, chicken', [['', 14.6]], true],
+    ['ch-pasta-tomato', 'Chicken pasta, tomato', 'Green pepper, onion, chicken', [['', 14]], true],
+    ['ch-pasta-alfredo', 'Chicken pasta, Alfredo', 'Green pepper, onion, chicken', [['', 15.04]], true],
+    ['momos', 'Momos', 'Veggie or non-veggie', [['Veggie', 9], ['Non-veggie', 11]]],
+  ] },
+  { id: 'gelato', title: 'Gelato & shakes', rows: [
+    ['cone', 'Gelato cone', 'Vanilla, mango, pistachio, chocolate and more', [['', 6]]],
+    ['scoop', 'Gelato scoop', 'Per scoop', [['', 2.99]]],
+    ['shake', 'Shake', 'Mango, strawberry, banana, badam, papaya, vanilla, pistachio, black cherry', SIZES3([8.41, 9.29, 11.11])],
+  ] },
+  { id: 'drinks', title: 'Drinks', rows: [
+    ['fruit-juice', 'Fresh fruit juice', 'Mix, orange, pineapple, guava', SIZES3([6.81, 8.01, 10])],
+    ['sugarcane', 'Sugarcane juice', '', SIZES3([6.81, 8.01, 10])],
+    ['lemonade', 'Lemonade', '', SIZES3([5.8, 7, 9])],
+    ['coconut', 'Fresh coconut juice', '', [['', 8.01]]],
+    ['lassi', 'Lassi', 'Mango, mint, strawberry, sweet, salty', [['', 6.8]]],
+    ['espresso', 'Italian espresso', '', [['', 3.1]]],
+    ['hot', 'Hot drinks', 'Indian coffee, cappuccino, hot chocolate, masala tea', [['', 3.1]]],
+    ['pop', 'Pop', 'Coke, Sprite, Canada Dry, Pepsi, Orange Crush', [['Can', 1.99], ['2 L bottle', 5]]],
+    ['water', 'Water', '500 mL bottle', [['', 1.99]]],
+    ['beer', 'Beer', 'Canadian, Molson, Moosehead, Miller, Corona, Heineken, Stella', [['Bottle', 5.7], ['Can', 7.5]]],
+  ] },
+  { id: 'dips', title: 'Dipping sauces', rows: [
+    ['dip-garlic', 'Creamy garlic', '', [['', 1.33]]],
+    ['dip-ranch', 'Ranch', '', [['', 1.33]]],
+    ['dip-chipotle', 'Chipotle', '', [['', 1.33]]],
+    ['dip-jalapeno', 'Jalapeño cheddar', '', [['', 1.33]]],
+    ['dip-marinara', 'Marinara', '', [['', 1.33]]],
+    ['dip-bbq', 'BBQ', '', [['', 1.33]]],
+    ['dip-honey', 'Honey', '', [['', 1.33]]],
+    ['dip-hot', 'Hot wing', '', [['', 1.33]]],
+    ['dip-chutney', 'Green chutney', '', [['', 1.33]]],
+  ] },
+];
+const NAV = [['walkin', 'Walk-in specials'], ['pizzas', 'Pizzas'], ...SECTIONS.map(s => [s.id, s.title])];
+
+class Component extends DCLogic {
+  state = { w: typeof window !== 'undefined' ? window.innerWidth : 1200, active: 'walkin', toast: '', builder: null, picker: null, spice: 'No spice' };
+  componentDidMount() {
+    this.onResize = () => this.setState({ w: window.innerWidth });
+    this.onScroll = () => {
+      let cur = NAV[0][0];
+      for (const [id] of NAV) { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top <= 140) cur = id; }
+      if (cur !== this.state.active) this.setState({ active: cur });
+    };
+    this.onKey = e => { if (e.key === 'Escape' && this.state.picker) this.setState({ picker: null }); };
+    window.addEventListener('resize', this.onResize);
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    document.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); window.removeEventListener('scroll', this.onScroll); document.removeEventListener('keydown', this.onKey); clearTimeout(this.tt); }
+  go(id, e) { if (e) e.preventDefault(); const el = document.getElementById(id); if (!el) return; window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 128, behavior: 'smooth' }); this.setState({ active: id }); }
+  add(line, qty) {
+    const q = qty || 1;
+    if (this.props.onAdd) { this.setState({ picker: null }); this.props.onAdd(line, q); return; }
+    let cart = [];
+    try { cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); if (!Array.isArray(cart)) cart = []; } catch (e) {}
+    const i = cart.findIndex(l => l.key === line.key);
+    if (i >= 0) cart[i] = { ...cart[i], qty: cart[i].qty + q }; else cart.push({ ...line, qty: q });
+    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) {}
+    clearTimeout(this.tt);
+    this.setState({ toast: 'Added ' + line.name, picker: null });
+    this.tt = setTimeout(() => this.setState({ toast: '' }), 3000);
+  }
+  renderVals() {
+    const s = this.state, w = s.w;
+    const byo = { id: 'byo', name: 'Build Your Own', tops: [], included: 4, img: PIZZA_IMG };
+    const pizzaRows = [{ img: PIZZA_PICS[0], hasImg: true, noImg: false, slotId: 'menu-byo', name: 'Build Your Own', desc: 'Any 4 toppings', hasDesc: true, veg: false, priceText: 'From ' + money(12), act: () => this.setState({ builder: byo }) },
+      ...PIZZAS.map(([id, name, desc, tops, veg], i) => ({ img: PIZZA_PHOTO[id] ? (PIZZA_PHOTO[id].indexOf('assets/') === 0 ? PIZZA_PHOTO[id] : UI(PIZZA_PHOTO[id])) : PIZZA_PICS[(i + 1) % PIZZA_PICS.length], hasImg: true, noImg: false, slotId: 'menu-' + id, name, desc, hasDesc: true, veg: !!veg, priceText: 'From ' + money((PIZZA_PRICES[id] || { S: 12 }).S), act: () => this.setState({ builder: { id, name, desc, tops, img: PIZZA_IMG } }) }))];
+    const rowsOf = sec => sec.rows.map(([key, name, desc, opts, spicy]) => {
+      const lineOf = ([label, price], spice) => ({ key: key + (label ? '-' + label : '') + (spice ? '-' + spice : ''), name: (label ? label + ' ' : '') + name.toLowerCase().replace(/^./, c => label ? c : c.toUpperCase()), summary: [desc || sec.title, spice].filter(Boolean).join(' · '), unit: price });
+      const multi = opts.length > 1, min = Math.min(...opts.map(o => o[1]));
+      return { cta: opts.length > 1 || spicy ? 'Choose' : 'Add', img: ROW_PIC[key] || '', hasImg: !!ROW_PIC[key], noImg: !ROW_PIC[key], slotId: 'menu-' + key, name, desc, hasDesc: !!desc, veg: false, priceText: (multi ? 'From ' : '') + money(min),
+        act: multi || spicy ? () => this.setState({ spice: SPICES[0], picker: { name, spicy: !!spicy, opts: opts.map(o => ({ label: o[0] || 'Add to order', priceText: money(o[1]), add: () => this.add(lineOf(o, spicy ? this.state.spice : undefined)) })) } }) : () => this.add(lineOf(opts[0])) };
+    });
+    return {
+      walkCols: w >= 1040 ? 'repeat(4,minmax(0,1fr))' : w >= 600 ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)',
+      twoCols: w >= 1120 ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)',
+      navItems: NAV.map(([id, label]) => { const on = s.active === id; return { label, href: '#' + id, fg: on ? '#1A1414' : '#818184', line: on ? '#D7192D' : 'transparent', go: e => this.go(id, e) }; }),
+      walkins: WALKINS.map(([key, name, price, desc], i) => ({ layers: SCENES[i], alt: SCENE_ALT[i], name, desc, priceText: money(price), add: () => { const d = { 'walkin-1l': 'one-large', 'walkin-2l': 'two-large', 'walkin-2m': 'two-medium', 'walkin-2s': 'two-small' }[key]; if (this.props.onDeal && d) return this.props.onDeal(d); this.add({ key, name, summary: 'Walk-in special · pickup only', unit: price }); } })),
+      sections: [{ id: 'pizzas', title: 'Pizzas', rows: pizzaRows }, ...SECTIONS.map(sec => ({ id: sec.id, title: sec.title, rows: rowsOf(sec) }))].map(x => { const t = THEME[x.id] || {}; return { ...x, ...t, isTile: true, isRow: false, rows: x.rows.map(r => ({ ...r, ...t, initial: r.name.charAt(0), cta: r.cta || 'Customize' })) }; }),
+      pickerOpen: !!s.picker, pickerName: s.picker ? s.picker.name : '', pickerOpts: s.picker ? s.picker.opts : [],
+      pickerSpicy: !!(s.picker && s.picker.spicy),
+      pickerSub: s.picker && s.picker.spicy ? 'Choose a spice level, then add' : 'Choose an option',
+      spiceOpts: SPICES.map((v, i) => { const on = s.spice === v; return { label: v, on, bg: on ? '#1A1414' : '#F2F2F5', fg: on ? '#fff' : '#1A1414', dots: [0, 1, 2].map(d => ({ bg: d < i ? '#D7192D' : (on ? 'rgba(255,255,255,.28)' : '#D9D9DE') })), pick: () => this.setState({ spice: v }) }; }),
+      closePicker: () => this.setState({ picker: null }),
+      toastOn: !!s.toast, toast: s.toast,
+      builderOpen: !!s.builder, builderItem: s.builder,
+      closeBuilder: () => this.setState({ builder: null }),
+      builderAdd: (line, qty) => { this.setState({ builder: null }); this.add(line, qty); },
+    };
+  }
+}
+</script>
+</body>
+</html>

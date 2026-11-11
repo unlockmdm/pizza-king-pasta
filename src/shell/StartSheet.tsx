@@ -104,14 +104,13 @@ export default function StartSheet({
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <span style={{ fontSize: 15, lineHeight: 1.5, color: '#636366' }}>Delivery is handled by DoorDash and Uber Eats. You{'\u2019'}ll finish your order in their app.</span>
-              <Hov as="a" href={SHOP.doordash} target="_blank" rel="noreferrer" style={{ height: 54, borderRadius: 14, background: '#1A1414', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontWeight: 700, fontSize: 16, textDecoration: 'none' }} hover={{ background: '#D7192D', color: '#fff' }}>
-                Order delivery on DoorDash <IconArrow size={16} stroke={2.6} />
-              </Hov>
-              <Hov as="a" href={SHOP.ubereats} target="_blank" rel="noreferrer" style={{ height: 54, borderRadius: 14, background: '#fff', color: '#1A1414', boxShadow: 'inset 0 0 0 1.5px #1A1414', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontWeight: 700, fontSize: 16, textDecoration: 'none' }} hover={{ background: '#F2F2F5', color: '#1A1414' }}>
-                Order delivery on Uber Eats <IconArrow size={16} stroke={2.6} />
-              </Hov>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: '#1A1414', textWrap: 'pretty' } as CSSProperties}>Delivery is handled by DoorDash and Uber Eats. You{'\u2019'}ll finish your order in their app.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <AppButton href={SHOP.doordash} logo={SHOP.doordashLogo} name="DoorDash" h={15} />
+                <AppButton href={SHOP.ubereats} logo={SHOP.ubereatsLogo} name="Uber Eats" h={20} />
+              </div>
+              <span style={{ fontSize: 13, lineHeight: 1.45, color: '#636366' }}>Delivery fees and tips are paid in the app.</span>
             </div>
           )}
 
@@ -176,5 +175,18 @@ function WhenRow({ bg, on, border, title, sub, onClick }: { bg: string; on: bool
       </span>
       <span style={{ marginLeft: 'auto', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{on && <IconCheck color="#D7192D" />}</span>
     </button>
+  );
+}
+
+/** "Order delivery on [logo] ↗" button for the Delivery tab. */
+function AppButton({ href, logo, name, h }: { href: string; logo: string; name: string; h: number }) {
+  return (
+    <Hov as="a" href={href} target="_blank" rel="noopener noreferrer" aria-label={'Order delivery on ' + name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 60, padding: '0 20px', borderRadius: 14, background: '#fff', color: '#1A1414', textDecoration: 'none', boxShadow: 'inset 0 0 0 1px #E4E4E7', transition: 'box-shadow .15s' }} hover={{ boxShadow: 'inset 0 0 0 2px #1A1414', color: '#1A1414' }}>
+      <span style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', minWidth: 0 }}>
+        <span style={{ fontWeight: 700, fontSize: 15, color: '#636366', whiteSpace: 'nowrap' }}>Order delivery on</span>
+        <img src={logo} alt={name} style={{ display: 'block', height: h, width: 'auto', flex: 'none' }} />
+      </span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flex: 'none' }} aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
+    </Hov>
   );
 }

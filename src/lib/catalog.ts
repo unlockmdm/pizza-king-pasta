@@ -17,6 +17,8 @@ export const SHOP = {
   // DoorDash Online Ordering / Uber Eats Webshop links once the owner turns them on.
   doordash: 'https://www.doordash.com/store/pizza-king-and-pasta-brampton-24430450/',
   ubereats: 'https://www.ubereats.com/ca/store/pizza-king-&-pasta/j1VSW4wkX02MplHbVNOSpg',
+  doordashLogo: 'assets/brands/doordash.svg',
+  ubereatsLogo: 'assets/brands/ubereats.svg',
 } as const;
 
 // Prices below match the shop's Square catalog (checked Nov 10, 2026). Square is the source of truth.

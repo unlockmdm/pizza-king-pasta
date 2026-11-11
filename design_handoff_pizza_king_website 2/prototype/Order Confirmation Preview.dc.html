@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<dc-import name="CartCheckout" preview-done="{{ true }}" stage="{{ stage }}" lines="{{ lines }}" hint-size="100%,800px"></dc-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;stage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;oven&quot;,&quot;ready&quot;],&quot;default&quot;:&quot;ready&quot;,&quot;tsType&quot;:&quot;'oven' | 'ready'&quot;}}">
+class Component extends DCLogic { renderVals() { return { stage: this.props.stage || 'ready', lines: [
+ { key: 'a', name: 'Large Shahi Paneer', summary: 'Regular crust · Wood-fired · medium spicy', unit: 17.3, qty: 1 },
+ { key: 'b', name: 'Large Meat Lover', summary: 'Regular crust · Wood-fired', unit: 16.5, qty: 2 },
+ { key: 'c', name: 'Alfredo sauce pasta', summary: 'Cream, parmesan, ginger, parsley', unit: 13, qty: 1 },
+ { key: 'd', name: 'Large fresh fruit juice', summary: 'Mix', unit: 8.01, qty: 2 } ] }; } }
+</script>
+</body>
+</html>

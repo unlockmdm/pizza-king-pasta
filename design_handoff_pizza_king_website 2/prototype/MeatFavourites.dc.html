@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="image-slot.js"></script>
+</helmet>
+<div data-screen-label="Meat Favourites" style="font-family:'Figtree',system-ui,sans-serif;color:#1A1414;background:#fff;padding-bottom:96px">
+
+  <section style="max-width:1320px;margin:0 auto;padding:16px clamp(16px,3vw,32px) 0">
+    <div style="position:relative;border-radius:32px;overflow:hidden;min-height:clamp(380px,48vh,480px);background:#1A1210;color:#fff;display:flex">
+      <image-slot id="meat-hero" shape="rect" credit="Photo by Tamas Pap on Unsplash" credit-href="https://unsplash.com/@tamasp" src="https://images.unsplash.com/photo-1611915365928-565c527a0590?fm=jpg&q=72&w=2000&auto=format&fit=crop" placeholder="Meat pizza photo" style="position:absolute;inset:0;display:block;width:100%;height:100%"></image-slot>
+      <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,rgba(18,10,8,.92) 0%,rgba(18,10,8,.5) 45%,rgba(18,10,8,.15) 100%),linear-gradient(90deg,rgba(18,10,8,.6) 0%,rgba(18,10,8,0) 65%)"></div>
+      <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:48px;padding:clamp(20px,4vw,52px);pointer-events:none">
+        <button onClick="{{ back }}" style="pointer-events:auto;align-self:flex-start;display:flex;align-items:center;gap:8px;height:44px;padding:0 18px 0 14px;border:0;border-radius:999px;background:rgba(255,255,255,.14);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28);color:#fff;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;transition:background .2s" style-hover="background:rgba(255,255,255,.26)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Back</button>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <span style="font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#FF8A80">Pizza · 8 recipes</span>
+          <h1 style="margin:0;font-weight:900;font-size:clamp(52px,7.4vw,104px);line-height:.9;letter-spacing:-.055em">Meat<br><span style="color:#FF5A4E">Favourites.</span></h1>
+          <p style="margin:0;max-width:520px;font-size:clamp(16px,1.4vw,18px);line-height:1.5;color:#DADADD;text-wrap:pretty">Pepperoni, ham, bacon, sausage and chicken on our wood-fired crust.</p>
+        </div>
+      </div>
+      <a href="https://unsplash.com/@tamasp" target="_blank" style="position:absolute;right:20px;top:16px;font-size:11px;color:rgba(255,255,255,.55);text-decoration:none">Photo: Tamas Pap / Unsplash</a>
+    </div>
+  </section>
+
+  <section style="max-width:1320px;margin:0 auto;padding:0 clamp(16px,3vw,32px)">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:36px 0 24px">
+      <div role="tablist" aria-label="Filter pizzas" style="display:flex;gap:8px;flex-wrap:wrap">
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+          <button role="tab" aria-selected="{{ f.on }}" onClick="{{ f.pick }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border:0;border-radius:999px;background:{{ f.bg }};color:{{ f.fg }};font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;transition:background .2s,color .2s">{{ f.label }}<span style="font-size:13px;font-weight:700;opacity:.6">{{ f.count }}</span></button>
+        </sc-for>
+      </div>
+      <a href="#menu" onClick="{{ fullMenu }}" style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:15px;color:#1A1414;text-decoration:none" style-hover="color:#D7192D">Full menu<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:20px">
+      <article style="display:flex;flex-direction:column;border-radius:28px;overflow:hidden;background:#D7192D;color:#fff;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s" style-hover="transform:translateY(-4px);box-shadow:0 22px 44px rgba(215,25,45,.28)">
+        <div style="position:relative;aspect-ratio:4/3;background:#B51424">
+          <image-slot id="meat-byo" shape="rect" credit="Photo by Ivan Torres on Unsplash" credit-href="https://unsplash.com/@iavnt" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?fm=jpg&q=72&w=800&auto=format&fit=crop" placeholder="Build your own photo" style="position:absolute;inset:0;display:block;width:100%;height:100%"></image-slot>
+          <span style="position:absolute;left:14px;top:14px;height:30px;padding:0 12px;border-radius:999px;background:#fff;color:#D7192D;font-size:12px;font-weight:800;display:flex;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.12)">Build your own</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:20px;padding:22px">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-weight:900;font-size:clamp(30px,2.8vw,38px);line-height:.95;letter-spacing:-.05em">Your meats.<br>Your way.</span>
+            <span style="font-size:14px;line-height:1.45;color:#EDEDF0">Pick any 4 toppings, from $12.00.</span>
+          </div>
+          <button onClick="{{ build }}" style="align-self:flex-start;display:flex;align-items:center;gap:12px;height:56px;padding:0 8px 0 24px;border:0;border-radius:999px;background:#fff;color:#1A1414;font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;transition:transform .2s" style-hover="transform:translateY(-2px)">Start building<span style="width:40px;height:40px;border-radius:50%;background:#D7192D;color:#fff;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></button>
+        </div>
+      </article>
+      <sc-for list="{{ pizzas }}" as="p" hint-placeholder-count="8">
+        <article style="display:flex;flex-direction:column;border-radius:28px;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1px #E8E8EB;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s" style-hover="transform:translateY(-4px);box-shadow:inset 0 0 0 1px #E8E8EB,0 22px 44px rgba(26,20,20,.12)">
+          <div style="position:relative;aspect-ratio:4/3;background:#EDEDF0">
+            <image-slot id="{{ p.slotId }}" shape="rect" credit="{{ p.credit }}" credit-href="{{ p.creditHref }}" src="{{ p.img }}" placeholder="Pizza photo" style="position:absolute;inset:0;display:block;width:100%;height:100%"></image-slot>
+            <sc-if value="{{ p.hasTag }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:14px;top:14px;height:30px;padding:0 12px;border-radius:999px;background:#fff;color:#1A1414;font-size:12px;font-weight:800;display:flex;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.12)">{{ p.tag }}</span></sc-if>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:18px;padding:20px 20px 20px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <button onClick="{{ p.customize }}" style="align-self:flex-start;padding:0;border:0;background:none;font-family:inherit;font-weight:900;font-size:22px;letter-spacing:-.03em;line-height:1.1;color:#1A1414;text-align:left;cursor:pointer" style-hover="color:#D7192D">{{ p.name }}</button>
+              <span style="font-size:14px;line-height:1.45;color:#646467;text-wrap:pretty">{{ p.desc }}</span>
+            </div>
+            <div role="radiogroup" aria-label="Size" style="margin-top:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:999px;background:#EDEDF0">
+              <sc-for list="{{ p.sizes }}" as="s" hint-placeholder-count="4">
+                <button role="radio" aria-checked="{{ s.on }}" aria-label="{{ s.aria }}" onClick="{{ s.pick }}" style="height:40px;border:0;border-radius:999px;background:{{ s.bg }};color:{{ s.fg }};box-shadow:{{ s.shadow }};font-family:inherit;font-weight:800;font-size:13px;cursor:pointer;transition:background .2s,color .2s">{{ s.label }}</button>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                <span style="font-weight:900;font-size:26px;letter-spacing:-.04em;line-height:1">{{ p.priceText }}</span>
+                <span style="font-size:12px;font-weight:600;color:#818184">{{ p.sizeName }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <button onClick="{{ p.customize }}" style="height:48px;padding:0 16px;border:0;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1.5px #DBDBDE;color:#1A1414;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;transition:box-shadow .2s" style-hover="box-shadow:inset 0 0 0 1.5px #1A1414">Customize</button>
+                <button onClick="{{ p.add }}" aria-label="{{ p.addAria }}" style="width:48px;height:48px;flex:none;border:0;border-radius:50%;background:{{ p.addBg }};color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .2s" style-hover="transform:scale(1.06)">
+                  <sc-if value="{{ p.justAdded }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>
+                  <sc-if value="{{ p.notAdded }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></sc-if>
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+      </sc-for>
+
+
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;onAdd&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;(line, qty) =&gt; void&quot;}, &quot;onCustomize&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;(item) =&gt; void&quot;}, &quot;onBack&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;() =&gt; void&quot;}, &quot;onMenu&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;() =&gt; void&quot;}, &quot;onBuild&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;() =&gt; void&quot;}}">
+const U = (id, w) => 'https://images.unsplash.com/photo-' + id + '?fm=jpg&q=72&w=' + (w || 800) + '&auto=format&fit=crop';
+const PRICES = { S: 12, M: 14.6, L: 16.5, XL: 22.8 };
+const PIZZA_PRICES = (() => { const D = { S: 13, M: 15.5, L: 17.3, XL: 23.8 }, C = { S: 12, M: 14.6, L: 16.5, XL: 22.5 }; return { 'butter-chicken': D, 'shahi-paneer': D, 'chicken-shawarma': D, 'tandoori-fish': D, pepperoni: D, bismark: C, 'non-veg': C, 'sea-food': C }; })();
+
+const NAMES = { S: 'Small', M: 'Medium', L: 'Large', XL: 'X-Large' };
+const money = n => '$' + n.toFixed(2);
+const PIZZAS = [
+  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausages', tops: ['pepperoni', 'ham', 'bacon', 'sausage'], pic: '1692737580547-b45bb4a02356', by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
+  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green pepper, onion', tops: ['tandoori-chicken', 'green-peppers', 'red-onions'], pic: '1604382354936-07c5d9983bd3', by: 'Shourav Sheikh', h: 'shouravsheikh', chicken: true },
+  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, onions', tops: ['shawarma-chicken', 'hot-peppers', 'red-onions'], pic: '1590947132387-155cc02f3212', by: 'Vit Ch', h: 'v_uk_europe', chicken: true, tag: 'Spicy' },
+  { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', tops: ['grilled-chicken', 'sausage', 'hot-salami', 'ham'], pic: '1593560708920-61dd98c46a4e', by: 'Saundarya Srinivasan', h: 'saundiii', chicken: true, cured: true },
+  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushroom, bacon', tops: ['pepperoni', 'mushrooms', 'bacon'], pic: '1565299624946-b28f40a0ae38', by: 'Chad Montano', h: 'briewilly', cured: true },
+  { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', tops: ['pineapple', 'bacon', 'ham'], pic: '1594007654729-407eedc4be65', by: 'Saahil Khatkhate', h: 'saahilkhatkhate', cured: true },
+  { id: 'bismark', name: 'Bismark', desc: 'Sun dried tomatoes, grilled chicken, sausage', tops: ['sun-dried', 'grilled-chicken', 'sausage'], pic: '1655673654158-9f7285b7d1ea', by: 'RUSU CIPRIAN', h: 'tehnosign', chicken: true, cured: true },
+  { id: 'four-seasons', name: 'Four Seasons', desc: 'Ham, mushrooms, artichokes, black olives', tops: ['ham', 'mushrooms', 'olives'], pic: '1604382355076-af4b0eb60143', by: 'Shourav Sheikh', h: 'shouravsheikh', cured: true },
+];
+const FILTERS = [['all', 'All', () => true], ['chicken', 'Chicken', p => p.chicken], ['cured', 'Pepperoni, ham & sausage', p => p.cured]];
+
+class Component extends DCLogic {
+  state = { filter: 'all', sizes: {}, added: null };
+  componentWillUnmount() { clearTimeout(this.t); }
+  add(p, size) {
+    const line = { key: [p.id, size, 'regular', 'house'].join('-'), name: NAMES[size] + ' ' + p.name, summary: 'Regular crust · house toppings', unit: (PIZZA_PRICES[p.id] || PRICES)[size] };
+    if (this.props.onAdd) this.props.onAdd(line, 1);
+    clearTimeout(this.t);
+    this.setState({ added: p.id });
+    this.t = setTimeout(() => this.setState({ added: null }), 1400);
+  }
+  customize(p) {
+    const item = { id: p.id, name: p.name, desc: p.desc, tops: p.tops, img: U(p.pic, 1000), credit: 'Photo by ' + p.by + ' on Unsplash', creditHref: 'https://unsplash.com/@' + p.h };
+    if (this.props.onCustomize) this.props.onCustomize(item);
+  }
+  renderVals() {
+    const s = this.state;
+    const test = (FILTERS.find(f => f[0] === s.filter) || FILTERS[0])[2];
+    const ev = fn => e => { if (e && e.preventDefault) e.preventDefault(); if (fn) fn(); };
+    return {
+      back: ev(this.props.onBack),
+      fullMenu: ev(this.props.onMenu),
+      build: ev(this.props.onBuild),
+      filters: FILTERS.map(([id, label, fn]) => {
+        const on = s.filter === id;
+        return { label, count: PIZZAS.filter(fn).length, on, bg: on ? '#1A1414' : '#EDEDF0', fg: on ? '#fff' : '#1A1414', pick: () => this.setState({ filter: id }) };
+      }),
+      pizzas: PIZZAS.filter(test).map(p => {
+        const size = s.sizes[p.id] || 'L';
+        const added = s.added === p.id;
+        return {
+          name: p.name, desc: p.desc, tag: p.tag || '', hasTag: !!p.tag,
+          img: U(p.pic), slotId: 'meat-' + p.id, credit: 'Photo by ' + p.by + ' on Unsplash', creditHref: 'https://unsplash.com/@' + p.h,
+          priceText: money((PIZZA_PRICES[p.id] || PRICES)[size]), sizeName: NAMES[size],
+          sizes: ['S', 'M', 'L', 'XL'].map(k => {
+            const on = k === size;
+            return { label: k, on, aria: NAMES[k] + ', ' + money((PIZZA_PRICES[p.id] || PRICES)[k]), bg: on ? '#fff' : 'transparent', fg: on ? '#1A1414' : '#818184', shadow: on ? '0 2px 8px rgba(26,20,20,.12)' : 'none', pick: () => this.setState(st => ({ sizes: { ...st.sizes, [p.id]: k } })) };
+          }),
+          justAdded: added, notAdded: !added, addBg: added ? '#1E8A4C' : '#D7192D',
+          addAria: 'Add ' + NAMES[size] + ' ' + p.name + ', ' + money((PIZZA_PRICES[p.id] || PRICES)[size]),
+          add: () => this.add(p, size),
+          customize: () => this.customize(p),
+        };
+      }),
+    };
+  }
+}
+</script>
+</body>
+</html>

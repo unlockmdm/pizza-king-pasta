@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="image-slot.js"></script>
+</helmet>
+<div data-screen-label="Category" style="font-family:'Figtree',system-ui,sans-serif;color:#1A1414;background:#fff;padding-bottom:96px">
+
+  <section style="max-width:1320px;margin:0 auto;padding:16px clamp(16px,3vw,32px) 0">
+    <sc-for list="{{ hero }}" as="h" hint-placeholder-count="0">
+      <div style="position:relative;border-radius:32px;overflow:hidden;min-height:clamp(380px,48vh,480px);background:#1A1210;color:#fff;display:flex">
+        <image-slot id="{{ h.slotId }}" shape="rect" credit="Photo on Unsplash" credit-href="https://unsplash.com" src="{{ h.img }}" placeholder="Category photo" style="position:absolute;inset:0;display:block;width:100%;height:100%"></image-slot>
+        <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,rgba(18,10,8,.92) 0%,rgba(18,10,8,.5) 45%,rgba(18,10,8,.15) 100%),linear-gradient(90deg,rgba(18,10,8,.6) 0%,rgba(18,10,8,0) 65%)"></div>
+        <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:48px;padding:clamp(20px,4vw,52px);pointer-events:none">
+          <button onClick="{{ back }}" style="pointer-events:auto;align-self:flex-start;display:flex;align-items:center;gap:8px;height:44px;padding:0 18px 0 14px;border:0;border-radius:999px;background:rgba(255,255,255,.14);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28);color:#fff;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;transition:background .2s" style-hover="background:rgba(255,255,255,.26)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Back</button>
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <span style="font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#FF8A80">{{ h.eyebrow }}</span>
+            <h1 style="margin:0;font-weight:900;font-size:clamp(52px,7.4vw,104px);line-height:.9;letter-spacing:-.055em">{{ h.t1 }}<br><span style="color:#FF5A4E">{{ h.t2 }}</span></h1>
+            <p style="margin:0;max-width:520px;font-size:clamp(16px,1.4vw,18px);line-height:1.5;color:#DADADD;text-wrap:pretty">{{ h.p }}</p>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </section>
+
+  <section style="max-width:1320px;margin:0 auto;padding:0 clamp(16px,3vw,32px)">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:36px 0 24px">
+      <sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ false }}">
+        <div role="tablist" aria-label="Filter" style="display:flex;gap:8px;flex-wrap:wrap">
+          <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+            <button role="tab" aria-selected="{{ f.on }}" onClick="{{ f.pick }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border:0;border-radius:999px;background:{{ f.bg }};color:{{ f.fg }};font-family:inherit;font-weight:800;font-size:15px;white-space:nowrap;cursor:pointer;transition:background .2s,color .2s">{{ f.label }}<span style="font-size:13px;font-weight:700;opacity:.6">{{ f.count }}</span></button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noFilters }}" hint-placeholder-val="{{ true }}">
+        <span style="font-weight:900;font-size:clamp(26px,2.6vw,34px);letter-spacing:-.04em">{{ countText }}</span>
+      </sc-if>
+      <a href="#menu" onClick="{{ fullMenu }}" style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:15px;color:#1A1414;text-decoration:none" style-hover="color:#D7192D">Full menu<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:20px">
+      <sc-for list="{{ items }}" as="it" hint-placeholder-count="4">
+        <article onClick="{{ it.open }}" style="cursor:pointer;display:flex;flex-direction:column;border-radius:28px;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1px #E8E8EB;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s" style-hover="transform:translateY(-4px);box-shadow:inset 0 0 0 1px #E8E8EB,0 22px 44px rgba(26,20,20,.12)">
+          <sc-if value="{{ it.hasImg }}" hint-placeholder-val="{{ true }}"><div style="position:relative;aspect-ratio:4/3;background:#EDEDF0">
+            <image-slot id="{{ it.slotId }}" shape="rect" credit="{{ it.credit }}" credit-href="{{ it.creditHref }}" src="{{ it.img }}" placeholder="Photo" style="position:absolute;inset:0;display:block;width:100%;height:100%"></image-slot>
+            <div style="position:absolute;left:14px;top:14px;display:flex;gap:6px;pointer-events:none">
+              <sc-if value="{{ it.hasTag }}" hint-placeholder-val="{{ false }}"><span style="height:30px;padding:0 12px;border-radius:999px;background:#fff;color:#1A1414;font-size:12px;font-weight:800;white-space:nowrap;display:flex;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.12)">{{ it.tag }}</span></sc-if>
+              <sc-if value="{{ it.veg }}" hint-placeholder-val="{{ false }}"><span style="height:30px;padding:0 12px 0 10px;border-radius:999px;background:#fff;color:#1E7A3C;font-size:12px;font-weight:800;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(0,0,0,.12)"><span style="width:8px;height:8px;border-radius:50%;background:#1E9E4A"></span>Veg</span></sc-if>
+            </div>
+          </div></sc-if>
+          <div style="flex:1;display:flex;flex-direction:column;gap:18px;padding:20px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-weight:900;font-size:22px;letter-spacing:-.03em;line-height:1.1">{{ it.name }}</span>
+              <sc-if value="{{ it.hasDesc }}" hint-placeholder-val="{{ true }}"><span style="font-size:14px;line-height:1.45;color:#646467;text-wrap:pretty">{{ it.desc }}</span></sc-if>
+            </div>
+            <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                <span style="font-weight:900;font-size:26px;letter-spacing:-.04em;line-height:1">{{ it.priceText }}</span>
+                <span style="font-size:12px;font-weight:600;color:#818184;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.sub }}</span>
+              </div>
+              <button onClick="{{ it.add }}" aria-label="{{ it.addAria }}" style="width:48px;height:48px;flex:none;border:0;border-radius:50%;background:{{ it.addBg }};color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .2s" style-hover="transform:scale(1.06)">
+                <sc-if value="{{ it.justAdded }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>
+                <sc-if value="{{ it.notAdded }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></sc-if>
+              </button>
+            </div>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+  </section>
+  <sc-for list="{{ sheet }}" as="m" hint-placeholder-count="0">
+    <div role="dialog" aria-modal="true" aria-label="{{ m.name }}" style="position:fixed;inset:0;z-index:200;display:flex;align-items:{{ m.align }};justify-content:center;padding:{{ m.pad }}">
+      <div onClick="{{ m.close }}" style="position:absolute;inset:0;background:rgba(20,14,12,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)"></div>
+      <div style="position:relative;width:100%;max-width:880px;max-height:{{ m.maxH }};display:flex;flex-direction:{{ m.dir }};background:#fff;border-radius:{{ m.radius }};overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.3)">
+        <div style="position:relative;flex:{{ m.imgFlex }};min-height:{{ m.imgH }};background:#EDEDF0">
+          <image-slot id="{{ m.slotId }}" shape="rect" credit="{{ m.credit }}" credit-href="{{ m.creditHref }}" src="{{ m.img }}" placeholder="Photo" style="position:absolute;inset:0;display:block;width:100%;height:100%"></image-slot>
+          <button onClick="{{ m.close }}" aria-label="Close" style="position:absolute;right:14px;top:14px;width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:#1A1414;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.18)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
+          <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:26px;padding:28px 28px 20px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-weight:900;font-size:32px;letter-spacing:-.04em;line-height:1.05">{{ m.name }}</span>
+              <sc-if value="{{ m.hasDesc }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;line-height:1.5;color:#646467;text-wrap:pretty">{{ m.desc }}</span></sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:22px">
+              <sc-for list="{{ m.groups }}" as="g" hint-placeholder-count="1">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-if value="{{ g.hasLabel }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#818184">{{ g.label }}</span></sc-if>
+                  <sc-if value="{{ g.seg }}" hint-placeholder-val="{{ true }}">
+                    <div role="radiogroup" aria-label="{{ g.aria }}" style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#EDEDF0">
+                      <sc-for list="{{ g.opts }}" as="o" hint-placeholder-count="4">
+                        <button role="radio" aria-checked="{{ o.on }}" aria-label="{{ o.aria }}" onClick="{{ o.pick }}" style="flex:1;min-width:0;height:46px;padding:0 6px;border:0;border-radius:999px;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.shadow }};font-family:inherit;font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:background .2s,color .2s">{{ o.label }}</button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ g.chips }}" hint-placeholder-val="{{ false }}">
+                    <div role="radiogroup" aria-label="{{ g.aria }}" style="display:flex;flex-wrap:wrap;gap:6px">
+                      <sc-for list="{{ g.opts }}" as="o" hint-placeholder-count="5">
+                        <button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.pick }}" style="height:44px;padding:0 16px;border:0;border-radius:999px;background:{{ o.chipBg }};color:{{ o.chipFg }};font-family:inherit;font-weight:700;font-size:14px;white-space:nowrap;cursor:pointer;transition:background .2s,color .2s">{{ o.label }}</button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:16px 28px 24px;border-top:1px solid #EDEDF0">
+            <div style="display:flex;align-items:center;gap:4px;height:56px;padding:0 6px;border-radius:999px;background:#EDEDF0">
+              <button onClick="{{ m.dec }}" aria-label="Decrease quantity" style="width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:#1A1414;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#fff"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+              <span style="min-width:22px;text-align:center;font-weight:900;font-size:17px">{{ m.qty }}</span>
+              <button onClick="{{ m.inc }}" aria-label="Increase quantity" style="width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:#1A1414;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#fff"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+            </div>
+            <button onClick="{{ m.add }}" style="flex:1;height:56px;border:0;border-radius:999px;background:#D7192D;color:#fff;font-family:inherit;font-weight:800;font-size:16px;white-space:nowrap;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 24px;transition:background .2s" style-hover="background:#B5121F"><span>Add to order</span><span>{{ m.totalText }}</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;category&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;wings&quot;, &quot;juice&quot;, &quot;gelato&quot;], &quot;default&quot;: &quot;wings&quot;, &quot;tsType&quot;: &quot;'wings' | 'juice' | 'gelato'&quot;}, &quot;onAdd&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;(line, qty) =&gt; void&quot;}, &quot;onBack&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;() =&gt; void&quot;}, &quot;onMenu&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;() =&gt; void&quot;}}">
+const IMG = (id, w) => !id ? '' : id.indexOf('assets/') === 0 ? id : 'https://images.unsplash.com/photo-' + id + '?fm=jpg&q=72&w=' + (w || 800) + '&auto=format&fit=crop';
+const money = n => '$' + n.toFixed(2);
+const o = (id, label, x) => Object.assign({ id, label }, x || {});
+const SIZES3 = (m, l, xl) => [o('M', 'M', { price: m, long: 'Medium' }), o('L', 'L', { price: l, long: 'Large' }), o('XL', 'XL', { price: xl, long: 'X-Large' })];
+const GELATO = ['Vanilla', 'Mango', 'Strawberry', 'Banana', 'Pistachio', 'Black cherry', 'Cappuccino', 'Chocolate', 'Red velvet', 'Rum & raisin'].map(f => o(f.toLowerCase().replace(/[^a-z]+/g, '-'), f));
+
+const SPICE = { id: 'spice', label: 'Spice level', chips: true, opts: ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'].map(v => o(v.toLowerCase().replace(/\s+/g, '-'), v)) };
+const CATS = {
+  wings: {
+    hero: { img: '1608039755401-742074f0548d', eyebrow: 'Wings & sides', t1: 'Tandoori', t2: 'Wings.', p: 'Baked in the wood oven in hot, honey garlic or BBQ. Plus tandoori chicken, fish and sides.' },
+    filters: [['all', 'All'], ['tandoor', 'Wings & tandoori'], ['sides', 'Sides & salads']],
+    items: [
+      { id: 'wings', f: 'tandoor', name: 'Tandoori wings', desc: 'Wood oven. Extra dip $1.33.', tag: 'Wood oven', img: '1608039755401-742074f0548d', def: { n: '12' },
+        groups: [
+          { id: 'flav', label: 'Flavour', opts: [o('hot', 'Hot', { img: '1608039755401-742074f0548d' }), o('honey', 'Honey garlic', { img: '1567620832903-9fc6debc209f' }), o('bbq', 'BBQ', { img: '1527477396000-e27163b481c2' })] },
+          { id: 'n', label: 'Wings', opts: [[8, 10], [12, 12], [16, 14], [24, 22], [34, 31], [48, 42]].map(([n, p]) => o(String(n), String(n), { price: p, long: n + ' wings' })) },
+          SPICE,
+        ] },
+      { id: 'leg', f: 'tandoor', name: 'Tandoori chicken leg', desc: '$5.00 per piece', img: '1617692855027-33b14f061079',
+        groups: [{ id: 'q', label: 'Pieces', opts: [1, 2, 3, 4].map(n => o(String(n), String(n), { price: n * 5, long: n + (n === 1 ? ' piece' : ' pieces') })) }] },
+      { id: 'fish', f: 'tandoor', name: 'Tandoori fish', desc: '$12.50 per pound', img: '',
+        groups: [{ id: 'w', label: 'Weight', opts: [[1, '1 lb'], [1.5, '1.5 lb'], [2, '2 lb']].map(([n, l]) => o(String(n), l, { price: n * 12.5 })) }, SPICE] },
+      { id: 'wedges', f: 'sides', name: 'Potato wedges', desc: 'Medium or large', veg: true, img: '1623238913973-21e45cced554',
+        groups: [{ id: 's', opts: [o('M', 'Medium', { price: 8 }), o('L', 'Large', { price: 10 })] }] },
+      { id: 'garlic-bread', f: 'sides', name: 'Garlic bread', desc: 'With or without cheese', veg: true, img: '',
+        groups: [{ id: 'c', opts: [o('cheese', 'With cheese', { price: 8.01 }), o('plain', 'Without cheese', { price: 6.99 })] }] },
+      { id: 'sub', f: 'sides', name: 'Sub', desc: 'One foot, veggie or non-veggie', img: '1509722747041-616f39b57569',
+        groups: [{ id: 'kind', opts: [o('veg', 'Veggie', { price: 10.18 }), o('nonveg', 'Non-veggie', { price: 11.06 })] }, SPICE] },
+      { id: 'nv-salad', f: 'sides', name: 'Non-veg salad', price: 8.99, img: '1546069901-ba9599a7e63c' },
+      { id: 'v-salad', f: 'sides', name: 'Veg salad', price: 7.99, veg: true, img: '1512621776951-a57141f2eefd' },
+      { id: 'corn', f: 'sides', name: 'Sweet corn', desc: 'Cooked in the wood oven', price: 5, veg: true, img: 'assets/ingredients/corn.jpg' },
+      { id: 'chaat', f: 'sides', name: 'Fruit chaat', desc: 'With sweet potatoes', price: 8.01, veg: true, img: '1490474418585-ba9bad8fd0ea' },
+    ],
+  },
+  juice: {
+    hero: { img: '1622597467836-f3285f2131b8', eyebrow: 'The Drinks Bar', t1: 'Fresh juice.', t2: 'Hot chai. Cold beer.', p: 'Juice, lassi, coffee and chai, and cold beer by the bottle or can.' },
+    filters: [['all', 'All'], ['juice', 'Juice'], ['lassi', 'Lassi'], ['hot', 'Coffee & chai'], ['soft', 'Pop & water'], ['beer', 'Beer']],
+    noun: 'drinks',
+    items: [
+      { id: 'fresh', f: 'juice', name: 'Fresh fruit juice', desc: 'Orange, pineapple, guava or mix', img: '1600271886742-f049cd451bba', def: { size: 'L' },
+        groups: [
+          { id: 'flav', label: 'Flavour', opts: [o('orange', 'Orange', { img: '1600271886742-f049cd451bba' }), o('pineapple', 'Pineapple', { img: '1534353473418-4cfa6c56fd38' }), o('guava', 'Guava', { img: '1497534446932-c925b458314e' }), o('mix', 'Mix', { img: '1622597467836-f3285f2131b8' })] },
+          { id: 'size', label: 'Size', opts: SIZES3(6.81, 8.01, 10) },
+        ] },
+      { id: 'sugarcane', f: 'juice', name: 'Sugarcane juice', img: '', def: { size: 'L' },
+        groups: [{ id: 'size', label: 'Size', opts: SIZES3(6.81, 8.01, 10) }] },
+      { id: 'lemonade', f: 'juice', name: 'Lemonade', img: '', def: { size: 'L' },
+        groups: [{ id: 'size', label: 'Size', opts: SIZES3(5.8, 7, 9) }] },
+      { id: 'coconut', f: 'juice', name: 'Fresh coconut juice', price: 8.01, img: '' },
+      { id: 'lassi', f: 'lassi', name: 'Lassi', price: 6.8, img: '',
+        groups: [{ id: 'flav', label: 'Flavour', chips: true, opts: [o('mango', 'Mango'), o('mint', 'Mint'), o('strawberry', 'Strawberry', { img: '1589733955941-5eeaf752f6dd' }), o('sweet', 'Sweet'), o('salty', 'Salty')] }] },
+      { id: 'espresso', f: 'hot', name: 'Italian espresso', price: 3.1, img: '1510591509098-f4fdc6d0ff04' },
+      { id: 'hot', f: 'hot', name: 'Hot drinks', price: 3.1, img: '1509042239860-f550ce710b93',
+        groups: [{ id: 'kind', label: 'Drink', chips: true, opts: [o('coffee', 'Indian coffee'), o('cappuccino', 'Cappuccino'), o('choc', 'Hot chocolate'), o('masala', 'Masala tea')] }] },
+      { id: 'pop', f: 'soft', name: 'Pop', desc: 'Can or 2 L bottle', img: '',
+        groups: [
+          { id: 'kind', label: 'Size', opts: [o('can', 'Can', { price: 1.99 }), o('2l', '2 L bottle', { price: 5 })] },
+          { id: 'brand', label: 'Brand', chips: true, opts: ['Coke', 'Sprite', 'Canada Dry', 'Pepsi', 'Orange Crush'].map(b => o(b.toLowerCase().replace(/\s+/g, '-'), b)) },
+        ] },
+      { id: 'water', f: 'soft', name: 'Water', desc: '500 mL bottle', price: 1.99, img: '' },
+      { id: 'beer', f: 'beer', name: 'Beer', desc: 'Prices before tax', img: '1600788886242-5c96aabe3757',
+        groups: [
+          { id: 'kind', label: 'Bottle or can', opts: [o('bottle', 'Bottle', { price: 5.7 }), o('can', 'Can', { price: 7.5 })] },
+          { id: 'brand', label: 'Brand', chips: true, opts: ['Canadian', 'Molson', 'Moosehead Blue', 'Miller', 'Corona', 'Heineken', 'Stella'].map(b => o(b.toLowerCase().replace(/\s+/g, '-'), b)) },
+        ] },
+    ],
+  },
+  gelato: {
+    hero: { img: '1501443762994-82bd5dace89a', eyebrow: 'Gelato & shakes', t1: 'Gelato &', t2: 'Shakes.', p: 'Cones, scoops and thick shakes. Ten gelato flavours.' },
+    noun: 'treats',
+    items: [
+      { id: 'cone', name: 'Gelato cone', price: 6, img: '1497034825429-c343d7c6a68f',
+        groups: [{ id: 'flav', label: 'Flavour', chips: true, opts: GELATO }] },
+      { id: 'scoop', name: 'Gelato by the scoop', desc: '$2.99 per scoop', img: '1570197788417-0e82375c9371', def: { n: '2' },
+        groups: [
+          { id: 'n', label: 'Scoops', opts: [1, 2, 3, 4].map(n => o(String(n), String(n), { price: n * 2.99, long: n + (n === 1 ? ' scoop' : ' scoops') })) },
+          { id: 'flav', label: 'Flavour', chips: true, opts: GELATO },
+        ] },
+      { id: 'shake', name: 'Thick shake', img: '1505252585461-04db1eb84625',
+        groups: [
+          { id: 'flav', label: 'Flavour', chips: true, opts: [o('mango', 'Mango', { img: '1525385133512-2f3bdd039054' }), o('strawberry', 'Strawberry', { img: '1579954115545-a95591f28bfc' }), o('banana', 'Banana'), o('badam', 'Badam'), o('papaya', 'Papaya'), o('vanilla', 'Vanilla', { img: '1568901839119-631418a3910d' }), o('pistachio', 'Pistachio'), o('cherry', 'Black cherry', { img: '1600718374662-0483d2b9da44' })] },
+          { id: 'size', label: 'Size', opts: SIZES3(8.41, 9.29, 11.11) },
+        ] },
+    ],
+  },
+};
+
+class Component extends DCLogic {
+  state = { filter: 'all', sel: {}, added: null, open: null, qty: 1, w: typeof window !== 'undefined' ? window.innerWidth : 1200 };
+  componentDidMount() { this.onR = () => this.setState({ w: window.innerWidth }); window.addEventListener('resize', this.onR); this.onK = e => { if (e.key === 'Escape' && this.state.open) this.setState({ open: null }); }; window.addEventListener('keydown', this.onK); }
+  componentWillUnmount() { clearTimeout(this.t); window.removeEventListener('resize', this.onR); window.removeEventListener('keydown', this.onK); }
+  renderVals() {
+    const s = this.state;
+    const key = this.props.category || 'wings';
+    const cat = CATS[key] || CATS.wings;
+    const ev = fn => e => { if (e && e.preventDefault) e.preventDefault(); if (fn) fn(); };
+    const filters = cat.filters || null;
+    const shown = filters && s.filter !== 'all' ? cat.items.filter(i => i.f === s.filter) : cat.items;
+    const out = {
+      back: ev(this.props.onBack),
+      fullMenu: ev(this.props.onMenu),
+      hero: [{ slotId: 'cat-' + key + '-hero', img: IMG(cat.hero.img, 2000), eyebrow: cat.hero.eyebrow, t1: cat.hero.t1, t2: cat.hero.t2, p: cat.hero.p }],
+      hasFilters: !!filters, noFilters: !filters,
+      countText: cat.items.length + ' ' + (cat.noun || 'items'),
+      filters: (filters || []).map(([id, label]) => {
+        const on = s.filter === id;
+        return { label, count: id === 'all' ? cat.items.length : cat.items.filter(i => i.f === id).length, on, bg: on ? '#1A1414' : '#EDEDF0', fg: on ? '#fff' : '#1A1414', pick: () => this.setState({ filter: id }) };
+      }),
+      sheet: [],
+      items: [],
+    };
+    const build = it => {
+        const groups = it.groups || [];
+        const mine = s.sel[it.id] || {};
+        const chosen = groups.map(g => g.opts.find(x => x.id === (mine[g.id] || (it.def && it.def[g.id]))) || g.opts[0]);
+        const priced = chosen.filter(c => c.price != null).pop();
+        const price = priced ? priced.price : it.price;
+        const pic = chosen.filter(c => c.img).pop();
+        const sub = chosen.map(c => c.long || c.label).join(' · ');
+        const added = s.added === it.id;
+        const hasOpts = groups.length > 0;
+        const minP = hasOpts ? Math.min.apply(null, [].concat(...groups.map(g => g.opts.map(x => x.price))).filter(p => p != null).concat(it.price != null ? [it.price] : [])) : price;
+        const addLine = q => {
+            if (this.props.onAdd) this.props.onAdd({ key: [it.id].concat(chosen.map(c => c.id)).join('-'), name: it.name, summary: sub || it.desc || cat.hero.eyebrow, unit: price, img: IMG(pic ? pic.img : it.img) }, q);
+            clearTimeout(this.t);
+            this.setState({ added: it.id, open: null });
+            this.t = setTimeout(() => this.setState({ added: null }), 1400);
+        };
+        return {
+          name: it.name, desc: it.desc || '', hasDesc: !!it.desc, tag: it.tag || '', hasTag: !!it.tag, veg: !!it.veg,
+          hasImg: !!(pic ? pic.img : it.img), credit: (pic ? pic.img : it.img) && (pic ? pic.img : it.img).indexOf('assets/') !== 0 ? 'Photo on Unsplash' : '', creditHref: 'https://unsplash.com', img: IMG(pic ? pic.img : it.img), slotId: 'cat-' + it.id + '-' + (pic ? pic.id : 'base'),
+          priceText: hasOpts && isFinite(minP) && minP !== price ? 'From ' + money(minP) : money(price), sub: hasOpts ? 'Tap to customize' : '',
+          open: () => { if (hasOpts) this.setState({ open: it.id, qty: 1 }); else addLine(1); },
+          qty: s.qty, totalText: money(price * s.qty),
+          inc: () => this.setState(st => ({ qty: Math.min(20, st.qty + 1) })),
+          dec: () => this.setState(st => ({ qty: Math.max(1, st.qty - 1) })),
+          close: () => this.setState({ open: null }),
+          addInSheet: () => addLine(s.qty),
+          groups: groups.map((g, gi) => ({
+            label: g.label || '', hasLabel: !!g.label, aria: g.label || 'Option', seg: !g.chips, chips: !!g.chips,
+            opts: g.opts.map(x => {
+              const on = x.id === chosen[gi].id;
+              return { label: x.label, on, aria: (x.long || x.label) + (x.price != null ? ', ' + money(x.price) : ''),
+                bg: on ? '#fff' : 'transparent', fg: on ? '#1A1414' : '#818184', shadow: on ? '0 2px 8px rgba(26,20,20,.12)' : 'none',
+                chipBg: on ? '#1A1414' : '#EDEDF0', chipFg: on ? '#fff' : '#1A1414',
+                pick: () => this.setState(st => ({ sel: { ...st.sel, [it.id]: { ...(st.sel[it.id] || {}), [g.id]: x.id } } })) };
+            }),
+          })),
+          justAdded: added, notAdded: !added, addBg: added ? '#1E8A4C' : '#D7192D',
+          addAria: 'Add ' + it.name + (sub ? ', ' + sub : '') + ', ' + money(price),
+          add: e => { if (e && e.stopPropagation) e.stopPropagation(); if (hasOpts) this.setState({ open: it.id, qty: 1 }); else addLine(1); },
+        };
+    };
+    const mob = s.w < 720;
+    out.items = shown.map(build);
+    const oi = s.open && cat.items.find(i => i.id === s.open);
+    if (oi) { const b = build(oi); out.sheet = [Object.assign(b, { add: b.addInSheet, align: mob ? 'flex-end' : 'center', pad: mob ? '0' : '24px', dir: mob ? 'column' : 'row', radius: mob ? '28px 28px 0 0' : '28px', maxH: mob ? '92vh' : 'min(640px,90vh)', imgFlex: mob ? 'none' : '0 0 44%', imgH: mob ? '220px' : '0' })]; }
+    return out;
+  }
+}
+</script>
+</body>
+</html>
