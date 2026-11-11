@@ -961,6 +961,11 @@ export default function CartCheckout(p: CartCheckoutProps) {
                   <span style={{ fontWeight: 900, fontSize: 30, letterSpacing: '-.045em' }}>{money(grand)}</span>
                 </div>
               </div>
+              <span style={{ fontSize: 12.5, lineHeight: 1.45, color: '#818184', padding: '0 4px' }}>
+                By placing your order you agree to our{' '}
+                <a href="?view=terms" target="_blank" rel="noopener" style={{ color: '#636366' }}>Terms of service</a> and{' '}
+                <a href="?view=privacy" target="_blank" rel="noopener" style={{ color: '#636366' }}>Privacy policy</a>.
+              </span>
               {wide && pickup ? (
                 <Hov
                   as="button"

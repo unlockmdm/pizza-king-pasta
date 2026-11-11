@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import CartCheckout from './components/CartCheckout';
 import CategoryPage from './components/CategoryPage';
+import LegalPage from './components/LegalPage';
 import ComboBuilder from './components/ComboBuilder';
 import MeatFavourites from './components/MeatFavourites';
 import MenuPage from './components/MenuPage';
@@ -19,8 +20,8 @@ import HomeSections from './shell/HomeSections';
 import StartSheet from './shell/StartSheet';
 import { AddedToast, InfoToast, type Added } from './shell/Toasts';
 
-type View = 'home' | 'menu' | 'pasta' | 'meat' | 'wings' | 'juice' | 'gelato';
-const VIEWS: View[] = ['home', 'menu', 'pasta', 'meat', 'wings', 'juice', 'gelato'];
+type View = 'home' | 'menu' | 'pasta' | 'meat' | 'wings' | 'juice' | 'gelato' | 'terms' | 'privacy';
+const VIEWS: View[] = ['home', 'menu', 'pasta', 'meat', 'wings', 'juice', 'gelato', 'terms', 'privacy'];
 const CART_KEY = 'pkp-home-v2-cart';
 const MODE_KEY = 'pkp-v2-mode';
 
@@ -71,7 +72,7 @@ export default function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [view, setViewState] = useState<View>(viewFromUrl);
   // Start sheet: shown on a first visit (no saved pickup/delivery choice yet).
-  const [welcome, setWelcome] = useState(!saved);
+  const [welcome, setWelcome] = useState(() => !saved && !['terms', 'privacy'].includes(viewFromUrl()));
   const [wMode, setWMode] = useState<Mode>('pickup');
   const [addrErr, setAddrErr] = useState('');
   const [item, setItem] = useState<{ id: string; custom?: BuilderItem } | null>(null);
@@ -114,13 +115,16 @@ export default function App() {
   }, []);
 
   // ---- in-place pages, with browser Back support ----
+  // Number of history entries this session has pushed, so "Back" on a page can use history.back()
+  // only when there is an in-app page to go back to (not when the page was opened from a link).
+  const pushed = useRef(0);
   const setView = useCallback((v: View) => {
     setViewState(v);
     const url = v === 'home' ? window.location.pathname : '?view=' + v;
-    if (viewFromUrl() !== v) window.history.pushState({ view: v }, '', url);
+    if (viewFromUrl() !== v) { window.history.pushState({ view: v }, '', url); pushed.current++; }
   }, []);
   useEffect(() => {
-    const onPop = () => setViewState(viewFromUrl());
+    const onPop = () => { setViewState(viewFromUrl()); pushed.current = Math.max(0, pushed.current - 1); };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
   }, []);
@@ -144,6 +148,11 @@ export default function App() {
   };
   const openMenu = openView('menu');
   const backToTiles = () => { setView('home'); setTimeout(() => scrollToId('menu'), 60); };
+  /** Legal pages: go back where the visitor came from, or to the homepage if they landed here directly. */
+  const legalBack = () => {
+    if (pushed.current > 0) window.history.back();
+    else { setView('home'); window.scrollTo({ top: 0 }); }
+  };
 
   // ---- toasts ----
   const showToast = (text: string, withCart = false) => {
@@ -259,6 +268,9 @@ export default function App() {
       {view === 'menu' && <MenuPage onAdd={addLine} onDeal={addDeal} />}
       {(view === 'wings' || view === 'juice' || view === 'gelato') && <CategoryPage key={view} category={view} {...pageProps} />}
       {view === 'pasta' && <PastaPage {...pageProps} />}
+      {(view === 'terms' || view === 'privacy') && (
+        <LegalPage key={view} doc={view} onBack={legalBack} onOther={openView(view === 'terms' ? 'privacy' : 'terms')} />
+      )}
       {view === 'meat' && (
         <MeatFavourites {...pageProps} onCustomize={(it) => setItem({ id: it.id, custom: it })} onBuild={() => setItem({ id: 'byo' })} />
       )}
@@ -274,6 +286,8 @@ export default function App() {
         onOven={goSection('oven')}
         onPickup={(e) => { e?.preventDefault(); setMode('pickup'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
         onDelivery={(e) => { e?.preventDefault(); openStart('delivery'); }}
+        onTerms={openView('terms')}
+        onPrivacy={openView('privacy')}
       />
 
       {added && <AddedToast added={added} right={w < 560 ? '16px' : '24px'} bottom={toastBottom} />}

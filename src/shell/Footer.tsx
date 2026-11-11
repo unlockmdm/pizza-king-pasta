@@ -8,7 +8,7 @@ const linkHover = { color: '#FF7A85' } as const;
 const colHead = { fontSize: 13, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#87878A' } as const;
 
 export default function Footer({
-  w, padBottom, ctaText, onStart, onMenu, onBest, onDeals, onOven, onPickup, onDelivery,
+  w, padBottom, ctaText, onStart, onMenu, onBest, onDeals, onOven, onPickup, onDelivery, onTerms, onPrivacy,
 }: {
   w: number;
   padBottom: string;
@@ -20,6 +20,8 @@ export default function Footer({
   onOven: Nav;
   onPickup: Nav;
   onDelivery: Nav;
+  onTerms: Nav;
+  onPrivacy: Nav;
 }) {
   const footCols = w >= 900 ? 'minmax(0,1.4fr) repeat(3,minmax(0,1fr))' : w >= 560 ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)';
   return (
@@ -69,9 +71,9 @@ export default function Footer({
               Photos: Unsplash; pasta by Dllu (CC BY-SA 4.0), juice by JIP (CC BY-SA 4.0) and gelato by Rizka Budiati (CC BY 2.0), via Wikimedia Commons.
             </span>
           </span>
-          <nav aria-label="Legal" style={{ display: 'flex', gap: 24 }}>
-            <Hov as="a" href="#terms" style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Terms of service</Hov>
-            <Hov as="a" href="#privacy" style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Privacy policy</Hov>
+          <nav aria-label="Legal" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px' }}>
+            <Hov as="a" href="?view=terms" onClick={onTerms} style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Terms of service</Hov>
+            <Hov as="a" href="?view=privacy" onClick={onPrivacy} style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Privacy policy</Hov>
           </nav>
         </div>
       </div>

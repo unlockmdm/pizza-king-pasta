@@ -82,7 +82,7 @@ export default function OrderConfirmation({
   const whenLine = ready ? 'Ready now' : /soon/i.test(done.when) ? 'Ready as soon as possible' : 'Ready at ' + done.when;
   const line = ready
     ? 'Your order is waiting at ' + SHOP.street + '. Your receipt was sent to ' + (done.email || 'your email') + '.'
-    : 'Your order has been sent to the kitchen.' + (done.email ? ' Your receipt is on its way to ' + done.email.trim() + '.' : '');
+    : 'Your order has been sent to the kitchen.' + (done.receiptUrl ? ' Your receipt is linked below.' : '');
 
   const bk = brandKey(done);
   const L = BRAND[bk];
