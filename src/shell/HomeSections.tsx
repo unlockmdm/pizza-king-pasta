@@ -133,18 +133,18 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
           <Hov style={{ gridArea: 'deal', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, background: '#D7192D', color: '#fff', overflow: 'hidden', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
             <div style={{ position: 'absolute', right: ph ? -46 : -60, top: ph ? -40 : -90, width: ph ? 200 : 330, height: ph ? 200 : 330 }}>
               <span aria-hidden="true" style={{ position: 'absolute', left: '8%', right: '8%', bottom: '-6%', height: '22%', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(40,0,6,.45),rgba(40,0,6,0))' }} />
-              <img src="assets/pizza-base.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 40s linear infinite', willChange: 'transform' }} />
+              <img src="assets/combo/pizza-meat.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 40s linear infinite', willChange: 'transform' }} />
             </div>
             <div style={{ position: 'absolute', right: ph ? 54 : 170, top: ph ? 104 : 110, width: ph ? 176 : 300, height: ph ? 176 : 300 }}>
               <span aria-hidden="true" style={{ position: 'absolute', left: '8%', right: '8%', bottom: '-6%', height: '22%', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(40,0,6,.45),rgba(40,0,6,0))' }} />
-              <img src="assets/pizza-base.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 50s linear reverse infinite', willChange: 'transform' }} />
+              <img src="assets/combo/pizza-veg.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 50s linear reverse infinite', willChange: 'transform' }} />
             </div>
             <div aria-hidden="true" style={{ position: 'absolute', right: ph ? 8 : 18, bottom: ph ? 10 : 14, width: 236, height: 128, display: 'flex', pointerEvents: 'none', transform: ph ? (w < 380 ? 'scale(.5)' : 'scale(.64)') : undefined, transformOrigin: 'right bottom' }}>
               <span style={{ position: 'absolute', left: 14, right: 8, bottom: -4, height: 20, borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(60,0,8,.5),rgba(60,0,8,0))' }} />
               <img src="assets/combo/coke.png" alt="" style={{ position: 'absolute', left: 68, bottom: 10, height: 108, filter: PRODUCT_SHADOW }} />
               <img src="assets/combo/coke.png" alt="" style={{ position: 'absolute', left: 118, bottom: 4, height: 112, filter: PRODUCT_SHADOW }} />
-              <img src="assets/combo/pk-garlic-dip.png" alt="" style={{ position: 'absolute', left: 0, bottom: 8, width: 84, filter: PRODUCT_SHADOW }} />
-              <img src="assets/combo/pk-garlic-dip.png" alt="" style={{ position: 'absolute', right: 0, bottom: 6, width: 84, filter: PRODUCT_SHADOW }} />
+              <img src="assets/combo/garlic-cup.webp" alt="" style={{ position: 'absolute', left: 0, bottom: 8, width: 92, filter: PRODUCT_SHADOW }} />
+              <img src="assets/combo/garlic-cup.webp" alt="" style={{ position: 'absolute', right: 0, bottom: 6, width: 92, filter: PRODUCT_SHADOW }} />
             </div>
             <div style={{ position: 'absolute', inset: 0, padding: ph ? '22px 22px' : '26px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: ph ? 'linear-gradient(90deg,rgba(215,25,45,.96) 0%,rgba(215,25,45,.82) 42%,rgba(215,25,45,0) 72%)' : 'linear-gradient(90deg,rgba(215,25,45,.92) 0%,rgba(215,25,45,.6) 34%,rgba(215,25,45,0) 52%)' }}>
               <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase' }}>Pickup combo</span>
@@ -338,11 +338,11 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 24, borderTop: '1px solid rgba(26,20,20,.1)' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: '#636366' }}>Delivery</span>
-                <span style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.45, textWrap: 'pretty' } as CSSProperties}>Available through DoorDash and Uber Eats.</span>
+                <span style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.45, textWrap: 'pretty' } as CSSProperties}>Available through {SHOP.ubereatsAvailable ? 'DoorDash and Uber Eats' : 'DoorDash'}.</span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 <AppPill href={SHOP.doordash} logo={SHOP.doordashLogo} name="DoorDash" h={14} />
-                <AppPill href={SHOP.ubereats} logo={SHOP.ubereatsLogo} name="Uber Eats" h={18} />
+                <AppPill href={SHOP.ubereats} logo={SHOP.ubereatsLogo} name="Uber Eats" h={18} off={!SHOP.ubereatsAvailable} />
               </div>
             </div>
           </div>
@@ -365,7 +365,15 @@ function InfoBlock({ label, children }: { label: string; children: React.ReactNo
 }
 
 /** White pill linking to the shop's page in a delivery app (Hours & location). */
-function AppPill({ href, logo, name, h }: { href: string; logo: string; name: string; h: number }) {
+function AppPill({ href, logo, name, h, off }: { href: string; logo: string; name: string; h: number; off?: boolean }) {
+  if (off) {
+    return (
+      <span role="note" aria-label={name + ' delivery is currently unavailable'} style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 50, maxWidth: '100%', minWidth: 0, background: '#F4F4F5', color: '#8E8E93', borderRadius: 999, padding: '8px 18px', boxShadow: '0 0 0 1px rgba(26,20,20,.08)', cursor: 'not-allowed' }}>
+        <img src={logo} alt={name} style={{ display: 'block', height: h, width: 'auto', flex: 'none', filter: 'grayscale(1)', opacity: 0.45 }} />
+        <span style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.2, minWidth: 0 }}>Currently unavailable</span>
+      </span>
+    );
+  }
   return (
     <Hov as="a" href={href} target="_blank" rel="noopener noreferrer" aria-label={'Order delivery on ' + name} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 50, background: '#fff', color: '#1A1414', borderRadius: 999, padding: '0 20px', textDecoration: 'none', boxShadow: '0 0 0 1px rgba(26,20,20,.12)', transition: 'box-shadow .15s' }} hover={{ boxShadow: '0 0 0 2px #1A1414', color: '#1A1414' }}>
       <img src={logo} alt={name} style={{ display: 'block', height: h, width: 'auto', flex: 'none' }} />

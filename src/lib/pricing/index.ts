@@ -105,7 +105,6 @@ export function pizzaSummary(o: PizzaOpts, extraCount: number): string {
   if (o.tops.some(([, h]) => h !== 'whole')) parts.push('half & half');
   if (o.spice !== 'No spice') parts.push(lc(o.spice));
   if (o.doneness !== 'Regular') parts.push(lc(o.doneness));
-  if (o.cut !== 'Triangles') parts.push(lc(o.cut));
   return parts.join(' · ');
 }
 /** Topping names with " (left half)" / " (right half)" suffixes. */
@@ -130,7 +129,6 @@ function pizzaKitchen(o: PizzaOpts, withTops: boolean): string {
   } else {
     bits.push(o.bake);
     if (o.doneness !== 'Regular') bits.push(lc(o.doneness));
-    if (o.cut !== 'Triangles') bits.push(lc(o.cut));
   }
   if (o.free.length) bits.push('Seasonings: ' + lc(o.free.join(', ')));
   if (withTops && o.notes.trim()) bits.push('Note: ' + o.notes.trim());
@@ -157,7 +155,7 @@ function checkPizzaOpts(x: unknown): PizzaOpts {
   if (!oneOf(o.cheese, CHEESES)) bad('cheese');
   if (!oneOf(o.spice, SPICES)) bad('spice');
   if (!oneOf(o.doneness, DONENESS)) bad('doneness');
-  if (!oneOf(o.cut, CUTS)) bad('cut');
+  // Cut is no longer a choice: any old value is ignored and every pizza is cut into triangles.
   if (!Array.isArray(o.tops) || o.tops.length > Object.keys(TOPPINGS).length) bad('toppings');
   const seen = new Set<string>();
   const tops = (o.tops as unknown[]).map((t): [string, Half] => {
@@ -171,7 +169,7 @@ function checkPizzaOpts(x: unknown): PizzaOpts {
   const free = o.free as unknown[];
   if (free.some((f) => !oneOf(f, SEASONINGS)) || new Set(free).size !== free.length) bad('seasoning');
   if (!isStr(o.notes) || o.notes.length > NOTES_MAX) bad('notes');
-  return { crust: o.crust as string, bake: o.bake as string, sauce: o.sauce as string, cheese: o.cheese as string, spice: o.spice as string, doneness: o.doneness as string, cut: o.cut as string, tops, free: free as string[], notes: o.notes as string };
+  return { crust: o.crust as string, bake: o.bake as string, sauce: o.sauce as string, cheese: o.cheese as string, spice: o.spice as string, doneness: o.doneness as string, cut: CUTS[0], tops, free: free as string[], notes: o.notes as string };
 }
 const checkSize = (x: unknown): SizeKey => (oneOf(x, SIZE_KEYS) ? (x as SizeKey) : bad('size'));
 /** {id: count} with known ids and whole counts; returns the total. */

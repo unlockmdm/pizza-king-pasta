@@ -16,6 +16,8 @@ export const SHOP = {
   // DoorDash Online Ordering / Uber Eats Webshop links once the owner turns them on.
   // DoorDash Storefront (commission-free web ordering; customer pays delivery). Store 24430450.
   doordash: 'https://order.online/business/pizza-king-and-pasta-38819',
+  /** Uber Eats is shown greyed out as "Currently unavailable" until the owner turns it back on. */
+  ubereatsAvailable: false,
   ubereats: 'https://www.ubereats.com/ca/store/pizza-king-&-pasta/j1VSW4wkX02MplHbVNOSpg',
   doordashLogo: 'assets/brands/doordash.svg',
   ubereatsLogo: 'assets/brands/ubereats.svg',

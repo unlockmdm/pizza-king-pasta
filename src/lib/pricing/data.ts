@@ -62,7 +62,10 @@ export const CHEESES = ['Light', 'Regular', 'None'];
 /** Spice level, same options as Square's "Pizza Spice Level" / "Pasta Spice Level" lists. */
 export const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
 export const DONENESS = ['Regular', 'Light', 'Well done'];
-export const CUTS = ['Triangles', 'Squares', 'Uncut'];
+// Every pizza is cut into triangles (not a customer choice since handoff 3).
+export const CUTS = ['Triangles'];
+/** Slices per size, shown on the size picker. */
+export const SLICES: Record<SizeKey, number> = { S: 6, M: 8, L: 10, XL: 12 };
 /** Free seasonings. */
 export const SEASONINGS = ['Ginger', 'Garlic', 'Coriander', 'Red chilli', 'Green chilli', 'Oregano', 'Italian spice'];
 export const HALVES = ['left', 'whole', 'right'] as const;
@@ -159,7 +162,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   { id: 'gelato', title: 'Gelato & shakes', rows: [
     ['cone', 'Gelato cone', 'Vanilla, mango, pistachio, chocolate and more', [['', GELATO_SCOOP]]],
     ['cup', 'Gelato cup', 'Medium cup, choice of flavour', [['', GELATO_SCOOP]]],
-    ['shake', 'Shake', 'Mango, strawberry, banana, badam, papaya, vanilla, pistachio, black cherry', SIZES3(SHAKE)],
+    ['shake', 'Shake', 'Mango, strawberry, banana, badam, papaya', SIZES3(SHAKE)],
   ] },
   { id: 'drinks', title: 'Drinks', rows: [
     ['fruit-juice', 'Fresh fruit juice', 'Mix, orange, pineapple, guava', SIZES3(JUICE)],
@@ -286,7 +289,7 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
       {
         id: 'shake', name: 'Thick shake',
         groups: [
-          { id: 'flav', label: 'Flavour', opts: [o('mango', 'Mango'), o('strawberry', 'Strawberry'), o('banana', 'Banana'), o('badam', 'Badam'), o('papaya', 'Papaya'), o('vanilla', 'Vanilla'), o('pistachio', 'Pistachio'), o('cherry', 'Black cherry')] },
+          { id: 'flav', label: 'Flavour', opts: [o('mango', 'Mango'), o('strawberry', 'Strawberry'), o('banana', 'Banana'), o('badam', 'Badam'), o('papaya', 'Papaya')] },
           { id: 'size', label: 'Size', opts: CSIZES3(SHAKE) },
         ],
       },

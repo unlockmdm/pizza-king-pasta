@@ -411,7 +411,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
 
   const modeCards: { id: Mode; label: string; sub: string }[] = [
     { id: 'pickup', label: 'Pickup', sub: 'Ready as soon as possible' },
-    { id: 'delivery', label: 'Delivery', sub: 'DoorDash or Uber Eats' },
+    { id: 'delivery', label: 'Delivery', sub: SHOP.ubereatsAvailable ? 'DoorDash or Uber Eats' : 'DoorDash' },
   ];
   const pays: { id: Pay; short: string }[] = [
     { id: 'card', short: 'Card' },

@@ -3,7 +3,7 @@ import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties, typ
 import type { Half, NewLine, PizzaBuilderProps, PizzaConfig, SizeKey, SizePrices } from '../lib/types';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
-import { CHEESES, PIZZA_SAUCES, SEASONINGS, SPICES, TOPPING_ROWS, TOP_PRICE, EXTRA_CHEESE, pizzaQuote, pizzaSummary, priceLine, pricesFor, pizzaTopNames, type PizzaSpec, type TopCat } from '../lib/pricing';
+import { CHEESES, PIZZA_SAUCES, SEASONINGS, SLICES, SPICES, TOPPING_ROWS, TOP_PRICE, EXTRA_CHEESE, pizzaQuote, pizzaSummary, priceLine, pricesFor, pizzaTopNames, type PizzaSpec, type TopCat } from '../lib/pricing';
 import { money } from '../lib/format';
 import './PizzaBuilder.css';
 
@@ -105,7 +105,10 @@ const HV: [Half, string, string][] = [['left', 'Left half', 'M12 3.5a8.5 8.5 0 0
 const DONENESS_FILTER: Record<string, string> = { Light: 'brightness(1.1) saturate(.7) contrast(.95)', Regular: 'none', 'Well done': 'brightness(.78) saturate(1.25) contrast(1.12) sepia(.12)' };
 /** Knife lines, in the 76x76 box of the pizza photo. */
 const CUT_PATH: Record<string, string> = { Triangles: 'M38 9V67M9 38H67M17.5 17.5L58.5 58.5M58.5 17.5L17.5 58.5', Squares: 'M27 10V66M49 10V66M10 27H66M10 49H66', Uncut: '' };
-const CHIP_GROUPS: ['doneness' | 'cut', string, string[]][] = [['doneness', 'Bake', ['Regular', 'Light', 'Well done']], ['cut', 'Cut', ['Triangles', 'Squares', 'Uncut']]];
+// Cut is not a customer choice: every pizza is cut into triangles.
+const CHIP_GROUPS: ['doneness', string, string[]][] = [['doneness', 'Bake', ['Regular', 'Light', 'Well done']]];
+/** Size picker icon: a pizza with one knife line per pair of slices (S 6, M 8, L 10, XL 12). */
+const sliceCuts = (n: number) => Array.from({ length: n / 2 }, (_, i) => { const a = (Math.PI * 2 * i) / n - Math.PI / 2, x = 19 * Math.cos(a), y = 19 * Math.sin(a); return 'M' + (20 + x).toFixed(2) + ' ' + (20 + y).toFixed(2) + 'L' + (20 - x).toFixed(2) + ' ' + (20 - y).toFixed(2); }).join('');
 
 const DEFAULTS = { size: 'L' as SizeKey, crust: 'Regular', bake: 'Wood-fired', sauce: 'Regular', cheese: 'Regular', spice: 'No spice', doneness: 'Regular', cut: 'Triangles', notes: '', qty: 1 };
 
@@ -323,7 +326,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
       st.size = combo.size;
       st.qty = 1;
       const init = combo.init || {};
-      (['crust', 'bake', 'sauce', 'cheese', 'spice', 'doneness', 'cut', 'notes'] as const).forEach((k) => { if (typeof init[k] === 'string') st[k] = init[k] as string; });
+      (['crust', 'bake', 'sauce', 'cheese', 'spice', 'doneness', 'notes'] as const).forEach((k) => { if (typeof init[k] === 'string') st[k] = init[k] as string; });
       if (init.tops) st.tops = { ...init.tops };
       if (init.free) st.free = { ...init.free };
     }
@@ -469,7 +472,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   const sizeCols = combo ? '1fr' : 'repeat(4,1fr)';
   const sizes = SIZES.filter(([k]) => !combo || k === combo.size).map(([k, nm, px], i) => {
     const on = s.size === k;
-    return { k, label: nm, short: k, price: combo ? 'In combo' : money(P[k]), px, on, fill: combo ? '#1A1414' : on ? '#D7192D' : '#DCDCDF', bg: combo ? '#fff' : on ? '#FFF1F2' : '#fff', divider: i ? '1px solid #E3E3E6' : '0', mBorder: on ? '#D7192D' : '#E3E3E6' };
+    return { k, label: nm, short: k, cuts: sliceCuts(SLICES[k]), slicesText: SLICES[k] + ' slices', price: combo ? 'In combo' : money(P[k]), px, on, fill: combo ? '#1A1414' : on ? '#D7192D' : '#DCDCDF', bg: combo ? '#fff' : on ? '#FFF1F2' : '#fff', divider: i ? '1px solid #E3E3E6' : '0', mBorder: on ? '#D7192D' : '#E3E3E6' };
   });
   const showQtyRow = !combo || hasExtra;
   const totalText = combo ? (hasExtra ? '+' + money(extra) : 'Included') : money(unit * s.qty);
@@ -764,9 +767,9 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 10 }}>
                   {opts.map((v) => {
                     const on = s[key] === v, t = tile(on);
-                    const cuts = key === 'cut' ? CUT_PATH[v] : '';
+                    const cuts = '';
                     return (
-                      <Hov as="button" key={v} onClick={() => set(key === 'cut' ? { cut: v } : { doneness: v })} aria-pressed={on} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '18px 8px 14px', borderRadius: 18, border: t.border, background: t.bg, cursor: 'pointer', color: '#1A1414', transition: 'background .15s,border-color .15s' }} hover={{ borderColor: '#1A1414' }}>
+                      <Hov as="button" key={v} onClick={() => set({ doneness: v })} aria-pressed={on} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '18px 8px 14px', borderRadius: 18, border: t.border, background: t.bg, cursor: 'pointer', color: '#1A1414', transition: 'background .15s,border-color .15s' }} hover={{ borderColor: '#1A1414' }}>
                         <span style={{ position: 'relative', width: 76, height: 76, display: 'block' }}>
                           <img src={BASE_IMG} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: key === 'doneness' ? DONENESS_FILTER[v] : 'none', transition: 'filter .2s' }} />
                           <svg width="76" height="76" viewBox="0 0 76 76" style={{ position: 'absolute', inset: 0 }}>
@@ -824,9 +827,10 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
               {sizes.map((o) => (
                 <button key={o.k} onClick={() => set({ size: o.k })} aria-pressed={o.on} style={{ border: 0, borderLeft: o.divider, background: o.bg, boxShadow: 'none', padding: '14px 4px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', color: '#1A1414', transition: 'background .15s' }}>
                   <span style={{ height: 40, display: 'flex', alignItems: 'center' }}>
-                    <svg width={o.px} height={o.px} viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill={o.fill} /><path d="M20 1v38M1 20h38M6.6 6.6l26.8 26.8M33.4 6.6L6.6 33.4" stroke="#fff" strokeWidth="1.6" /></svg>
+                    <svg width={o.px} height={o.px} viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill={o.fill} /><path d={o.cuts} stroke="#fff" strokeWidth="1.6" strokeLinecap="round" /></svg>
                   </span>
                   <span style={{ fontSize: 13, fontWeight: 700 }}>{o.label}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#636366' }}>{o.slicesText}</span>
                   <span style={{ fontSize: 12, fontWeight: 600, color: '#636366' }}>{o.price}</span>
                 </button>
               ))}
@@ -856,8 +860,9 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
         <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 30, background: '#fff', borderTop: '1px solid #E9E9EC', padding: '12px 16px 16px', display: 'flex', flexDirection: 'column', gap: 10, boxShadow: '0 -10px 30px rgba(26,20,20,.08)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: sizeCols, gap: 6 }}>
             {sizes.map((o) => (
-              <button key={o.k} onClick={() => set({ size: o.k })} aria-pressed={o.on} aria-label={o.label} style={{ border: '1.5px solid ' + o.mBorder, background: '#fff', borderRadius: 12, height: 44, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#1A1414' }}>
-                {o.short}
+              <button key={o.k} onClick={() => set({ size: o.k })} aria-pressed={o.on} aria-label={o.label + ', ' + o.slicesText} style={{ border: '1.5px solid ' + o.mBorder, background: o.on ? '#FFF1F2' : '#fff', borderRadius: 12, height: 48, padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1, fontFamily: 'inherit', cursor: 'pointer', color: '#1A1414' }}>
+                <span style={{ fontSize: 14, fontWeight: 800, lineHeight: 1.1 }}>{o.short}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, lineHeight: 1.1, color: '#636366', whiteSpace: 'nowrap' }}>{o.slicesText}</span>
               </button>
             ))}
           </div>

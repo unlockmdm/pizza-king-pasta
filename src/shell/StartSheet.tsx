@@ -99,10 +99,10 @@ export default function StartSheet({
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: '#1A1414', textWrap: 'pretty' } as CSSProperties}>Delivery is handled by DoorDash and Uber Eats. You{'\u2019'}ll finish your order in their app.</p>
+              <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: '#1A1414', textWrap: 'pretty' } as CSSProperties}>Delivery is handled by {SHOP.ubereatsAvailable ? 'DoorDash and Uber Eats' : 'DoorDash'}. You{'\u2019'}ll finish your order in their app.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <AppButton href={SHOP.doordash} logo={SHOP.doordashLogo} name="DoorDash" h={15} />
-                <AppButton href={SHOP.ubereats} logo={SHOP.ubereatsLogo} name="Uber Eats" h={20} />
+                <AppButton href={SHOP.ubereats} logo={SHOP.ubereatsLogo} name="Uber Eats" h={20} off={!SHOP.ubereatsAvailable} />
               </div>
               <span style={{ fontSize: 13, lineHeight: 1.45, color: '#636366' }}>Delivery fees and tips are paid in the app.</span>
             </div>
@@ -182,7 +182,17 @@ function WhenRow({ bg, on, border, title, sub, onClick }: { bg: string; on: bool
 }
 
 /** "Order delivery on [logo] ↗" button for the Delivery tab. */
-function AppButton({ href, logo, name, h }: { href: string; logo: string; name: string; h: number }) {
+function AppButton({ href, logo, name, h, off }: { href: string; logo: string; name: string; h: number; off?: boolean }) {
+  if (off) {
+    return (
+      <div role="note" aria-label={name + ' delivery is currently unavailable'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 60, padding: '0 20px', borderRadius: 14, background: '#F4F4F5', color: '#8E8E93', boxShadow: 'inset 0 0 0 1px #E4E4E7', cursor: 'not-allowed' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', minWidth: 0 }}>
+          <img src={logo} alt={name} style={{ display: 'block', height: h, width: 'auto', flex: 'none', filter: 'grayscale(1)', opacity: 0.45 }} />
+        </span>
+        <span style={{ fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>Currently unavailable</span>
+      </div>
+    );
+  }
   return (
     <Hov as="a" href={href} target="_blank" rel="noopener noreferrer" aria-label={'Order delivery on ' + name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 60, padding: '0 20px', borderRadius: 14, background: '#fff', color: '#1A1414', textDecoration: 'none', boxShadow: 'inset 0 0 0 1px #E4E4E7', transition: 'box-shadow .15s' }} hover={{ boxShadow: 'inset 0 0 0 2px #1A1414', color: '#1A1414' }}>
       <span style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', minWidth: 0 }}>

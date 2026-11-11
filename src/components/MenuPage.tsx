@@ -43,6 +43,7 @@ const PIZZA_PHOTO: Record<string, string> = {
  * ("leave an empty image box rather than a misleading picture").
  */
 const ROW_PIC: Record<string, string> = {
+  sugarcane: 'assets/menu/sugarcane.webp',
   'fruit-juice': 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?fm=jpg&q=70&w=600&auto=format&fit=crop',
   espresso: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?fm=jpg&q=70&w=600&auto=format&fit=crop',
   hot: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?fm=jpg&q=70&w=600&auto=format&fit=crop',

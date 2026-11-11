@@ -65,7 +65,7 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   chaat: { f: 'sides', veg: true, img: '1490474418585-ba9bad8fd0ea' },
   // drinks
   fresh: { f: 'juice', img: '1600271886742-f049cd451bba' },
-  sugarcane: { f: 'juice', img: '' },
+  sugarcane: { f: 'juice', img: 'assets/menu/sugarcane.webp' },
   lemonade: { f: 'juice', img: '' },
   coconut: { f: 'juice', img: '' },
   lassi: { f: 'lassi', img: '' },
@@ -84,9 +84,16 @@ const CHIPS = new Set(['lassi.flav', 'hot.kind', 'pop.brand', 'beer.brand', 'con
 /** Option photos ("item.option" → Unsplash id). */
 const OPT_IMG: Record<string, string> = {
   'wings.hot': '1608039755401-742074f0548d', 'wings.honey': '1567620832903-9fc6debc209f', 'wings.bbq': '1527477396000-e27163b481c2',
-  'fresh.orange': '1600271886742-f049cd451bba', 'fresh.pineapple': '1534353473418-4cfa6c56fd38', 'fresh.guava': '1497534446932-c925b458314e', 'fresh.mix': '1622597467836-f3285f2131b8',
+  'fresh.orange': '1600271886742-f049cd451bba', 'fresh.pineapple': '1534353473418-4cfa6c56fd38', 'fresh.guava': '1497534446932-c925b458314e', 'fresh.mix': 'assets/menu/juice-mix-cup.webp',
   'lassi.strawberry': '1589733955941-5eeaf752f6dd',
-  'shake.mango': '1525385133512-2f3bdd039054', 'shake.strawberry': '1579954115545-a95591f28bfc', 'shake.vanilla': '1568901839119-631418a3910d', 'shake.cherry': '1600718374662-0483d2b9da44',
+  'shake.mango': 'assets/menu/mango-shake.webp', 'shake.strawberry': 'assets/menu/strawberry-shake.webp', 'shake.banana': 'assets/menu/banana-shake.webp',
+  'shake.badam': 'assets/menu/badam-shake.webp', 'shake.papaya': 'assets/menu/papaya-shake.webp',
+};
+/** Fresh-juice pop-up: real cut-out cup photos on a soft tinted glow (Guava keeps its stock photo). */
+const JUICE_CUPS: Record<string, { src: string; tint: string; alt: string }> = {
+  mix: { src: 'assets/menu/juice-cup-clean.webp', tint: '#E2335A', alt: 'Mixed juice' },
+  orange: { src: 'assets/menu/juice-cup-orange.webp', tint: '#F59A1F', alt: 'Orange juice' },
+  pineapple: { src: 'assets/menu/juice-cup-pineapple.webp', tint: '#F2C230', alt: 'Pineapple juice' },
 };
 const withUi = (cat: CategoryId): Item[] =>
   CAT_MENU[cat].items.map((it) => ({
@@ -366,8 +373,18 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
         <div role="dialog" aria-modal="true" aria-label={m.it.name} style={{ ...S.dialog, alignItems: mob ? 'flex-end' : 'center', padding: mob ? '0' : '24px' }}>
           <div onClick={() => setOpen(null)} style={S.scrim} />
           <div style={{ ...S.panel, maxHeight: mob ? '92vh' : 'min(640px,90vh)', flexDirection: mob ? 'column' : 'row', borderRadius: mob ? '28px 28px 0 0' : '28px' }}>
-            <div style={{ position: 'relative', flex: mob ? 'none' : '0 0 44%', minHeight: mob ? '220px' : '0', background: '#EDEDF0' }}>
-              <Photo src={m.img} alt={m.it.name} credit={m.credit} creditHref="https://unsplash.com" />
+            <div style={{ position: 'relative', flex: mob ? 'none' : '0 0 44%', minHeight: mob ? '220px' : '0', background: '#EDEDF0', overflow: 'hidden' }}>
+              {(() => {
+                const fi = m.groups.findIndex((g) => g.id === 'flav');
+                const cup = m.it.id === 'fresh' && fi >= 0 ? JUICE_CUPS[m.chosen[fi].id] : undefined;
+                if (!cup) return <Photo src={m.img} alt={m.it.name} credit={m.credit} creditHref="https://unsplash.com" />;
+                return (
+                  <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(60% 55% at 50% 46%, ' + cup.tint + '2E 0%, ' + cup.tint + '12 45%, #FBFBFC 78%), linear-gradient(180deg,#FFFFFF 0%,#F4F4F6 100%)' }}>
+                    <span aria-hidden="true" style={{ position: 'absolute', left: '50%', bottom: '10.5%', width: '30%', height: '3.2%', transform: 'translateX(-50%)', borderRadius: '50%', background: 'rgba(30,20,20,.26)', filter: 'blur(8px)' }} />
+                    <img src={cup.src} alt={cup.alt} decoding="async" style={{ position: 'absolute', left: 0, right: 0, top: '9%', width: '100%', height: '79%', objectFit: 'contain', filter: 'drop-shadow(0 22px 26px ' + cup.tint + '33)' }} />
+                  </div>
+                );
+              })()}
               <button type="button" onClick={() => setOpen(null)} aria-label="Close" style={S.close}>
                 <IconClose size={16} stroke={2.8} />
               </button>
