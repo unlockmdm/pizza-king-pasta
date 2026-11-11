@@ -294,6 +294,7 @@ export default function App() {
     <>
       <Header
         w={w}
+        view={view}
         modeLabel={modeLabel}
         cartCount={count}
         onHome={(e) => { e?.preventDefault(); setView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}

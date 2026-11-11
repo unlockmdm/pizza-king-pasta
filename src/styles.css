@@ -50,3 +50,6 @@ img { max-width: none; }
 .pk-faq summary { list-style: none; }
 .pk-faq summary::-webkit-details-marker { display: none; }
 .pk-faq details[open] .pk-plus { transform: rotate(45deg); }
+
+/* Header links: hover hint only on real mouse hover; the solid underline marks where you are. */
+@media (hover: hover) { .pk-nav-link:not([aria-current]):hover { border-bottom-color: rgba(215, 25, 45, .35) !important; } }

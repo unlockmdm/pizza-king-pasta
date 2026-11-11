@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import { Hov, IconCart, IconChevronDown } from '../lib/ui';
 
 type Nav = (e?: MouseEvent) => void;
@@ -6,11 +6,48 @@ type Nav = (e?: MouseEvent) => void;
 const navLink = {
   color: '#1A1414', textDecoration: 'none', padding: '10px 0', borderBottom: '2px solid transparent', transition: 'border-color .2s,color .2s',
 } as const;
+const navOn = { ...navLink, borderBottomColor: '#D7192D' } as const;
+
+type Section = 'menu' | 'bestsellers' | 'deals' | 'visit' | null;
+const SPY: Exclude<Section, null>[] = ['bestsellers', 'deals', 'visit'];
+
+/** Which header link to underline: the Menu page, or the homepage section currently under the header. */
+function useActive(view: string): Section {
+  const [sec, setSec] = useState<Section>(null);
+  useEffect(() => {
+    if (view !== 'home') { setSec(null); return; }
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      const line = 120; // just below the sticky header
+      let cur: Section = null;
+      for (const id of SPY) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) cur = id;
+      }
+      // At the very bottom the last section may never reach the line.
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
+        const v = document.getElementById('visit');
+        if (v && v.getBoundingClientRect().top < window.innerHeight) cur = 'visit';
+      }
+      setSec(cur);
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(check); };
+    check();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); if (raf) cancelAnimationFrame(raf); };
+  }, [view]);
+  return view === 'menu' ? 'menu' : sec;
+}
 
 export default function Header({
-  w, modeLabel, cartCount, onHome, onMenu, onBest, onDeals, onVisit, onStart, onCart,
+  w, view, modeLabel, cartCount, onHome, onMenu, onBest, onDeals, onVisit, onStart, onCart,
 }: {
   w: number;
+  view: string;
   modeLabel: string;
   cartCount: number;
   onHome: Nav;
@@ -24,6 +61,8 @@ export default function Header({
   const showNav = w >= 1180;
   const showWordmark = w >= 560;
   const showCartLabel = w >= 480;
+  const active = useActive(view);
+  const link = (id: Section) => ({ className: 'pk-nav-link', style: active === id ? navOn : navLink, 'aria-current': active === id ? ('true' as const) : undefined });
   return (
     <header style={{ position: 'sticky', top: 0, zIndex: 30, background: 'rgba(255,255,255,.86)', backdropFilter: 'saturate(1.6) blur(16px)', WebkitBackdropFilter: 'saturate(1.6) blur(16px)', borderBottom: '1px solid rgba(26,20,20,.07)' }}>
       <div style={{ maxWidth: 1320, margin: '0 auto', padding: '12px clamp(16px,3vw,32px)', display: 'flex', alignItems: 'center', gap: w >= 560 ? 24 : 12 }}>
@@ -39,10 +78,10 @@ export default function Header({
         </a>
         {showNav && (
           <nav style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: 32, fontWeight: 600, fontSize: 15, whiteSpace: 'nowrap' }}>
-            <Hov as="a" href="#menu" onClick={onMenu} style={navLink} hover={{ borderColor: '#D7192D' }}>Menu</Hov>
-            <Hov as="a" href="#bestsellers" onClick={onBest} style={navLink} hover={{ borderColor: '#D7192D' }}>Specials</Hov>
-            <Hov as="a" href="#deals" onClick={onDeals} style={navLink} hover={{ borderColor: '#D7192D' }}>Pickup combos</Hov>
-            <Hov as="a" href="#visit" onClick={onVisit} style={navLink} hover={{ borderColor: '#D7192D' }}>Hours &amp; location</Hov>
+            <a href="/menu" onClick={onMenu} {...link('menu')}>Menu</a>
+            <a href="#bestsellers" onClick={onBest} {...link('bestsellers')}>Specials</a>
+            <a href="#deals" onClick={onDeals} {...link('deals')}>Pickup combos</a>
+            <a href="#visit" onClick={onVisit} {...link('visit')}>Hours &amp; location</a>
           </nav>
         )}
         <div style={{ marginLeft: 'auto', minWidth: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
