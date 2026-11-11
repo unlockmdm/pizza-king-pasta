@@ -2,11 +2,11 @@
 // Pickup combo builder: full-screen sheet. Pizzas open the Pizza Builder in "combo" mode.
 import { useState, type CSSProperties } from 'react';
 import type { ComboBuilderProps, ComboContext, NewLine, PizzaConfig } from '../lib/types';
-import { COMBOS, COMBO_DIPS, COMBO_POPS, COMBO_SIDES, EXTRA_DIP, SIZE_NAMES, comboPizzaBits, mustPrice, pizzaOptsOf, type LineSpec, type PizzaOpts } from '../lib/pricing';
+import { COMBOS, COMBO_DIPS, COMBO_POPS, COMBO_SIDES, EXTRA_DIP, SIZE_NAMES, comboPizzaBits, mustPrice, SLICES, pizzaOptsOf, type LineSpec, type PizzaOpts } from '../lib/pricing';
 import { money } from '../lib/format';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody } from '../lib/hooks';
-import PizzaBuilder from './PizzaBuilder';
+import PizzaBuilder, { PizzaArt } from './PizzaBuilder';
 
 // ---------- Spec data (from the prototype; these arrays are the spec) ----------
 // Combo contents and prices (deal price, included toppings/dips/pops, EXTRA_DIP) come from the shared pricing module.
@@ -383,7 +383,14 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
                       justifyContent: 'center',
                     }}
                   >
-                    <img src="assets/pizza-base.webp" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 10px 14px rgba(60,30,10,.22))' }} />
+                    {p.done && pizzas[p.i] ? (
+                      // The finished pizza, drawn with its own sauce and toppings (same art as the builder).
+                      <span aria-hidden="true" style={{ position: 'relative', display: 'block', width: '100%', height: '100%' }}>
+                        <PizzaArt sauce={pizzas[p.i].opts.sauce} tops={pizzas[p.i].opts.tops} doneness={pizzas[p.i].opts.doneness} slices={SLICES[sp.size]} />
+                      </span>
+                    ) : (
+                      <img src="assets/pizza-base.webp" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 10px 14px rgba(60,30,10,.22))' }} />
+                    )}
                     {p.done ? (
                       <span style={{ position: 'absolute', right: 2, top: 2, width: 30, height: 30, borderRadius: '50%', background: '#1E8A4C', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 3px #fff' }}>
                         <CheckSvg stroke={3.4} />
