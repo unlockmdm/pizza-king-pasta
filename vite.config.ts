@@ -1,12 +1,19 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-import { handlePay } from './server/square';
+import { handlePay, handleStatus } from './server/square';
 
 /** Serves POST /api/pay from the dev server, with the same handler Vercel runs in production. */
 function squareApi(env: Record<string, string>): Plugin {
   return {
     name: 'square-api',
     configureServer(server) {
+      server.middlewares.use('/api/order-status', async (req, res) => {
+        const u = new URL(req.url || '', 'http://localhost');
+        const out = await handleStatus(u.searchParams.get('id'), u.searchParams.get('t'), env);
+        res.statusCode = out.status;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(out.json));
+      });
       server.middlewares.use('/api/pay', async (req, res) => {
         if (req.method !== 'POST') {
           res.statusCode = 405;

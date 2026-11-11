@@ -1,7 +1,7 @@
 // Cloudflare Worker: POST /api/pay -> Square (same handler as the Vite dev server); everything else -> static site.
 // Runtime secrets/vars (Worker settings): SQUARE_ACCESS_TOKEN (secret), SQUARE_ENV, VITE_SQUARE_LOCATION_ID.
 // Static files get their security headers from public/_headers; responses made here add them explicitly.
-import { handlePay, type PayEnv } from '../server/square';
+import { handlePay, handleStatus, type PayEnv } from '../server/square';
 
 interface RateLimiter { limit(o: { key: string }): Promise<{ success: boolean }> }
 interface Env extends PayEnv {
@@ -64,6 +64,11 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === '/api/pay') return pay(request, env);
+    if (url.pathname === '/api/order-status') {
+      if (request.method !== 'GET') return json(405, { ok: false, message: 'Method not allowed.' }, { Allow: 'GET' });
+      const out = await handleStatus(url.searchParams.get('id'), url.searchParams.get('t'), env);
+      return json(out.status, out.json);
+    }
     // No other API routes exist; don't fall through to the site for /api/*.
     if (url.pathname.startsWith('/api/')) return json(404, { ok: false, message: 'Not found.' });
     // Apple Pay domain verification (Square). Served from a plain asset so dot-folders don't matter.

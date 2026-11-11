@@ -28,6 +28,44 @@ interface PayBody {
 
 export interface PayResult { status: number; json: Record<string, unknown> }
 
+/**
+ * Signed code that lets the customer's confirmation screen check one order's status (and nothing else).
+ * HMAC-SHA256 of the order ID, keyed from the server-only Square token, so it can't be forged or guessed.
+ */
+async function statusToken(orderId: string, secret: string): Promise<string> {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', enc.encode('order-status:' + secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(orderId)));
+  return Array.from(sig.slice(0, 16), (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+export type OrderStage = 'received' | 'preparing' | 'ready' | 'completed' | 'canceled';
+
+/**
+ * GET /api/order-status?id=...&t=...: the pickup order's current stage, as set by the kitchen in Square POS.
+ * Square fulfillment states: PROPOSED (new) -> RESERVED (accepted) -> PREPARED (ready) -> COMPLETED (picked up).
+ * Returns only the stage: no names, phone numbers or items.
+ */
+export async function handleStatus(id: string | null, t: string | null, env: PayEnv): Promise<PayResult> {
+  const token = env.SQUARE_ACCESS_TOKEN;
+  if (!token) return fail(500, 'Order status is unavailable right now.');
+  if (!id || !t || !/^[A-Za-z0-9_-]{8,64}$/.test(id) || !/^[0-9a-f]{32}$/.test(t)) return fail(400, 'Unknown order.');
+  if ((await statusToken(id, token)) !== t) return fail(403, 'Unknown order.');
+  const base = env.SQUARE_ENV === 'production' ? 'https://connect.squareup.com' : 'https://connect.squareupsandbox.com';
+  const r = await fetch(base + '/v2/orders/' + id, { headers: { Authorization: 'Bearer ' + token, 'Square-Version': API_VERSION } });
+  if (!r.ok) return fail(502, 'Order status is unavailable right now.');
+  const o = ((await r.json().catch(() => ({}))) as Record<string, any>).order || {};
+  const f = (o.fulfillments || [])[0] || {};
+  const fs = String(f.state || '');
+  const stage: OrderStage =
+    o.state === 'CANCELED' || fs === 'CANCELED' || fs === 'FAILED' ? 'canceled'
+      : fs === 'COMPLETED' || o.state === 'COMPLETED' ? 'completed'
+        : fs === 'PREPARED' ? 'ready'
+          : fs === 'RESERVED' ? 'preparing'
+            : 'received';
+  return { status: 200, json: { ok: true, stage } };
+}
+
 const API_VERSION = '2024-10-17';
 const cents = (n: number) => Math.round(n * 100);
 const clip = (s: unknown, n: number) => String(s ?? '').slice(0, n);
@@ -196,6 +234,7 @@ export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
     json: {
       ok: true,
       orderId: o.id,
+      statusToken: await statusToken(o.id, token),
       orderNumber: p?.receipt_number || String(o.id).slice(-6).toUpperCase(),
       receiptUrl: p?.receipt_url || null,
       total,

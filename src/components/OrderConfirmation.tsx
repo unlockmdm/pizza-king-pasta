@@ -1,11 +1,12 @@
 // Order confirmation ("Order placed") — the approved design from CartCheckout.dc.html (handoff v2).
-import type { CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { SHOP } from '../lib/catalog';
 import { orderTotals } from '../lib/pricing';
 import { money } from '../lib/format';
 import { useLockBody, useWidth } from '../lib/hooks';
 import type { CartLine } from '../lib/types';
 import { Hov } from '../lib/ui';
+import { fetchOrderStage, type OrderStage } from '../lib/square';
 
 export type PayKind = 'card' | 'gpay' | 'apple' | 'store';
 
@@ -21,12 +22,21 @@ export interface Confirmation {
   cardBrand?: string;
   last4?: string;
   receiptUrl?: string;
+  /** Square order + signed status code: the screen follows the kitchen's progress in Square POS. */
+  orderId?: string;
+  statusToken?: string;
 }
 
 type Stage = 'oven' | 'ready';
+type StepState = 'done' | 'now' | 'next';
 
-/** Progress shown only while the order is in the oven. */
-const STEPS: [string, 'done' | 'now' | 'next'][] = [['Received', 'done'], ['In the oven', 'now'], ['Ready for pickup', 'next']];
+/** Progress bar: Received -> In the oven -> Ready for pickup. */
+const stepsFor = (stage: OrderStage): [string, StepState][] => {
+  const at = stage === 'received' ? 0 : stage === 'preparing' ? 1 : 2;
+  return (['Received', 'In the oven', 'Ready for pickup'] as const).map((label, i) => [label, i < at ? 'done' : i === at ? 'now' : 'next']);
+};
+/** How often to ask Square for the latest stage while the screen is open. */
+const POLL_MS = 15000;
 
 const BRAND: Record<string, [name: string, w: string, h: string, bg: string]> = {
   visa: ['Visa', '38px', '14px', '#fff'],
@@ -74,16 +84,44 @@ export default function OrderConfirmation({
 }) {
   useLockBody(true);
   const w = useWidth();
-  const ready = stage === 'ready';
+  // Live stage from Square POS (New -> In progress -> Ready -> Picked up). Demo orders have no orderId and stay put.
+  const [live, setLive] = useState<OrderStage>(done.orderId ? 'received' : stage === 'ready' ? 'ready' : 'preparing');
+  useEffect(() => {
+    const id = done.orderId, t = done.statusToken;
+    if (!id || !t) return;
+    let alive = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const tick = async () => {
+      if (document.visibilityState === 'visible') {
+        const s = await fetchOrderStage(id, t);
+        if (!alive) return;
+        if (s) setLive(s);
+        if (s === 'completed' || s === 'canceled') return; // final: stop asking
+      }
+      timer = setTimeout(tick, POLL_MS);
+    };
+    void tick();
+    const onVis = () => { if (document.visibilityState === 'visible') { clearTimeout(timer); void tick(); } };
+    document.addEventListener('visibilitychange', onVis);
+    return () => { alive = false; clearTimeout(timer); document.removeEventListener('visibilitychange', onVis); };
+  }, [done.orderId, done.statusToken]);
+  const ready = live === 'ready' || live === 'completed';
+  const pickedUp = live === 'completed';
+  const canceled = live === 'canceled';
+  const STEPS = stepsFor(live);
   const items = done.items || [];
   // Same rounding as the charged Square order (see orderTotals).
   const { sub, tax } = orderTotals(items);
   const count = items.reduce((a, l) => a + l.qty, 0);
   const noShort = done.no.replace('Order ', '');
-  const whenLine = ready ? 'Ready now' : /soon/i.test(done.when) ? 'Ready as soon as possible' : 'Ready at ' + done.when;
-  const line = ready
-    ? 'Your order is waiting at ' + SHOP.street + '. Your receipt was sent to ' + (done.email || 'your email') + '.'
-    : 'Your order has been sent to the kitchen.' + (done.receiptUrl ? ' Your receipt is linked below.' : '');
+  const whenLine = pickedUp ? 'Picked up' : ready ? 'Ready now' : /soon/i.test(done.when) ? 'Ready as soon as possible' : 'Ready at ' + done.when;
+  const line = canceled
+    ? 'This order was cancelled. If you have questions, please call us at ' + SHOP.phoneText + '.'
+    : pickedUp
+      ? 'Thanks for ordering from Pizza King & Pasta. Enjoy your meal!'
+      : ready
+        ? 'Your order is waiting at ' + SHOP.street + '.' + (done.receiptUrl ? ' Your receipt is linked below.' : '')
+        : 'Your order has been sent to the kitchen.' + (done.receiptUrl ? ' Your receipt is linked below.' : '');
 
   const bk = brandKey(done);
   const L = BRAND[bk];
@@ -122,13 +160,13 @@ export default function OrderConfirmation({
             <h1 style={{ margin: 0, fontWeight: 900, fontSize: 'clamp(46px,7vw,92px)', lineHeight: 0.92, letterSpacing: '-.055em' }}>
               {done.name ? 'Thanks, ' + done.name + '.' : 'Thank you.'}
               <br />
-              <span style={{ color: ready ? '#1E8A4C' : '#D7192D' }}>{ready ? 'It’s ready.' : 'We’re on it.'}</span>
+              <span style={{ color: canceled ? '#818184' : ready ? '#1E8A4C' : '#D7192D' }}>{canceled ? 'Order cancelled.' : pickedUp ? 'Enjoy!' : ready ? 'It’s ready.' : 'We’re on it.'}</span>
             </h1>
             <p style={{ margin: 0, maxWidth: 520, fontSize: 'clamp(16px,1.4vw,18px)', lineHeight: 1.55, color: '#636366', textWrap: 'pretty' } as CSSProperties}>{line}</p>
           </div>
 
-          {!ready ? (
-            <div aria-label="Order status" style={{ ...statusCard, background: '#1A1414' }}>
+          {!ready && !canceled ? (
+            <div aria-label="Order status" aria-live="polite" style={{ ...statusCard, background: '#1A1414' }}>
               <img src="assets/oven.png" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 22%', transformOrigin: 'center top', animation: 'ocDrift 14s ease-in-out infinite alternate' }} />
               <span style={{ position: 'absolute', right: '-8%', top: '-30%', width: '62%', height: '100%', background: 'radial-gradient(ellipse at 55% 45%,rgba(255,150,50,.6),rgba(255,90,10,.28) 42%,transparent 70%)', mixBlendMode: 'screen', animation: 'ocFlicker 2.3s ease-in-out infinite' }} />
               <span style={{ position: 'absolute', right: '6%', top: '-10%', width: '40%', height: '70%', background: 'radial-gradient(ellipse at 50% 50%,rgba(255,200,90,.5),transparent 65%)', mixBlendMode: 'screen', animation: 'ocFlicker 1.4s ease-in-out .3s infinite' }} />
@@ -141,13 +179,15 @@ export default function OrderConfirmation({
               <span style={ember('22%', '44%', 2, 'ocEmberA 5.4s linear 2.8s infinite')} />
               <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg,rgba(18,10,8,.94) 0%,rgba(18,10,8,.78) 36%,rgba(18,10,8,.15) 72%,rgba(18,10,8,0) 100%)' }} />
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, position: 'relative', zIndex: 1 }}>
-                <span style={{ fontWeight: 900, fontSize: 'clamp(38px,5vw,52px)', letterSpacing: '-.05em', lineHeight: 0.95 }}>In the oven</span>
-                <span style={{ maxWidth: 340, fontSize: 16, lineHeight: 1.5, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>Made to order. When you arrive, give your name or order number at the counter.</span>
+                <span style={{ fontWeight: 900, fontSize: 'clamp(38px,5vw,52px)', letterSpacing: '-.05em', lineHeight: 0.95 }}>{live === 'received' ? 'Order received' : 'In the oven'}</span>
+                <span style={{ maxWidth: 340, fontSize: 16, lineHeight: 1.5, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>
+                  {live === 'received' ? 'The kitchen has your order and will start it shortly.' : 'Made to order.'} When you arrive, give your name or order number at the counter.
+                </span>
                 {orderPill}
               </div>
             </div>
           ) : null}
-          {!ready ? (
+          {!ready && !canceled ? (
             <div role="list" aria-label="Order progress" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 10 }}>
               {STEPS.map(([label, k]) => (
                 <div key={label} role="listitem" aria-current={k === 'now' ? 'step' : undefined} style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
@@ -163,7 +203,7 @@ export default function OrderConfirmation({
             </div>
           ) : null}
           {ready ? (
-            <div aria-label="Order status" style={{ ...statusCard, background: '#120B08' }}>
+            <div aria-label="Order status" aria-live="polite" style={{ ...statusCard, background: '#120B08' }}>
               <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: w >= 760 ? '64%' : '100%', overflow: 'hidden' }}>
                 <img src="assets/ready.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '60% 62%' }} />
                 <span style={steam('34%', '46%', 56, 110, 'ccSteamA 5.2s ease-out 0s infinite')} />
@@ -174,9 +214,17 @@ export default function OrderConfirmation({
               </div>
               <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg,rgba(18,11,8,1) 0%,rgba(18,11,8,.88) 34%,rgba(18,11,8,.25) 62%,rgba(18,11,8,0) 80%)' }} />
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, position: 'relative', zIndex: 1 }}>
-                <span style={{ fontWeight: 900, fontSize: 'clamp(38px,5vw,52px)', letterSpacing: '-.05em', lineHeight: 0.95 }}>Ready for pickup</span>
-                <span style={{ maxWidth: 360, fontSize: 16, lineHeight: 1.5, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>Give your name or order number at the counter.</span>
+                <span style={{ fontWeight: 900, fontSize: 'clamp(38px,5vw,52px)', letterSpacing: '-.05em', lineHeight: 0.95 }}>{pickedUp ? 'Picked up' : 'Ready for pickup'}</span>
+                <span style={{ maxWidth: 360, fontSize: 16, lineHeight: 1.5, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>{pickedUp ? 'Thanks for coming in. Enjoy your meal!' : 'Give your name or order number at the counter.'}</span>
                 {orderPill}
+              </div>
+            </div>
+          ) : null}
+          {canceled ? (
+            <div aria-label="Order status" aria-live="polite" style={{ ...statusCard, background: '#F4F4F6', color: '#1A1414' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <span style={{ fontWeight: 900, fontSize: 'clamp(32px,4.5vw,44px)', letterSpacing: '-.05em', lineHeight: 0.95 }}>Order cancelled</span>
+                <span style={{ maxWidth: 420, fontSize: 16, lineHeight: 1.5, color: '#636366' }}>Call us at {SHOP.phoneText} if you have any questions about this order or a refund.</span>
               </div>
             </div>
           ) : null}

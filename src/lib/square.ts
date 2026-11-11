@@ -77,7 +77,7 @@ export interface PayRequest {
   pickupAt?: string;
   expectedTotal: number;
 }
-export interface PayResponse { ok: boolean; message?: string; orderNumber?: string; receiptUrl?: string | null; total?: number; cardBrand?: string | null; cardLast4?: string | null }
+export interface PayResponse { ok: boolean; message?: string; orderId?: string; statusToken?: string; orderNumber?: string; receiptUrl?: string | null; total?: number; cardBrand?: string | null; cardLast4?: string | null }
 
 export async function submitPayment(body: PayRequest): Promise<PayResponse> {
   try {
@@ -104,4 +104,17 @@ export function slotToIso(label: string | undefined): string | undefined {
   d.setHours(h, +m[2], 0, 0);
   if (d.getTime() < Date.now() - 5 * 60 * 1000) d.setDate(d.getDate() + 1);
   return d.toISOString();
+}
+
+export type OrderStage = 'received' | 'preparing' | 'ready' | 'completed' | 'canceled';
+/** Current stage of a placed order, as set by the kitchen in Square POS (null if it can't be checked right now). */
+export async function fetchOrderStage(orderId: string, token: string): Promise<OrderStage | null> {
+  try {
+    const r = await fetch('/api/order-status?id=' + encodeURIComponent(orderId) + '&t=' + encodeURIComponent(token), { cache: 'no-store' });
+    if (!r.ok) return null;
+    const j = (await r.json()) as { stage?: OrderStage };
+    return j.stage || null;
+  } catch {
+    return null;
+  }
 }

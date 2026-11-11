@@ -348,7 +348,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
         return;
       }
       const via = method === 'gpay' ? ' · Google Pay' : method === 'apple' ? ' · Apple Pay' : '';
-      setDone({ no: 'Order #' + String(r.orderNumber || '').toUpperCase(), items: lines.map((l) => ({ ...l })), email: f.email.trim(), phone: f.phone.trim(), name: firstName, when: doneWhen, pay: method, cardBrand: r.cardBrand || undefined, last4: r.cardLast4 || undefined, receiptUrl: r.receiptUrl || undefined });
+      setDone({ no: 'Order #' + String(r.orderNumber || '').toUpperCase(), items: lines.map((l) => ({ ...l })), email: f.email.trim(), phone: f.phone.trim(), name: firstName, when: doneWhen, pay: method, cardBrand: r.cardBrand || undefined, last4: r.cardLast4 || undefined, receiptUrl: r.receiptUrl || undefined, orderId: r.orderId, statusToken: r.statusToken });
       setStep('cart');
       setTried(false);
       setTriedX('');
