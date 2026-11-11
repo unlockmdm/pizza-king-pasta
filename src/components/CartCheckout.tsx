@@ -1026,9 +1026,10 @@ export default function CartCheckout(p: CartCheckoutProps) {
                   Edit
                 </button>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 320, overflow: 'auto' }}>
+              {/* Phones: list every item in full (a small scroll box inside the page cut cards off). Desktop sidebar: cap it so the total stays in view. */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, ...(wide ? { maxHeight: 'min(420px, 45vh)', overflow: 'auto', overscrollBehavior: 'contain' } : {}) }}>
                 {rows.map((l) => (
-                  <div key={l.key} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', padding: 12, borderRadius: 20, background: '#fff' }}>
+                  <div key={l.key} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', padding: 12, borderRadius: 20, background: '#fff', flex: 'none' }}>
                     <div style={{ width: 56, height: 56, flex: 'none', borderRadius: 14, background: '#EFEFF2', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>{thumbBox(l)}</div>
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <span style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.25, textWrap: 'pretty' } as CSSProperties}>{l.name}</span>
