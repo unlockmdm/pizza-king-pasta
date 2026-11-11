@@ -168,6 +168,15 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
   };
 
   const wide = w >= 980;
+  // Phones: sauce and pasta choices as a compact list (small photo, name, price, tick) instead of tall photo cards.
+  const ph = w < 600;
+  const gridS: CSSProperties = ph ? { display: 'flex', flexDirection: 'column', gap: 10 } : S.choiceGrid;
+  const choiceS: CSSProperties = ph ? { ...S.choice, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 10, borderRadius: 20 } : S.choice;
+  const mediaS: CSSProperties = ph ? { ...S.choiceMedia, width: 76, height: 76, aspectRatio: 'auto', flex: 'none', borderRadius: 14 } : S.choiceMedia;
+  const textS: CSSProperties = ph ? { ...S.choiceText, flex: 1, minWidth: 0, padding: 0, gap: 2 } : S.choiceText;
+  const nameS: CSSProperties = ph ? { ...S.choiceName, fontSize: 18 } : S.choiceName;
+  const descS: CSSProperties = ph ? { ...S.choiceDesc, fontSize: 13 } : S.choiceDesc;
+  const tickAt = (on: boolean) => (ph ? <span aria-hidden="true" style={{ flex: 'none', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', background: on ? '#D7192D' : '#fff', boxShadow: on ? 'none' : 'inset 0 0 0 2px #D9D9DE', marginRight: 4 }}>{on ? <IconCheck size={13} stroke={3.6} /> : null}</span> : null);
   const base = BASES.find((b) => b.id === baseId) || BASES[0];
   const sauce = SAUCES.find((x) => x[0] === sauceId) || SAUCES[0];
   // Removals only make sense for what's in this base (e.g. no "No chicken" on veggie pasta).
@@ -242,8 +251,8 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
               <span style={S.stepNum}>01</span>
               <h2 style={S.h2}>Choose your sauce</h2>
             </div>
-            <div role="radiogroup" aria-label="Sauce" style={S.choiceGrid}>
-              {SAUCES.map(([id, name, desc, ph]) => {
+            <div role="radiogroup" aria-label="Sauce" style={gridS}>
+              {SAUCES.map(([id, name, desc, pic]) => {
                 const on = sauceId === id;
                 return (
                   <Hov
@@ -253,17 +262,19 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
                     role="radio"
                     aria-checked={on}
                     onClick={() => pickSauce(id)}
-                    style={{ ...S.choice, boxShadow: on ? RING_ON : RING_OFF, cursor: 'pointer', transition: 'box-shadow .2s,transform .2s' }}
+                    style={{ ...choiceS, boxShadow: on ? RING_ON : RING_OFF, cursor: 'pointer', transition: 'box-shadow .2s,transform .2s' }}
                     hover={S.liftHover}
                   >
-                    <span style={{ ...S.choiceMedia, background: '#EDEDF0' }}>
-                      <span aria-hidden="true" style={{ ...S.sauceImg, backgroundImage: `url('${U(ph, 600)}')`, transform: `scale(${on ? 1.06 : 1})` }} />
-                      <Tick on={on} />
+                    <span style={{ ...mediaS, background: '#EDEDF0' }}>
+                      {/* Local photos (assets/...) as-is; Unsplash ids through U(). */}
+                      <span aria-hidden="true" style={{ ...S.sauceImg, backgroundImage: `url('${pic.indexOf('assets/') === 0 ? pic : U(pic, 600)}')`, transform: `scale(${on && !ph ? 1.06 : 1})` }} />
+                      {ph ? null : <Tick on={on} />}
                     </span>
-                    <span style={S.choiceText}>
-                      <span style={S.choiceName}>{name}</span>
-                      <span style={S.choiceDesc}>{desc}</span>
+                    <span style={textS}>
+                      <span style={nameS}>{name}</span>
+                      <span style={descS}>{desc}</span>
                     </span>
+                    {tickAt(on)}
                   </Hov>
                 );
               })}
@@ -275,7 +286,7 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
               <span style={S.stepNum}>02</span>
               <h2 style={S.h2}>Choose your pasta</h2>
             </div>
-            <div role="radiogroup" aria-label="Pasta" style={S.choiceGrid}>
+            <div role="radiogroup" aria-label="Pasta" style={gridS}>
               {BASES.map((b) => {
                 const p = b.p[sauceId];
                 const ok = p != null;
@@ -290,10 +301,10 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
                     aria-checked={on}
                     aria-disabled={!ok}
                     onClick={() => { if (ok) setBase(b.id); }}
-                    style={{ ...S.choice, boxShadow: on ? RING_ON : RING_OFF, opacity: ok ? 1 : 0.4, cursor: ok ? 'pointer' : 'default', transition: 'box-shadow .2s,transform .2s,opacity .2s' }}
+                    style={{ ...choiceS, boxShadow: on ? RING_ON : RING_OFF, opacity: ok ? 1 : 0.4, cursor: ok ? 'pointer' : 'default', transition: 'box-shadow .2s,transform .2s,opacity .2s' }}
                     hover={ok ? S.liftHover : undefined}
                   >
-                    <span style={{ ...S.choiceMedia, background: b.tint }}>
+                    <span style={{ ...mediaS, background: b.tint }}>
                       {b.ings.map(([f, x, y, iw, r]) => (
                         <span
                           key={f}
@@ -301,21 +312,22 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
                           style={{ ...S.ing, backgroundImage: `url('assets/ingredients/${f}.png')`, left: x + '%', top: y + '%', width: iw + '%', transform: `translate(-50%,-50%) rotate(${r}deg) scale(${zoom})` }}
                         />
                       ))}
-                      <Tick on={on} />
-                      {b.veg ? (
+                      {ph ? null : <Tick on={on} />}
+                      {b.veg && !ph ? (
                         <span style={S.vegBadge}>
                           <span style={S.vegDot} />
                           Veg
                         </span>
                       ) : null}
                     </span>
-                    <span style={{ ...S.choiceText, flex: 1 }}>
+                    <span style={{ ...textS, flex: 1 }}>
                       <span style={S.baseTitleRow}>
-                        <span style={S.choiceName}>{b.name}</span>
+                        <span style={nameS}>{b.name}{b.veg && ph ? <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 800, color: '#12663A', letterSpacing: 0 }}>Veg</span> : null}</span>
                         <span style={S.basePrice}>{ok ? money(p) : ''}</span>
                       </span>
-                      <span style={S.choiceDesc}>{ok ? b.desc : 'Rosé or Alfredo only'}</span>
+                      <span style={descS}>{ok ? b.desc : 'Rosé or Alfredo only'}</span>
                     </span>
+                    {tickAt(on)}
                   </Hov>
                 );
               })}
@@ -323,7 +335,7 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
           </div>
         </div>
 
-        <aside style={{ ...S.aside, position: wide ? 'sticky' : 'relative' }}>
+        <aside style={{ ...S.aside, position: wide ? 'sticky' : 'relative', top: wide ? 96 : undefined }}>
           <div style={{ ...S.bowlMedia, aspectRatio: wide ? '4/3' : '16/10' }}>
             <span role="img" aria-label={title} style={{ ...S.bowlImg, backgroundImage: `url('${img}')` }} />
             <div style={S.bowlShade} />
