@@ -6,6 +6,7 @@ import type { BuilderItem, MenuPageProps, NewLine } from '../lib/types';
 import { Hov, Photo } from '../lib/ui';
 import { useEscape, useWidth } from '../lib/hooks';
 import { pricesFor, SIZE_PRICES, U } from '../lib/catalog';
+import { COMBOS, MENU_SECTIONS, PIZZAS as PIZZA_DATA, SPICES, mustPrice, type LineSpec, type MenuOpt, type MenuRow, type MenuSection } from '../lib/pricing';
 import { money } from '../lib/format';
 import PizzaBuilder from './PizzaBuilder';
 import './MenuPage.css';
@@ -185,98 +186,38 @@ const SCENES: Layer[][] = [
 const SCENE_ALT = ['One large pepperoni pizza', 'Two large pizzas with two dips and two pops', 'Two medium pizzas with two dips and two pops', 'Two small pizzas with two dips'];
 
 /** [key, name, price, description, combo-builder deal id] */
-const WALKINS: [string, string, number, string, string][] = [
-  ['walkin-1l', 'One Large', 11.99, '1 large pizza with 1 topping, wood-fired or conventional oven', 'one-large'],
-  ['walkin-2l', 'Two Large', 36.0, '2 large pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-large'],
-  ['walkin-2m', 'Two Medium', 32.0, '2 medium pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-medium'],
-  ['walkin-2s', 'Two Small', 25.99, '2 small pizzas with 4 toppings each and 2 dips', 'two-small'],
-];
+const WALKINS: [string, string, number, string, string][] = ([
+  ['walkin-1l', '1 large pizza with 1 topping, wood-fired or conventional oven', 'one-large'],
+  ['walkin-2l', '2 large pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-large'],
+  ['walkin-2m', '2 medium pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-medium'],
+  ['walkin-2s', '2 small pizzas with 4 toppings each and 2 dips', 'two-small'],
+] as const).map(([key, desc, deal]) => [key, COMBOS[deal].name, COMBOS[deal].price, desc, deal]);
 
-/** [id, name, description, builder topping ids, vegetarian] */
-const PIZZAS: [string, string, string, string[], boolean?][] = [
-  ['napoli', 'Napoli', 'Anchovies, capers, green olives, oregano', ['anchovies', 'green-olives']],
-  ['four-seasons', 'Four Seasons', 'Ham, mushrooms, artichokes, black olives', ['ham', 'mushrooms', 'olives']],
-  ['italian-veg', 'Italian Vegetarian', 'Grilled zucchini, red peppers, eggplant, red onions', ['zucchini', 'red-pepper', 'eggplant', 'red-onions'], true],
-  ['non-veg', 'Non-Vegetarian', 'Grilled chicken, sausage, hot salami, ham', ['grilled-chicken', 'sausage', 'hot-salami', 'ham']],
-  ['bismark', 'Bismark', 'Sun-dried tomatoes, grilled chicken, sausage', ['sun-dried', 'grilled-chicken', 'sausage']],
-  ['sea-food', 'Sea Food', 'Shrimp, gambari, calamari, salmon', ['shrimp', 'seafood-mix']],
-  ['chicken-shawarma', 'Shawarma Chicken', 'Garlic base, shawarma chicken, hot peppers, red onions', ['shawarma-chicken', 'hot-peppers', 'red-onions']],
-  ['butter-chicken', 'Butter Chicken', 'Tandoori chicken, green peppers, red onions', ['tandoori-chicken', 'green-peppers', 'red-onions']],
-  ['shahi-paneer', 'Shahi Paneer', 'Tandoori paneer, green peppers, red onions, jalapeños', ['paneer', 'green-peppers', 'red-onions', 'jalapenos'], true],
-  ['greek', 'Greek', 'Feta, black olives, tomatoes', ['feta', 'olives', 'tomatoes'], true],
-  ['hawaiian', 'Hawaiian', 'Pineapple, bacon, ham', ['pineapple', 'bacon', 'ham']],
-  ['meat-lover', 'Meat Lover', 'Pepperoni, ham, bacon, sausage', ['pepperoni', 'ham', 'bacon', 'sausage']],
-  ['canadian', 'Canadian', 'Pepperoni, mushrooms, bacon', ['pepperoni', 'mushrooms', 'bacon']],
-  ['tandoori-fish', 'Tandoori Fish', 'Tandoori fish, mushrooms, red onions, green peppers', ['mushrooms', 'red-onions', 'green-peppers']],
-  ['pepperoni', 'Pepperoni', 'Pepperoni and mozzarella', ['pepperoni']],
+/** [id, name, description, builder topping ids, vegetarian]. Toppings come from the shared pricing data. */
+const PIZZA_ROWS: [string, string, string, string[], boolean?][] = [
+  ['napoli', 'Napoli', 'Anchovies, capers, green olives, oregano', []],
+  ['four-seasons', 'Four Seasons', 'Ham, mushrooms, artichokes, black olives', []],
+  ['italian-veg', 'Italian Vegetarian', 'Grilled zucchini, red peppers, eggplant, red onions', [], true],
+  ['non-veg', 'Non-Vegetarian', 'Grilled chicken, sausage, hot salami, ham', []],
+  ['bismark', 'Bismark', 'Sun-dried tomatoes, grilled chicken, sausage', []],
+  ['sea-food', 'Sea Food', 'Shrimp, gambari, calamari, salmon', []],
+  ['chicken-shawarma', 'Shawarma Chicken', 'Garlic base, shawarma chicken, hot peppers, red onions', []],
+  ['butter-chicken', 'Butter Chicken', 'Tandoori chicken, green peppers, red onions', []],
+  ['shahi-paneer', 'Shahi Paneer', 'Tandoori paneer, green peppers, red onions, jalapeños', [], true],
+  ['greek', 'Greek', 'Feta, black olives, tomatoes', [], true],
+  ['hawaiian', 'Hawaiian', 'Pineapple, bacon, ham', []],
+  ['meat-lover', 'Meat Lover', 'Pepperoni, ham, bacon, sausage', []],
+  ['canadian', 'Canadian', 'Pepperoni, mushrooms, bacon', []],
+  ['tandoori-fish', 'Tandoori Fish', 'Tandoori fish, mushrooms, red onions, green peppers', []],
+  ['pepperoni', 'Pepperoni', 'Pepperoni and mozzarella', []],
 ];
+const PIZZAS = PIZZA_ROWS.map(([id, name, desc, , veg]): [string, string, string, string[], boolean?] => [id, name, desc, PIZZA_DATA[id].tops, veg]);
 
-/** [option label, price] — an empty label means a single fixed price. */
-type Opt = [string, number];
-/** [key, name, description, options, asks for spice level] */
-type Row = [string, string, string, Opt[], boolean?];
-/** Spice levels, same options as the shop's Square spice lists. */
-const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
-interface Section { id: string; title: string; rows: Row[] }
-
-const SIZES3 = (p: [number, number, number]): Opt[] => [['Medium', p[0]], ['Large', p[1]], ['X-Large', p[2]]];
-// Prices match the shop's Square catalog (checked Nov 10, 2026). Items not in Square keep their flyer price.
-const SECTIONS: Section[] = [
-  { id: 'tandoori', title: 'Wings & tandoori', rows: [
-    ['wings', 'Tandoori wings', 'Hot, honey garlic or BBQ', [['8 wings', 10], ['12 wings', 12], ['16 wings', 14], ['24 wings', 22], ['34 wings', 31], ['48 wings', 42]], true],
-    ['leg', 'Tandoori chicken leg', 'Per piece', [['', 5]]],
-    ['fish', 'Tandoori fish', 'Per pound', [['1 lb', 12.5], ['1.5 lb', 18.75], ['2 lb', 25]], true],
-  ] },
-  { id: 'sides', title: 'Sides & salads', rows: [
-    ['wedges', 'Potato wedges', '', [['Medium', 8], ['Large', 10]]],
-    ['garlic-bread', 'Garlic bread', 'With or without cheese', [['With cheese', 8.01], ['Without cheese', 6.99]]],
-    ['sub', 'Sub', 'Foot-long, veggie or non-veggie', [['Veggie', 10.18], ['Non-veggie', 11.06]], true],
-    ['nv-salad', 'Non-veg salad', '', [['', 8.99]]],
-    ['v-salad', 'Veg salad', '', [['', 7.99]]],
-    ['corn', 'Sweet corn', 'Roasted in the wood oven', [['', 5]]],
-    ['chaat', 'Fruit chaat', 'With sweet potato', [['', 8.01]]],
-  ] },
-  { id: 'pasta', title: 'Pasta & momos', rows: [
-    ['pasta-rose', 'Rosé sauce pasta', 'Tomato, cream, parmesan, ginger, parsley', [['', 12.5]], true],
-    ['pasta-alfredo', 'Alfredo sauce pasta', 'Cream, parmesan, ginger, parsley', [['', 13]], true],
-    ['veg-pasta-rose', 'Veggie pasta, rosé', 'Green peppers, onions, broccoli, mushrooms', [['', 13.27]], true],
-    ['veg-pasta-tomato', 'Veggie pasta, tomato', 'Green peppers, onions, broccoli, mushrooms', [['', 12.5]], true],
-    ['veg-pasta-alfredo', 'Veggie pasta, Alfredo', 'Green peppers, onions, broccoli, mushrooms', [['', 13.72]], true],
-    ['ch-pasta-rose', 'Chicken pasta, rosé', 'Chicken, green peppers, onions', [['', 14.6]], true],
-    ['ch-pasta-tomato', 'Chicken pasta, tomato', 'Chicken, green peppers, onions', [['', 14]], true],
-    ['ch-pasta-alfredo', 'Chicken pasta, Alfredo', 'Chicken, green peppers, onions', [['', 15.04]], true],
-    ['momos', 'Momos', 'Veggie or non-veggie', [['Veggie', 9], ['Non-veggie', 11]]],
-  ] },
-  { id: 'gelato', title: 'Gelato & shakes', rows: [
-    ['cone', 'Gelato cone', 'Vanilla, mango, pistachio, chocolate and more', [['', 6]]],
-    ['cup', 'Gelato cup', 'Medium cup, choice of flavour', [['', 6]]],
-    ['shake', 'Shake', 'Mango, strawberry, banana, badam, papaya, vanilla, pistachio, black cherry', SIZES3([8.41, 9.29, 11.11])],
-  ] },
-  { id: 'drinks', title: 'Drinks', rows: [
-    ['fruit-juice', 'Fresh fruit juice', 'Mix, orange, pineapple, guava', SIZES3([6.81, 8.01, 10])],
-    ['sugarcane', 'Sugarcane juice', '', SIZES3([6.81, 8.01, 10])],
-    ['lemonade', 'Lemonade', '', SIZES3([5.8, 7, 9])],
-    ['coconut', 'Fresh coconut juice', '', [['', 8.01]]],
-    ['lassi', 'Lassi', 'Mango, mint, strawberry, sweet, salty', [['', 6.8]]],
-    ['espresso', 'Italian espresso', '', [['', 3.1]]],
-    ['hot', 'Hot drinks', 'Indian coffee, cappuccino, hot chocolate, masala tea', [['', 3.1]]],
-    ['pop', 'Pop', 'Coke, Sprite, Canada Dry, Pepsi, Orange Crush', [['Can', 1.99], ['2 L bottle', 5]]],
-    ['water', 'Water', '500 mL bottle', [['', 1.99]]],
-    ['beer', 'Beer', 'Canadian, Molson, Moosehead, Miller, Corona, Heineken, Stella', [['Bottle', 5.7], ['Can', 7.5]]],
-  ] },
-  // Dipping sauces always come last.
-  { id: 'dips', title: 'Dipping sauces', rows: [
-    ['dip-garlic', 'Creamy garlic', '', [['', 1.33]]],
-    ['dip-ranch', 'Ranch', '', [['', 1.33]]],
-    ['dip-chipotle', 'Chipotle', '', [['', 1.33]]],
-    ['dip-jalapeno', 'Jalapeño cheddar', '', [['', 1.33]]],
-    ['dip-marinara', 'Marinara', '', [['', 1.33]]],
-    ['dip-bbq', 'BBQ', '', [['', 1.33]]],
-    ['dip-honey', 'Honey', '', [['', 1.33]]],
-    ['dip-hot', 'Hot wing', '', [['', 1.33]]],
-    ['dip-chutney', 'Green chutney', '', [['', 1.33]]],
-  ] },
-];
+type Opt = MenuOpt;
+type Row = MenuRow;
+type Section = MenuSection;
+// Menu rows and prices come from the shared pricing module (Square is the source of truth).
+const SECTIONS: Section[] = MENU_SECTIONS;
 const NAV: [string, string][] = [['walkin', 'Pickup combos'], ['pizzas', 'Pizzas'], ...SECTIONS.map((s): [string, string] => [s.id, s.title])];
 
 /** Scroll-spy: a section becomes active once its top reaches 140px from the viewport top. */
@@ -375,12 +316,11 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
 
   const rowsOf = (sec: Section): Tile[] =>
     sec.rows.map(([key, name, desc, opts, spicy]) => {
-      const lineOf = ([label, price]: Opt, spice?: string): NewLine => ({
-        key: key + (label ? '-' + label : '') + (spice ? '-' + spice : ''),
-        name: label ? name + ', ' + label.toLowerCase() : name,
-        summary: [desc || sec.title, spice].filter(Boolean).join(' · '),
-        unit: price,
-      });
+      const lineOf = ([label]: Opt, spice?: string): NewLine => {
+        const spec: LineSpec = { k: 'menu', id: key, opt: label, ...(spice ? { spice } : {}) };
+        const q = mustPrice(spec);
+        return { key: key + (label ? '-' + label : '') + (spice ? '-' + spice : ''), name: q.name, summary: q.summary, unit: q.unit, spec };
+      };
       const multi = opts.length > 1 || !!spicy;
       const min = Math.min(...opts.map((o) => o[1]));
       return {

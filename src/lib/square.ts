@@ -1,5 +1,6 @@
 // Browser side of the Square checkout: loads the Web Payments SDK and talks to /api/pay.
 // When the Square env vars are missing (e.g. the GitHub Pages demo build) the checkout stays a demo.
+import type { LineSpec } from './pricing';
 
 const APP_ID = (import.meta.env.VITE_SQUARE_APP_ID as string | undefined) || '';
 const LOCATION_ID = (import.meta.env.VITE_SQUARE_LOCATION_ID as string | undefined) || '';
@@ -69,7 +70,8 @@ export interface PayRequest {
   sourceId: string;
   verificationToken?: string;
   idempotencyKey: string;
-  lines: { name: string; summary?: string; unit: number; qty: number }[];
+  /** Each line's choices by id; the server works out the price, name and kitchen note. */
+  lines: { spec: LineSpec; qty: number }[];
   customer: { name: string; phone: string; email: string };
   note?: string;
   pickupAt?: string;

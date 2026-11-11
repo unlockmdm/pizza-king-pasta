@@ -1,27 +1,13 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { SHOP } from '../lib/catalog';
+import { useEffect } from 'react';
 import { useLockBody } from '../lib/hooks';
+import { canOrderAsap, timeSlots } from '../lib/hours';
 import { Hov, IconArrow, IconCheck, IconClose, Photo } from '../lib/ui';
 import type { Mode } from '../lib/types';
 
-/** Next six half-hour slots (prototype `timeSlots`). When closed, starts at 11:00 AM. */
-export function timeSlots(open: boolean): string[] {
-  const out: string[] = [];
-  const d = new Date();
-  if (!open) {
-    if (d.getHours() >= 2) d.setHours(11, 0, 0, 0);
-  } else {
-    d.setMinutes(d.getMinutes() < 30 ? 30 : 60, 0, 0);
-    d.setMinutes(d.getMinutes() + 30);
-  }
-  for (let i = 0; i < 6; i++) {
-    const hh = d.getHours();
-    if (open && hh >= 2 && hh < 11) break;
-    out.push(d.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' }).replace('a.m.', 'AM').replace('p.m.', 'PM'));
-    d.setMinutes(d.getMinutes() + 30);
-  }
-  return out;
-}
+// Pickup times come from the shared hours module (Toronto time), which the payment server also checks.
+export { timeSlots } from '../lib/hours';
 
 const LABEL: CSSProperties = { fontSize: 12, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#818184' };
 
@@ -44,8 +30,16 @@ export default function StartSheet({
   useLockBody(true);
   const sheet = w < 560;
   const wide = w >= 820;
-  const slots = timeSlots(open);
-  const later = when !== 'asap' || !open;
+  void open;
+  const asapOk = canOrderAsap();
+  const slots = timeSlots();
+  const later = when !== 'asap' || !asapOk;
+  // Keep the saved choice valid: no ASAP while closed, and no pickup time that has passed.
+  useEffect(() => {
+    if (!asapOk && !slots.includes(when)) setWhen(slots[0] || 'asap');
+    else if (asapOk && when !== 'asap' && !slots.includes(when)) setWhen('asap');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const isPickup = wMode === 'pickup';
 
   return (
@@ -119,16 +113,25 @@ export default function StartSheet({
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <span style={LABEL}>When</span>
             <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid #E4E4E7', borderRadius: 16, overflow: 'hidden' }}>
-              <WhenRow bg={later ? '#fff' : '#F8F8FB'} on={!later} title={open ? 'As soon as possible' : 'Next available'} sub={open ? '' : '11:00 AM'} onClick={() => setWhen('asap')} />
-              <WhenRow
-                bg={later ? '#F8F8FB' : '#fff'}
-                on={later}
-                border
-                title="Schedule for later"
-                sub={later && when !== 'asap' ? when : 'Pick a time'}
-                onClick={() => setWhen(when === 'asap' ? slots[0] || 'asap' : when)}
-              />
-              {later && (
+              {asapOk ? (
+                <WhenRow bg={later ? '#fff' : '#F8F8FB'} on={!later} title="As soon as possible" sub="" onClick={() => setWhen('asap')} />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '14px 16px', background: '#FFF8E6' }}>
+                  <span style={{ fontWeight: 800, fontSize: 15, color: '#1A1414' }}>We{'’'}re closed right now</span>
+                  <span style={{ fontSize: 13, color: '#636366' }}>Open every day, {SHOP.hoursText}. Choose a pickup time below.</span>
+                </div>
+              )}
+              {asapOk && slots.length ? (
+                <WhenRow
+                  bg={later ? '#F8F8FB' : '#fff'}
+                  on={later}
+                  border
+                  title="Schedule for later"
+                  sub={later && when !== 'asap' ? when : 'Pick a time'}
+                  onClick={() => setWhen(when === 'asap' ? slots[0] || 'asap' : when)}
+                />
+              ) : null}
+              {later && slots.length > 0 && (
                 <div style={{ padding: '2px 16px 16px', background: '#F8F8FB', display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 8 }}>
                   {slots.map((t) => {
                     const on = when === t;

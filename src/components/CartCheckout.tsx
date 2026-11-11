@@ -2,8 +2,10 @@
 // Floating cart bar, cart drawer, checkout and the order-placed confirmation.
 import { useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 import type { CartCheckoutProps, CartLine, Mode } from '../lib/types';
-import { HST, SHOP } from '../lib/catalog';
-import { CARD_STYLE, isSafari, loadSquare, newKey, slotToIso, SQUARE_ENABLED, SQUARE_SANDBOX, submitPayment, type SqCard, type SqCardEvent, type SqCardState, type SqPaymentRequest, type SqWallet } from '../lib/square';
+import { SHOP } from '../lib/catalog';
+import { canOrderAsap, isValidWhen, slotToIso } from '../lib/hours';
+import { UPSELLS as UPSELL_DATA, mustPrice, orderTotals, type LineSpec } from '../lib/pricing';
+import { CARD_STYLE, isSafari, loadSquare, newKey, SQUARE_ENABLED, SQUARE_SANDBOX, submitPayment, type SqCard, type SqCardEvent, type SqCardState, type SqPaymentRequest, type SqWallet } from '../lib/square';
 import { money } from '../lib/format';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
@@ -35,10 +37,9 @@ interface Upsell {
   flavours: string[];
 }
 // Upsells ask for a flavour before adding, so the kitchen always knows what to make.
-const UPSELLS: Upsell[] = [
-  { key: 'fruit-juice', name: 'Fresh fruit juice', unit: 6.81, img: 'assets/menu/juice-mix.png', summary: 'Medium', flavours: ['Orange', 'Pineapple', 'Guava', 'Mix'] },
-  { key: 'gelato-cone', name: 'Gelato cone', unit: 6, img: 'assets/menu/gelato.jpg', summary: '', flavours: ['Vanilla', 'Mango', 'Strawberry', 'Banana', 'Pistachio', 'Black cherry', 'Cappuccino', 'Chocolate', 'Red velvet', 'Rum & raisin'] },
-];
+// Names, prices and flavours come from the shared pricing module; only the photos live here.
+const UPSELL_IMG: Record<string, string> = { 'fruit-juice': 'assets/menu/juice-mix.png', 'gelato-cone': 'assets/menu/gelato.jpg' };
+const UPSELLS: Upsell[] = UPSELL_DATA.map((u) => ({ ...u, img: UPSELL_IMG[u.key] || '' }));
 
 const TIP_PRESETS = [0, 10, 15, 18] as const;
 const DEFAULT_TIP = 15;
@@ -162,13 +163,14 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const mode: Mode = p.mode === 'delivery' ? 'delivery' : 'pickup';
   const pickup = mode === 'pickup';
   const count = lines.reduce((a, l) => a + l.qty, 0);
-  const sub = lines.reduce((a, l) => a + l.qty * l.unit, 0);
-  // Delivery goes through DoorDash / Uber Eats, so this checkout only ever charges pickup orders.
-  const fee = 0;
-  const tax = (sub + fee) * HST;
+  // Delivery goes through DoorDash / Uber Eats, so this checkout only ever charges pickup orders (no fee, no tip).
+  // Totals come from the shared pricing module, which rounds HST exactly like the Square order that gets charged.
+  const totals = orderTotals(lines);
+  const sub = totals.sub;
+  const tax = totals.tax;
   const tipAmt = 0;
   void tip; void setTip;
-  const grand = sub + fee + tax + tipAmt;
+  const grand = totals.total;
 
   const set = (k: FieldKey) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const v = e.target.value;
@@ -227,6 +229,14 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const setMode = (m: Mode) => p.onMode(m);
   // Owner rule: no wait-time estimates. Timing is ASAP (or scheduled from the start sheet).
   const doneWhen = p.when && p.when !== 'asap' ? p.when : 'As soon as possible';
+  // Opening hours: ASAP only while open, and a scheduled time must still be offered (the server checks too).
+  const timeOk = isValidWhen(p.when);
+  const timeMsg = timeOk
+    ? ''
+    : !p.when || p.when === 'asap'
+      ? 'We\u2019re closed right now. We\u2019re open every day, ' + SHOP.hoursText + '. Choose a pickup time to continue.'
+      : 'Your pickup time (' + p.when + ') is no longer available. Choose a new time to continue.';
+  const goToTime = () => requestAnimationFrame(() => document.getElementById('cc-when')?.scrollIntoView({ block: 'center', behavior: 'smooth' }));
   const where = pickup ? SHOP.street : f.street + (f.unit ? ', ' + f.unit : '');
   const firstName = f.name.split(' ')[0];
 
@@ -287,6 +297,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
 
   const charge = async (method: 'card' | 'gpay' | 'apple') => {
     if (busy || !count) return;
+    if (!isValidWhen(p.when)) { setTried(true); goToTime(); return; }
     if (method === 'card') {
       // Check the card too, so every problem shows at once (not one per tap).
       cardForce.current = true;
@@ -323,11 +334,12 @@ export default function CartCheckout(p: CartCheckoutProps) {
       const r = await submitPayment({
         sourceId: t.token,
         idempotencyKey: payKey.current,
-        lines: lines.map((l) => ({ name: l.name, summary: l.summary, unit: l.unit, qty: l.qty })),
+        // Only what was chosen and how many: the server prices every line itself.
+        lines: lines.map((l) => ({ spec: l.spec, qty: l.qty })),
         customer: { name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim() },
         note: f.note.trim() || undefined,
         pickupAt: slotToIso(p.when),
-        expectedTotal: Math.round(grand * 100),
+        expectedTotal: totals.totalCents,
       });
       payKey.current = newKey();
       if (!r.ok) {
@@ -647,7 +659,9 @@ export default function CartCheckout(p: CartCheckoutProps) {
                               <button
                                 key={f}
                                 onClick={() => {
-                                  p.onAdd({ key: pickU.key + '-' + f.toLowerCase().replace(/[^a-z]+/g, '-'), name: pickU.name, summary: [pickU.summary, f].filter(Boolean).join(' · '), unit: pickU.unit });
+                                  const spec: LineSpec = { k: 'upsell', id: pickU.key, flavour: f };
+                                  const q = mustPrice(spec);
+                                  p.onAdd({ key: pickU.key + '-' + f.toLowerCase().replace(/[^a-z]+/g, '-'), name: q.name, summary: q.summary, unit: q.unit, spec });
                                   setUpPick(null);
                                 }}
                                 style={{ height: 38, padding: '0 14px', borderRadius: 999, border: '1px solid #E4E4E7', background: '#fff', color: '#1A1414', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
@@ -738,7 +752,26 @@ export default function CartCheckout(p: CartCheckoutProps) {
                       </span>
                     </div>
                   ) : null}
+                  {pickup ? (
+                    <div id="cc-when" style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '0 18px', minHeight: 60, boxShadow: '0 -1px 0 #EFEFF2', scrollMarginTop: 90 }}>
+                      <span style={{ width: lblW, flex: 'none', fontSize: 15, fontWeight: 700, color: '#1A1414' }}>When</span>
+                      <span style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: 600, color: timeOk ? '#1A1414' : '#C11425' }}>
+                        {timeOk ? doneWhen : canOrderAsap() ? 'Choose a time' : 'Closed now'}
+                      </span>
+                      {p.onChangeTime ? (
+                        <button onClick={p.onChangeTime} style={{ flex: 'none', height: 36, padding: '0 14px', borderRadius: 999, border: '1px solid #E4E4E7', background: '#fff', color: '#1A1414', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                          Change
+                        </button>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
+                {timeMsg ? (
+                  <span role="alert" style={{ ...fieldErr, marginTop: 10, background: '#FDECEE', borderRadius: 12, padding: '10px 12px' }}>
+                    <ErrIcon />
+                    {timeMsg}
+                  </span>
+                ) : null}
                 {err.street ? <span style={errText}>Enter an address.</span> : null}
               </section>
 
@@ -1079,10 +1112,10 @@ export default function CartCheckout(p: CartCheckoutProps) {
 
           {!wide && pickup ? (
             <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 10, display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 16px calc(12px + env(safe-area-inset-bottom))', background: pageBgA, backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', boxShadow: '0 -1px 0 rgba(26,20,20,.06)' }}>
-              {tried && (missing.length || cardErr) ? (
+              {tried && (!timeOk || missing.length || cardErr) ? (
                 <span role="status" style={{ ...fieldErr, justifyContent: 'center' }}>
                   <ErrIcon />
-                  {missing.length ? 'Add your ' + joinList(missing) + ' to place your order.' : cardErr}
+                  {!timeOk ? 'Choose a pickup time to place your order.' : missing.length ? 'Add your ' + joinList(missing) + ' to place your order.' : cardErr}
                 </span>
               ) : null}
               <button

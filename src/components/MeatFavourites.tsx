@@ -6,6 +6,7 @@ import type { BuilderItem, MeatFavouritesProps, NewLine, SizeKey } from '../lib/
 import { Hov, Photo } from '../lib/ui';
 import { SIZE_NAMES, SIZE_PRICES, U, creditOf, pricesFor } from '../lib/catalog';
 import { money } from '../lib/format';
+import { PIZZAS as PIZZA_DATA, mustPrice, type LineSpec } from '../lib/pricing';
 import { useWidth } from '../lib/hooks';
 
 // ---------- Data (the prototype's const arrays are the spec) ----------
@@ -26,17 +27,20 @@ interface MeatPizza {
   tag?: string;
 }
 
-const PIZZAS: MeatPizza[] = [
-  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', tops: ['pepperoni', 'ham', 'bacon', 'sausage'], pic: '1692737580547-b45bb4a02356', by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
-  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', tops: ['tandoori-chicken', 'green-peppers', 'red-onions'], pic: '1604382354936-07c5d9983bd3', by: 'Shourav Sheikh', h: 'shouravsheikh', chicken: true },
-  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', tops: ['shawarma-chicken', 'hot-peppers', 'red-onions'], pic: '1590947132387-155cc02f3212', by: 'Vit Ch', h: 'v_uk_europe', chicken: true, tag: 'Spicy' },
-  { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', tops: ['grilled-chicken', 'sausage', 'hot-salami', 'ham'], pic: '1593560708920-61dd98c46a4e', by: 'Saundarya Srinivasan', h: 'saundiii', chicken: true, cured: true },
-  { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', tops: ['pepperoni'], pic: '1611915365928-565c527a0590', by: 'Tamas Pap', h: 'tamasp', cured: true },
-  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', tops: ['pepperoni', 'mushrooms', 'bacon'], pic: '1565299624946-b28f40a0ae38', by: 'Chad Montano', h: 'briewilly', cured: true },
-  { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', tops: ['pineapple', 'bacon', 'ham'], pic: '1594007654729-407eedc4be65', by: 'Saahil Khatkhate', h: 'saahilkhatkhate', cured: true },
-  { id: 'bismark', name: 'Bismark', desc: 'Sun-dried tomatoes, grilled chicken, sausage', tops: ['sun-dried', 'grilled-chicken', 'sausage'], pic: '1655673654158-9f7285b7d1ea', by: 'RUSU CIPRIAN', h: 'tehnosign', chicken: true, cured: true },
-  { id: 'four-seasons', name: 'Four Seasons', desc: 'Ham, mushrooms, artichokes, black olives', tops: ['ham', 'mushrooms', 'olives'], pic: '1604382355076-af4b0eb60143', by: 'Shourav Sheikh', h: 'shouravsheikh', cured: true },
+const PIZZA_LIST: Omit<MeatPizza, 'tops'>[] = [
+  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', pic: '1692737580547-b45bb4a02356', by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
+  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', pic: '1604382354936-07c5d9983bd3', by: 'Shourav Sheikh', h: 'shouravsheikh', chicken: true },
+  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', pic: '1590947132387-155cc02f3212', by: 'Vit Ch', h: 'v_uk_europe', chicken: true, tag: 'Spicy' },
+  { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', pic: '1593560708920-61dd98c46a4e', by: 'Saundarya Srinivasan', h: 'saundiii', chicken: true, cured: true },
+  { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', pic: '1611915365928-565c527a0590', by: 'Tamas Pap', h: 'tamasp', cured: true },
+  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', pic: '1565299624946-b28f40a0ae38', by: 'Chad Montano', h: 'briewilly', cured: true },
+  { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', pic: '1594007654729-407eedc4be65', by: 'Saahil Khatkhate', h: 'saahilkhatkhate', cured: true },
+  { id: 'bismark', name: 'Bismark', desc: 'Sun-dried tomatoes, grilled chicken, sausage', pic: '1655673654158-9f7285b7d1ea', by: 'RUSU CIPRIAN', h: 'tehnosign', chicken: true, cured: true },
+  { id: 'four-seasons', name: 'Four Seasons', desc: 'Ham, mushrooms, artichokes, black olives', pic: '1604382355076-af4b0eb60143', by: 'Shourav Sheikh', h: 'shouravsheikh', cured: true },
 ];
+
+/** House toppings come from the shared pricing data (they set the included topping count). */
+const PIZZAS: MeatPizza[] = PIZZA_LIST.map((p) => ({ ...p, tops: PIZZA_DATA[p.id].tops }));
 
 type FilterId = 'all' | 'chicken' | 'cured';
 const FILTERS: [FilterId, string, (p: MeatPizza) => boolean][] = [
@@ -64,11 +68,14 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const add = (p: MeatPizza, size: SizeKey) => {
+    const spec: LineSpec = { k: 'house', id: p.id, size };
+    const q = mustPrice(spec);
     const line: NewLine = {
       key: [p.id, size, 'regular', 'house'].join('-'),
-      name: SIZE_NAMES[size] + ' ' + p.name,
-      summary: 'Regular crust · house toppings',
-      unit: pricesFor(p.id)[size],
+      name: q.name,
+      summary: q.summary,
+      unit: q.unit,
+      spec,
     };
     onAdd(line, 1);
     window.clearTimeout(timer.current);

@@ -1,6 +1,7 @@
 // Order confirmation ("Order placed") — the approved design from CartCheckout.dc.html (handoff v2).
 import type { CSSProperties } from 'react';
-import { HST, SHOP } from '../lib/catalog';
+import { SHOP } from '../lib/catalog';
+import { orderTotals } from '../lib/pricing';
 import { money } from '../lib/format';
 import { useLockBody, useWidth } from '../lib/hooks';
 import type { CartLine } from '../lib/types';
@@ -75,8 +76,8 @@ export default function OrderConfirmation({
   const w = useWidth();
   const ready = stage === 'ready';
   const items = done.items || [];
-  const sub = items.reduce((a, l) => a + l.qty * l.unit, 0);
-  const tax = sub * HST;
+  // Same rounding as the charged Square order (see orderTotals).
+  const { sub, tax } = orderTotals(items);
   const count = items.reduce((a, l) => a + l.qty, 0);
   const noShort = done.no.replace('Order ', '');
   const whenLine = ready ? 'Ready now' : /soon/i.test(done.when) ? 'Ready as soon as possible' : 'Ready at ' + done.when;

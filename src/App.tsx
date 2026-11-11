@@ -11,6 +11,7 @@ import PastaPage from './components/PastaPage';
 import PizzaBuilder, { preloadPizzaImages } from './components/PizzaBuilder';
 import { creditOf, isShopOpen, pricesFor, SIZE_PRICES } from './lib/catalog';
 import { money } from './lib/format';
+import { MAX_QTY, priceLine } from './lib/pricing';
 import { useWidth } from './lib/hooks';
 import type { BuilderItem, CartLine, Mode, NewLine } from './lib/types';
 import { BASE_TOPS, BYO, DEALS, SPECIALS, type Tile } from './shell/data';
@@ -18,6 +19,7 @@ import Footer from './shell/Footer';
 import Header from './shell/Header';
 import HomeSections from './shell/HomeSections';
 import StartSheet from './shell/StartSheet';
+import { isValidWhen } from './lib/hours';
 import { AddedToast, InfoToast, type Added } from './shell/Toasts';
 
 type View = 'home' | 'menu' | 'pasta' | 'meat' | 'wings' | 'juice' | 'gelato' | 'terms' | 'privacy';
@@ -55,6 +57,21 @@ function guessImg(t: string) {
   return '';
 }
 
+/**
+ * Re-price a saved cart with the shared pricing module. Lines saved before cart lines carried a
+ * `spec` (or whose spec no longer prices, e.g. an item was removed) are dropped, so they never reach checkout.
+ */
+function repriceSaved(saved: unknown[]): CartLine[] {
+  const out: CartLine[] = [];
+  for (const l of saved as Partial<CartLine>[]) {
+    if (!l || typeof l.key !== 'string' || !Number.isInteger(l.qty) || (l.qty as number) < 1) continue;
+    const q = priceLine(l.spec);
+    if ('error' in q) continue;
+    out.push({ ...(l as CartLine), name: q.name, summary: q.summary, unit: q.unit, qty: Math.min(l.qty as number, MAX_QTY) });
+  }
+  return out;
+}
+
 type SavedMode = { mode: Mode; addr: string; when: string } | null;
 
 export default function App() {
@@ -64,10 +81,14 @@ export default function App() {
   // The site is pickup-only (delivery goes through DoorDash / Uber Eats).
   const [mode, setMode] = useState<Mode | null>(saved ? 'pickup' : null);
   const [addr, setAddr] = useState(saved?.addr ?? '');
-  const [when, setWhen] = useState(saved?.when ?? 'asap');
+  // A pickup time saved on an earlier visit may have passed; fall back to ASAP (checkout asks for a time if closed).
+  const [when, setWhen] = useState(() => {
+    const w = saved?.when ?? 'asap';
+    return w === 'asap' || isValidWhen(w) ? w : 'asap';
+  });
   const [cart, setCart] = useState<CartLine[]>(() => {
     const c = readJSON<unknown>(CART_KEY, []);
-    return Array.isArray(c) ? (c as CartLine[]) : [];
+    return Array.isArray(c) ? repriceSaved(c) : [];
   });
   const [cartOpen, setCartOpen] = useState(false);
   const [view, setViewState] = useState<View>(viewFromUrl);
@@ -183,7 +204,7 @@ export default function App() {
     const q = n || 1;
     setCart((c) => {
       const i = c.findIndex((l) => l.key === line.key);
-      if (i >= 0) return c.map((l, j) => (j === i ? { ...l, qty: l.qty + q } : l));
+      if (i >= 0) return c.map((l, j) => (j === i ? { ...l, qty: Math.min(50, l.qty + q) } : l));
       return [...c, { ...line, qty: q }];
     });
     clearTimeout(addedT.current);
@@ -199,12 +220,14 @@ export default function App() {
     addedT.current = window.setTimeout(() => setAdded(null), 3800);
     flyDot(q);
   };
-  const changeQty = (key: string, d: number) => setCart((c) => c.map((l) => (l.key === key ? { ...l, qty: l.qty + d } : l)).filter((l) => l.qty > 0));
+  // Quantities stay between 1 and 50 (the payment server rejects more).
+  const changeQty = (key: string, d: number) => setCart((c) => c.map((l) => (l.key === key ? { ...l, qty: Math.min(50, l.qty + d) } : l)).filter((l) => l.qty > 0));
 
   // ---- start sheet ----
   // "Start your order" on the homepage: ask pickup/time only once. After that it goes straight to the menu.
   const thenMenu = useRef(false);
-  const openStart = (tab: Mode = 'pickup') => { thenMenu.current = false; setWMode(tab); setAddrErr(''); setWelcome(true); };
+  const reopenCart = useRef(false);
+  const openStart = (tab: Mode = 'pickup') => { thenMenu.current = false; reopenCart.current = false; setWMode(tab); setAddrErr(''); setWelcome(true); };
   const startOrder = () => {
     if (mode) { scrollToId('menu'); return; }
     openStart();
@@ -216,6 +239,7 @@ export default function App() {
     setAddrErr('');
     showToast('Pickup' + (when === 'asap' ? ', as soon as possible' : ' at ' + when));
     if (thenMenu.current) { thenMenu.current = false; setTimeout(() => scrollToId('menu'), 250); }
+    if (reopenCart.current) { reopenCart.current = false; setTimeout(() => setCartOpen(true), 200); }
   };
 
   // ---- combos (pickup only) ----
@@ -346,6 +370,7 @@ export default function App() {
         onMode={() => setMode('pickup')}
         onBrowse={() => { setCartOpen(false); goSection('bestsellers')(); }}
         onPlaced={() => { setCart([]); setCartOpen(false); }}
+        onChangeTime={() => { setCartOpen(false); openStart(); reopenCart.current = true; }}
         when={when}
       />
     </>

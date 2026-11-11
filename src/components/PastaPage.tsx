@@ -6,6 +6,7 @@ import { Hov, Photo, IconBack, IconCheck, IconMinus, IconPlus } from '../lib/ui'
 import { useWidth } from '../lib/hooks';
 import { U } from '../lib/catalog';
 import { money } from '../lib/format';
+import { MOMOS as MOMO_DATA, PASTA_BASES, PASTA_SAUCES, SPICES as SPICE_LIST, mustPrice, type LineSpec } from '../lib/pricing';
 
 // ---------- Data (the prototype's `const` arrays are the spec) ----------
 
@@ -14,11 +15,13 @@ type BaseId = 'classic' | 'veggie' | 'chicken';
 
 /** [id, name, description, Unsplash photo id] */
 type Sauce = readonly [id: SauceId, name: string, desc: string, photo: string];
-const SAUCES: readonly Sauce[] = [
-  ['rose', 'Rosé', 'Tomato, cream, parmesan', 'assets/menu/pasta-rose.png'],
-  ['alfredo', 'Alfredo', 'Cream, parmesan', 'assets/menu/pasta-alfredo.png'],
-  ['tomato', 'Tomato', 'Tomato sauce', '1598866594230-a7c12756260f'],
-];
+const SAUCE_UI: Record<SauceId, [desc: string, photo: string]> = {
+  rose: ['Tomato, cream, parmesan', 'assets/menu/pasta-rose.png'],
+  alfredo: ['Cream, parmesan', 'assets/menu/pasta-alfredo.png'],
+  tomato: ['Tomato sauce', '1598866594230-a7c12756260f'],
+};
+// Names and prices come from the shared pricing module.
+const SAUCES: readonly Sauce[] = PASTA_SAUCES.map(([id, name]): Sauce => [id, name, ...SAUCE_UI[id]]);
 
 interface Base {
   id: BaseId;
@@ -32,11 +35,12 @@ interface Base {
   /** Price per sauce. A missing sauce means the base isn't offered with it. */
   p: Partial<Record<SauceId, number>>;
 }
-const BASES: readonly Base[] = [
-  { id: 'classic', name: 'Classic', tint: '#F6F0E4', ings: [['ginger', 34, 44, 46, -12], ['coriander', 68, 58, 44, 18]], desc: 'Ginger and parsley', p: { rose: 12.5, alfredo: 13 } },
-  { id: 'veggie', name: 'Veggie', veg: true, tint: '#EAF3E6', ings: [['broccoli', 30, 36, 36, -10], ['mushrooms', 70, 34, 34, 14], ['green-peppers', 34, 70, 36, 8], ['red-onions', 70, 70, 34, -16]], desc: 'Green peppers, onions, broccoli, mushrooms', p: { rose: 13.27, tomato: 12.5, alfredo: 13.72 } },
-  { id: 'chicken', name: 'Chicken', tint: '#F7ECE4', ings: [['tandoori-chicken', 46, 48, 52, -6], ['green-peppers', 78, 30, 30, 20], ['red-onions', 78, 72, 30, -12]], desc: 'Chicken, green peppers, onions', p: { rose: 14.6, tomato: 14, alfredo: 15.04 } },
-];
+const BASE_UI: Record<BaseId, Pick<Base, 'veg' | 'tint' | 'ings'>> = {
+  classic: { tint: '#F6F0E4', ings: [['ginger', 34, 44, 46, -12], ['coriander', 68, 58, 44, 18]] },
+  veggie: { veg: true, tint: '#EAF3E6', ings: [['broccoli', 30, 36, 36, -10], ['mushrooms', 70, 34, 34, 14], ['green-peppers', 34, 70, 36, 8], ['red-onions', 70, 70, 34, -16]] },
+  chicken: { tint: '#F7ECE4', ings: [['tandoori-chicken', 46, 48, 52, -6], ['green-peppers', 78, 30, 30, 20], ['red-onions', 78, 72, 30, -12]] },
+};
+const BASES: readonly Base[] = PASTA_BASES.map((b) => ({ ...b, ...BASE_UI[b.id] }));
 
 /** Bowl photo per `${base}-${sauce}`; falls back to the sauce photo. */
 const PHOTO: Partial<Record<`${BaseId}-${SauceId}`, string>> = {
@@ -45,12 +49,9 @@ const PHOTO: Partial<Record<`${BaseId}-${SauceId}`, string>> = {
 
 type MomoId = 'veg' | 'nonveg';
 /** Spice level, same options as the shop's Square "Pasta Spice Level" list. */
-const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
+const SPICES = SPICE_LIST;
 
-const MOMOS: readonly (readonly [id: MomoId, name: string, price: number])[] = [
-  ['veg', 'Veggie', 9],
-  ['nonveg', 'Non-veggie', 11],
-];
+const MOMOS: readonly (readonly [id: MomoId, name: string, price: number])[] = MOMO_DATA;
 
 const HERO_IMG = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?fm=jpg&q=72&w=1200&auto=format&fit=crop';
 const HERO_IMG_WIDE = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?fm=jpg&q=72&w=1400&auto=format&fit=crop';
@@ -180,12 +181,16 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
     setBase((cur) => (BASES.find((b) => b.id === cur)?.p[id] != null ? cur : 'veggie'));
   };
   const add = () => {
-    onAdd?.({ key: 'pasta-' + baseId + '-' + sauceId + '-' + spice, name: title, summary: base.desc + ' · ' + spice, unit: price }, qty);
+    const spec: LineSpec = { k: 'pasta', base: baseId, sauce: sauceId, spice };
+    const q = mustPrice(spec);
+    onAdd?.({ key: 'pasta-' + baseId + '-' + sauceId + '-' + spice, name: q.name, summary: q.summary, unit: q.unit, spec }, qty);
     flash(() => { setAdded(true); setQty(1); });
   };
   const addMomo = () => {
     const m = momoSel;
-    onAdd?.({ key: 'momos-' + m[0], name: m[1] + ' momos', summary: 'Steamed dumplings', unit: m[2] }, 1);
+    const spec: LineSpec = { k: 'momo', id: m[0] };
+    const q = mustPrice(spec);
+    onAdd?.({ key: 'momos-' + m[0], name: q.name, summary: q.summary, unit: q.unit, spec }, 1);
     flash(() => setAddedM(m[0]));
   };
 

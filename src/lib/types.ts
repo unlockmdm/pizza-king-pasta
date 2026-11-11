@@ -1,4 +1,5 @@
 // Shared types. Component prop interfaces live here so every screen is coded against the same contract.
+import type { LineSpec } from './pricing';
 
 export type Mode = 'pickup' | 'delivery';
 export type SizeKey = 'S' | 'M' | 'L' | 'XL';
@@ -9,9 +10,11 @@ export interface CartLine {
   key: string;
   name: string;
   summary?: string;
-  /** Unit price in dollars. */
+  /** Unit price in dollars. Always equals `priceLine(spec).unit` (the server re-prices from `spec`). */
   unit: number;
   qty: number;
+  /** What was chosen, by id. The checkout sends this (not the price) and the server prices it. */
+  spec: LineSpec;
   /** Optional thumbnail. If omitted, the shell guesses one from the name. */
   img?: string;
   /** Free-form detail (e.g. chosen toppings) for the receipt / future Square order. */
@@ -156,6 +159,8 @@ export interface CartCheckoutProps {
   onBrowse: () => void;
   /** Order placed: shell clears the cart. */
   onPlaced: () => void;
+  /** Reopen the pickup-time sheet (closed shop, or the chosen time has passed). */
+  onChangeTime?: () => void;
   /** Pickup time from the start sheet: 'asap' or a slot label like "7:30 PM". */
   when?: string;
 }

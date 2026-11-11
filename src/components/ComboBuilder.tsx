@@ -1,30 +1,19 @@
 // Port of design_handoff_pizza_king_website/prototype/ComboBuilder.dc.html
 // Pickup combo builder: full-screen sheet. Pizzas open the Pizza Builder in "combo" mode.
 import { useState, type CSSProperties } from 'react';
-import type { ComboBuilderProps, ComboContext, NewLine, PizzaConfig, SizeKey } from '../lib/types';
-import { SIZE_NAMES } from '../lib/catalog';
+import type { ComboBuilderProps, ComboContext, NewLine, PizzaConfig } from '../lib/types';
+import { COMBOS, COMBO_DIPS, COMBO_POPS, COMBO_SIDES, EXTRA_DIP, SIZE_NAMES, comboPizzaBits, mustPrice, pizzaOptsOf, type LineSpec, type PizzaOpts } from '../lib/pricing';
 import { money } from '../lib/format';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody } from '../lib/hooks';
 import PizzaBuilder from './PizzaBuilder';
 
 // ---------- Spec data (from the prototype; these arrays are the spec) ----------
-const EXTRA_DIP = 1.33; // Square: dipping sauce $1.33
-const MAX_DIPS = 8;
-
-type DipId = 'garlic' | 'ranch' | 'chipotle' | 'jalapeno-cheddar' | 'marinara';
-const DIPS: [DipId, string][] = [
-  ['garlic', 'Creamy garlic'],
-  ['ranch', 'Ranch'],
-  ['chipotle', 'Chipotle'],
-  ['jalapeno-cheddar', 'Jalapeño cheddar'],
-  ['marinara', 'Marinara'],
-];
-
-type PopName = 'Coca-Cola' | 'Pepsi' | 'Sprite' | 'Canada Dry' | 'Orange Crush';
-const POPS: PopName[] = ['Coca-Cola', 'Pepsi', 'Sprite', 'Canada Dry', 'Orange Crush'];
+// Combo contents and prices (deal price, included toppings/dips/pops, EXTRA_DIP) come from the shared pricing module.
+const DIPS = COMBO_DIPS;
+const POPS = COMBO_POPS;
 /** Trimmed, same-height cans. */
-const POP_IMG: Record<PopName, string> = {
+const POP_IMG: Record<string, string> = {
   'Coca-Cola': 'n-coke.png',
   Pepsi: 'n-pepsi.png',
   Sprite: 'n-sprite.png',
@@ -32,27 +21,15 @@ const POP_IMG: Record<PopName, string> = {
   'Orange Crush': 'n-crush.png',
 };
 
-type SideId = 'sugarcane' | 'corn';
-/** [id, name, img, worth, desc] */
-const SIDES: [SideId, string, string, string, string][] = [
-  ['sugarcane', 'Sugarcane juice', 'assets/menu/juice-mix.png', '$6.81', 'Served cold'],
-  ['corn', 'Wood-oven corn', 'assets/ingredients/corn.jpg', '$5.00', 'Sweet corn from the wood oven'],
-];
-
-interface Spec {
-  size: SizeKey;
-  pizzas: number;
-  tops: number;
-  dips: number;
-  pops: number;
-  side: boolean;
-}
-const SPEC: Record<string, Spec> = {
-  'one-large': { size: 'L', pizzas: 1, tops: 1, dips: 0, pops: 0, side: false },
-  'two-large': { size: 'L', pizzas: 2, tops: 4, dips: 2, pops: 2, side: true },
-  'two-medium': { size: 'M', pizzas: 2, tops: 4, dips: 2, pops: 2, side: true },
-  'two-small': { size: 'S', pizzas: 2, tops: 4, dips: 2, pops: 0, side: false },
+type SideId = string;
+/** Side visuals: [img, worth (the side's menu price), desc] by side id. */
+const SIDE_UI: Record<string, [string, string, string]> = {
+  sugarcane: ['assets/menu/juice-mix.png', money(mustPrice({ k: 'menu', id: 'sugarcane', opt: 'Medium' }).unit), 'Served cold'],
+  corn: ['assets/ingredients/corn.jpg', money(mustPrice({ k: 'menu', id: 'corn', opt: '' }).unit), 'Sweet corn from the wood oven'],
 };
+/** [id, name, img, worth, desc] */
+const SIDES: [SideId, string, string, string, string][] = COMBO_SIDES.map(([id, name]) => [id, name, ...SIDE_UI[id]]);
+const SPEC = COMBOS;
 
 /**
  * The Pizza Builder's config, sent back as the 3rd `onAdd` argument (prototype) and as `line.meta`.
@@ -62,6 +39,8 @@ type ComboCfg = Partial<PizzaConfig>;
 interface PizzaPick {
   summary: string;
   cfg: ComboCfg;
+  /** The pizza's options by id, for the combo's line spec. */
+  opts: PizzaOpts;
 }
 
 const isCfg = (x: unknown): x is ComboCfg => !!x && typeof x === 'object' && ('extra' in x || 'topNames' in x);
@@ -182,7 +161,7 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
   const np = sum(pops);
   const extra = Object.values(pizzas).reduce((a, p) => a + Math.max(0, p.cfg.extra || 0), 0);
   const extraDips = Math.max(0, nd - sp.dips);
-  const total = deal.price + extra + extraDips * EXTRA_DIP;
+  const total = sp.price + extra + extraDips * EXTRA_DIP;
 
   const step = (
     bag: Record<string, number>,
@@ -237,7 +216,9 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
       if (pl.length) parts.push('Pops: ' + pl.join(', '));
       if (sp.side) parts.push(SIDES.find((x) => x[0] === side)![1]);
       const key = [deal.id, JSON.stringify(pizzas), JSON.stringify(dips), JSON.stringify(pops), side].join('|');
-      onAdd({ key, name: deal.name + ' combo', summary: parts.join(' · '), unit: Math.round(total * 100) / 100 }, 1);
+      const spec: LineSpec = { k: 'combo', id: deal.id, pizzas: pz.map((i) => pizzas[i].opts), dips, pops, side: sp.side ? side : null };
+      const q = mustPrice(spec);
+      onAdd({ key, name: q.name, summary: q.summary, unit: q.unit, spec }, 1);
     };
 
   const solo = sp.pizzas === 1 && !sp.dips && !sp.pops && !sp.side;
@@ -316,20 +297,18 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
     // The builder passes its config as the 3rd argument (prototype); fall back to line.meta.
     const meta = line.meta;
     const cfg: ComboCfg = cfgArg || (isCfg(meta) ? meta : null) || { extra: 0 };
-    const bits = [cfg.topNames && cfg.topNames.length ? cfg.topNames.join(', ') : 'Cheese only'];
-    if (cfg.crustName && cfg.crustName !== 'Regular') bits.push(cfg.crustName.toLowerCase() + ' crust');
-    if (cfg.sauceName && cfg.sauceName !== 'Regular') bits.push(cfg.sauceName.toLowerCase() + ' sauce');
-    if (cfg.cheeseName && cfg.cheeseName !== 'Regular') bits.push(cfg.cheeseName === 'None' ? 'no cheese' : cfg.cheeseName.toLowerCase() + ' cheese');
-    if (cfg.spice && cfg.spice !== 'No spice') bits.push(cfg.spice.toLowerCase());
-    if (cfg.notes && cfg.notes.trim()) bits.push('Note: ' + cfg.notes.trim());
+    if (line.spec.k !== 'pizza') return;
+    const opts = pizzaOptsOf(line.spec);
+    const bits = comboPizzaBits(opts);
     if (solo) {
-      const ex = Math.max(0, cfg.extra || 0);
-      onAdd({ key: [deal.id, JSON.stringify(cfg)].join('|'), name: deal.name + ' combo', summary: bits.join(' · '), unit: Math.round((deal.price + ex) * 100) / 100 }, 1);
+      const spec: LineSpec = { k: 'combo', id: deal.id, pizzas: [opts], dips: {}, pops: {}, side: null };
+      const q = mustPrice(spec);
+      onAdd({ key: [deal.id, JSON.stringify(cfg)].join('|'), name: q.name, summary: q.summary, unit: q.unit, spec }, 1);
       return;
     }
     const at = edit;
     if (at == null) return;
-    setPizzas((st) => ({ ...st, [at]: { summary: bits.join(' · '), cfg } }));
+    setPizzas((st) => ({ ...st, [at]: { summary: bits, cfg, opts } }));
     setEdit(null);
   };
 

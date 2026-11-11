@@ -3,7 +3,7 @@ import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties, typ
 import type { Half, NewLine, PizzaBuilderProps, PizzaConfig, SizeKey, SizePrices } from '../lib/types';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
-import { SIZE_PRICES } from '../lib/catalog';
+import { CHEESES, PIZZA_SAUCES, SEASONINGS, SPICES, TOPPING_ROWS, TOP_PRICE, EXTRA_CHEESE, pizzaQuote, pizzaSummary, priceLine, pricesFor, pizzaTopNames, type PizzaSpec, type TopCat } from '../lib/pricing';
 import { money } from '../lib/format';
 import './PizzaBuilder.css';
 
@@ -32,7 +32,6 @@ const hash = (s: string) => {
   return (x >>> 0) / 4294967296;
 };
 
-type TopCat = 'Veggie' | 'Meat';
 interface Topping {
   id: string;
   name: string;
@@ -46,17 +45,18 @@ interface Topping {
   initials: string;
 }
 
-// [id, name, category, ingredient photo, weight]
-const TOP_ROWS: [string, string, TopCat, string | null, number?][] = [
-  ['mushrooms', 'Mushrooms', 'Veggie', 'mushrooms.png'], ['green-peppers', 'Green pepper', 'Veggie', 'green-peppers.png'], ['red-pepper', 'Red pepper', 'Veggie', 'red-pepper.png'], ['tomatoes', 'Tomatoes', 'Veggie', 'tomatoes.png'],
-  ['green-olives', 'Green olives', 'Veggie', 'olives.png'], ['soya-champ', 'Soya champ', 'Veggie', 'soya-champ.jpg'], ['olives', 'Black olives', 'Veggie', 'olives.png'], ['red-onions', 'Onions', 'Veggie', 'red-onions.png'],
-  ['hot-peppers', 'Hot pepper', 'Veggie', 'chilli.png'], ['pineapple', 'Pineapple', 'Veggie', 'pineapple.png'], ['jalapenos', 'Jalapeño pepper', 'Veggie', 'jalapenos.png'], ['sun-dried', 'Sun dried tomatoes', 'Veggie', 'sun-dried.png'],
-  ['broccoli', 'Broccoli', 'Veggie', 'broccoli.png'], ['corn', 'Sweet corn', 'Veggie', 'corn.jpg'], ['shahi-paneer', 'Shahi paneer', 'Veggie', 'shahi-paneer-y.jpg'], ['paneer', 'Tandoori paneer', 'Veggie', 'paneer.jpg'],
-  ['veg-pepperoni', 'Veggie pepperoni', 'Veggie', 'pepperoni.jpg'], ['extra-mozz', 'Extra cheese', 'Veggie', 'extra-mozz.png', 2], ['feta', 'Feta cheese', 'Veggie', 'feta.jpg'], ['zucchini', 'Zucchini', 'Veggie', 'zucchini.png'], ['eggplant', 'Eggplant', 'Veggie', 'eggplant.png'],
-  ['pepperoni', 'Pepperoni', 'Meat', 'pepperoni.jpg'], ['anchovies', 'Anchovies', 'Meat', null], ['bacon', 'Bacon', 'Meat', 'bacon.png'], ['ham', 'Ham', 'Meat', 'ham.png'], ['sausage', 'Hot Italian sausage', 'Meat', 'sausage.png'],
-  ['grilled-chicken', 'Grilled chicken', 'Meat', 'shawarma-chicken.png', 2], ['tandoori-chicken', 'Tandoori chicken', 'Meat', 'tandoori-chicken.png', 2], ['butter-chicken', 'Butter chicken', 'Meat', 'butter-chicken.png'],
-  ['shawarma-chicken', 'Shawarma chicken', 'Meat', 'shawarma-chicken.png'], ['seafood-mix', 'Sea food mix', 'Meat', 'shrimp.png'], ['shrimp', 'Shrimp', 'Meat', 'shrimp.png'], ['chicken-kabab', 'Chicken kabab', 'Meat', null], ['hot-salami', 'Hot salami', 'Meat', 'pepperoni.jpg'],
-];
+/** Ingredient photo per topping (names, categories and weights come from the shared pricing data). */
+const TOP_IMG: Record<string, string | null> = {
+  mushrooms: 'mushrooms.png', 'green-peppers': 'green-peppers.png', 'red-pepper': 'red-pepper.png', tomatoes: 'tomatoes.png',
+  'green-olives': 'olives.png', 'soya-champ': 'soya-champ.jpg', olives: 'olives.png', 'red-onions': 'red-onions.png',
+  'hot-peppers': 'chilli.png', pineapple: 'pineapple.png', jalapenos: 'jalapenos.png', 'sun-dried': 'sun-dried.png',
+  broccoli: 'broccoli.png', corn: 'corn.jpg', 'shahi-paneer': 'shahi-paneer-y.jpg', paneer: 'paneer.jpg',
+  'veg-pepperoni': 'pepperoni.jpg', 'extra-mozz': 'extra-mozz.png', feta: 'feta.jpg', zucchini: 'zucchini.png', eggplant: 'eggplant.png',
+  pepperoni: 'pepperoni.jpg', anchovies: null, bacon: 'bacon.png', ham: 'ham.png', sausage: 'sausage.png',
+  'grilled-chicken': 'shawarma-chicken.png', 'tandoori-chicken': 'tandoori-chicken.png', 'butter-chicken': 'butter-chicken.png',
+  'shawarma-chicken': 'shawarma-chicken.png', 'seafood-mix': 'shrimp.png', shrimp: 'shrimp.png', 'chicken-kabab': null, 'hot-salami': 'pepperoni.jpg',
+};
+const TOP_ROWS: [string, string, TopCat, string | null, number][] = TOPPING_ROWS.map(([id, name, cat, wt]) => [id, name, cat, TOP_IMG[id] ?? null, wt]);
 
 const TOPS: Topping[] = TOP_ROWS.map(([id, name, cat, f, wt]) => ({
   id, name, cat, wt: wt || 1,
@@ -68,11 +68,12 @@ const TOPS: Topping[] = TOP_ROWS.map(([id, name, cat, f, wt]) => ({
 }));
 const TOPMAP: Record<string, Topping> = Object.fromEntries(TOPS.map((t) => [t.id, t]));
 
-const FREE = ['Ginger', 'Garlic', 'Coriander', 'Red chilli', 'Green chilli', 'Oregano', 'Italian spice'] as const;
+const FREE = SEASONINGS;
 const FREE_IMG: Record<string, string> = { Ginger: 'ginger.png', Garlic: 'sauce-garlic.png', Coriander: 'coriander.png', 'Red chilli': 'red-chilli.png', 'Green chilli': 'chilli.png', Oregano: 'oregano.png', 'Italian spice': 'italian-spice.png' };
 
 // [value, display label, file under assets/sauces/ without .png]. 'Regular' is shown as "Marinara".
-const SAUCES: [string, string, string][] = [['Regular', 'Marinara', 'tomato'], ['Butter chicken', 'Butter chicken', 'butter-chicken'], ['Shahi paneer', 'Shahi paneer', 'shahi-paneer'], ['Garlic', 'Garlic', 'garlic'], ['Hot', 'Hot sauce', 'hot'], ['BBQ', 'BBQ', 'bbq'], ['Pesto', 'Pesto', 'pesto'], ['Honey garlic', 'Honey garlic', 'honey-garlic']];
+const SAUCE_FILE: Record<string, string> = { Regular: 'tomato', 'Butter chicken': 'butter-chicken', 'Shahi paneer': 'shahi-paneer', Garlic: 'garlic', Hot: 'hot', BBQ: 'bbq', Pesto: 'pesto', 'Honey garlic': 'honey-garlic' };
+const SAUCES: [string, string, string][] = PIZZA_SAUCES.map(([v, label]) => [v, label, SAUCE_FILE[v] || 'tomato']);
 const sauceImg = (f: string) => 'assets/sauces/' + f + '.png';
 /** Live pizza base image per sauce. Regular (marinara) keeps the plain base photo. */
 const SAUCE_BASE: Record<string, string> = { 'Butter chicken': 'assets/sauce-base/butter-chicken.webp', 'Shahi paneer': 'assets/sauce-base/shahi-paneer.webp', Garlic: 'assets/sauce-base/garlic.webp', Hot: 'assets/sauce-base/hot.webp', BBQ: 'assets/sauce-base/bbq.webp', Pesto: 'assets/sauce-base/pesto.webp', 'Honey garlic': 'assets/sauce-base/honey-garlic.webp' };
@@ -89,17 +90,12 @@ const OVENS: OvenCard[] = [
   { v: 'Wood-fired', desc: 'Smoky, blistered crust. Our default.', img: 'assets/oven-wood-fired.png', bg: '#120B08', r: '0', b: '0', w: '100%', h: '100%', fit: 'cover', pos: '40% 45%', ar: 'auto' },
   { v: 'Conventional', desc: 'Even bake, softer crust. Same price.', img: 'assets/oven-conventional.webp', bg: '#120B08', r: '0', b: '0', w: '100%', h: '100%', fit: 'cover', pos: '50% 60%', ar: 'auto' },
 ];
-const CHEESES = ['Light', 'Regular', 'None'];
 /** Cheese level: [meter bars, photo width]. */
 const CL: Record<string, [number, string | null]> = { Light: [1, '58%'], Regular: [2, '74%'], Extra: [3, '92%'], None: [0, null] };
 
 const SIZES: [SizeKey, string, number][] = [['S', 'Small', 24], ['M', 'Medium', 29], ['L', 'Large', 34], ['XL', 'X-Large', 40]];
 const SCALE: Record<SizeKey, number> = { S: 0.8, M: 0.87, L: 0.94, XL: 1 };
-// Extra topping price by size, from the shop's Square catalog (Extra Veggie / Extra Meat Toppings lists).
-const TOP_PRICE: Record<SizeKey, number> = { S: 1.15, M: 2.25, L: 2.5, XL: 3.5 };
-// Spice level, same options as Square's "Pizza Spice Level" list.
-const SPICES = ['No spice', 'Little spicy', 'Medium spicy', 'Extra spicy'];
-const EXTRA_CHEESE = 0;
+// Extra topping price (TOP_PRICE), spice levels and cheese levels come from the shared pricing module.
 
 const SECS: [SecKey, string][] = [['crust', 'Oven & crust'], ['sauce', 'Base sauce'], ['cheese', 'Cheese'], ['tops', 'Toppings'], ['notes', 'Instructions']];
 type SecKey = 'crust' | 'sauce' | 'cheese' | 'tops' | 'notes';
@@ -303,8 +299,9 @@ const photoSpan = (img: string, w: string, fit: string, extra?: CSSProperties): 
 type BuilderState = typeof DEFAULTS & { tops: Record<string, Half>; free: Record<string, boolean>; cat: TopCat; sec: SecKey };
 
 export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }: PizzaBuilderProps) {
-  // A special can carry its own size prices (desi specials cost more than the classics).
-  const P: SizePrices = (item?.prices as SizePrices | undefined) || sizePrices || SIZE_PRICES;
+  // Size prices come from the shared pricing module by pizza id (desi specials cost more than the classics),
+  // so what the builder shows is exactly what the payment server charges.
+  void sizePrices;
   const w = useWidth();
   const wide = w >= 960;
   useLockBody(true);
@@ -368,17 +365,15 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   const [noteFocus, setNoteFocus] = useState(false);
 
   // ----- derived values (renderVals) -----
-  const included = item?.included != null ? item.included : Math.max(4, (item?.tops || []).reduce((a, k) => a + (TOPMAP[k]?.wt || 1), 0));
   const keys = Object.keys(s.tops);
+  // In a combo the deal sets the included toppings (and the pizza is priced as Build Your Own).
+  const pid = item?.id || 'byo';
+  const P: SizePrices = pricesFor(pid);
+  const q = pizzaQuote(pid, s.size, keys, s.cheese, combo && item?.included != null ? item.included : undefined, P);
+  const { included, used, extraCount, topCost, cheeseCost, unit, extra } = q;
   const wOf = (k: string) => TOPMAP[k]?.wt || 1;
-  const used = keys.reduce((a, k) => a + wOf(k), 0);
   const cumOf: Record<string, number> = {};
   keys.reduce((a, k) => (cumOf[k] = a + wOf(k)), 0);
-  const extraCount = Math.max(0, used - included);
-  const topCost = extraCount * TOP_PRICE[s.size];
-  const cheeseCost = s.cheese === 'Extra' ? EXTRA_CHEESE : 0;
-  const unit = Math.round((P[s.size] + topCost + cheeseCost) * 100) / 100;
-  const extra = Math.round((unit - P[s.size]) * 100) / 100;
   const hasExtra = extra > 0.001;
   const sizeName = SIZES.find((x) => x[0] === s.size)![1];
   const topOf = (id: string) => TOPMAP[id] || ({ name: id } as Topping);
@@ -441,26 +436,27 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
 
   const add = () => {
     const tl = keys.map((k) => k + ':' + s.tops[k]).sort().join(',');
-    const parts = [s.crust + ' crust', s.bake];
-    if (s.sauce !== 'Regular') parts.push(s.sauce === 'None' ? 'no sauce' : s.sauce.toLowerCase() + ' sauce');
-    if (s.cheese !== 'Regular') parts.push(s.cheese === 'None' ? 'no cheese' : s.cheese.toLowerCase() + ' cheese');
-    if (extraCount) parts.push('+' + extraCount + ' topping' + (extraCount > 1 ? 's' : ''));
-    if (lh.length || rh.length) parts.push('half & half');
-    if (s.spice !== 'No spice') parts.push(s.spice.toLowerCase());
-    if (s.doneness !== 'Regular') parts.push(s.doneness.toLowerCase());
-    if (s.cut !== 'Triangles') parts.push(s.cut.toLowerCase());
+    const spec: PizzaSpec = {
+      k: 'pizza', id: pid, size: s.size,
+      crust: s.crust, bake: s.bake, sauce: s.sauce, cheese: s.cheese, spice: s.spice, doneness: s.doneness, cut: s.cut,
+      tops: keys.map((k) => [k, s.tops[k]]), free: FREE.filter((f) => s.free[f]), notes: s.notes,
+    };
     const cfg: PizzaConfig = {
       tops: s.tops, free: s.free, crust: s.crust, bake: s.bake, sauce: s.sauce, cheese: s.cheese, spice: s.spice, doneness: s.doneness, cut: s.cut, notes: s.notes,
       extra,
-      topNames: keys.map((k) => (TOPMAP[k]?.name || k) + (s.tops[k] === 'left' ? ' (left half)' : s.tops[k] === 'right' ? ' (right half)' : '')),
+      topNames: pizzaTopNames(spec),
       crustName: s.crust, sauceName: s.sauce, cheeseName: s.cheese,
     };
+    // Outside a combo the line is priced and named by the shared priceLine (the server does the same).
+    const priced = combo ? null : priceLine(spec);
+    const ok = priced && !('error' in priced) ? priced : null;
     const line: NewLine = {
       key: [item?.id, s.size, s.crust, s.bake, s.sauce, s.cheese, tl, s.spice, s.doneness, s.cut, FREE.filter((f) => s.free[f]).join('+'), s.notes.trim()].join('|'),
-      name: sizeName + ' ' + (item?.name || 'Build your own'),
-      summary: parts.join(' · '),
-      unit,
+      name: ok ? ok.name : sizeName + ' ' + (item?.name || 'Build your own'),
+      summary: ok ? ok.summary : pizzaSummary(spec, extraCount),
+      unit: ok ? ok.unit : unit,
       meta: cfg,
+      spec,
     };
     // Prototype signature is onAdd(line, qty, cfg); the cfg is also on line.meta for typed callers.
     (onAdd as (l: NewLine, q: number, c: PizzaConfig) => void)(line, s.qty, cfg);

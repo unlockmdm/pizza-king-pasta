@@ -1,5 +1,7 @@
 // Homepage data, ported verbatim from `Pizza King Home v2.dc.html`. These arrays are the spec.
 import { U } from '../lib/catalog';
+import { money } from '../lib/format';
+import { COMBOS } from '../lib/pricing';
 import type { BuilderItem, Deal } from '../lib/types';
 
 export interface Special {
@@ -21,10 +23,10 @@ export const SPECIALS: Special[] = [
 ];
 
 export const DEALS: (Deal & { by: string; h: string })[] = [
-  { id: 'one-large', name: 'One Large', price: 11.99, desc: '1 large pizza with 1 topping, wood-fired or conventional oven', img: U('1593560708920-61dd98c46a4e'), by: 'Saundarya Srinivasan', h: 'saundiii' },
-  { id: 'two-large', name: 'Two Large', price: 36.0, desc: '2 large pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', img: U('1604382355076-af4b0eb60143'), by: 'Shourav Sheikh', h: 'shouravsheikh' },
-  { id: 'two-medium', name: 'Two Medium', price: 32.0, desc: '2 medium pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', img: U('1682264788192-9abdec90c425'), by: 'Joanie Simon', h: 'joaniesimon' },
-  { id: 'two-small', name: 'Two Small', price: 25.99, desc: '2 small pizzas with 4 toppings each and 2 dips', img: U('1600628421066-f6bda6a7b976'), by: 'Klara Kulikova', h: 'kkalerry' },
+  { id: 'one-large', name: COMBOS['one-large'].name, price: COMBOS['one-large'].price, desc: '1 large pizza with 1 topping, wood-fired or conventional oven', img: U('1593560708920-61dd98c46a4e'), by: 'Saundarya Srinivasan', h: 'saundiii' },
+  { id: 'two-large', name: COMBOS['two-large'].name, price: COMBOS['two-large'].price, desc: '2 large pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', img: U('1604382355076-af4b0eb60143'), by: 'Shourav Sheikh', h: 'shouravsheikh' },
+  { id: 'two-medium', name: COMBOS['two-medium'].name, price: COMBOS['two-medium'].price, desc: '2 medium pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', img: U('1682264788192-9abdec90c425'), by: 'Joanie Simon', h: 'joaniesimon' },
+  { id: 'two-small', name: COMBOS['two-small'].name, price: COMBOS['two-small'].price, desc: '2 small pizzas with 4 toppings each and 2 dips', img: U('1600628421066-f6bda6a7b976'), by: 'Klara Kulikova', h: 'kkalerry' },
 ];
 
 export type TileId = 'byo' | 'specials' | 'meat' | 'combos' | 'pasta' | 'wings' | 'juice' | 'gelato';
@@ -45,7 +47,7 @@ export const TILES: Tile[] = [
   { id: 'byo', name: 'Build your own', sub: 'Any 4 toppings', bg: '#EDEDF0', fg: '#1A1414', img: U('1593560708920-61dd98c46a4e'), by: 'Saundarya Srinivasan', h: 'saundiii' },
   { id: 'specials', name: 'House specials', sub: 'Indian-fusion and classic', bg: '#D7192D', fg: '#fff', img: U('1565299624946-b28f40a0ae38'), by: 'Chad Montano', h: 'briewilly', target: 'bestsellers' },
   { id: 'meat', name: 'Meat favourites', sub: 'Pepperoni, bacon, sausage', bg: '#C2511F', fg: '#fff', img: U('1611915365928-565c527a0590'), by: 'Tamas Pap', h: 'tamasp' },
-  { id: 'combos', name: 'Pickup combos', sub: 'From $11.99', bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
+  { id: 'combos', name: 'Pickup combos', sub: 'From ' + money(Math.min(...Object.values(COMBOS).map((c) => c.price))), bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
   { id: 'pasta', name: 'Pasta & momos', sub: 'Rosé, Alfredo, tomato', bg: '#F2B53A', fg: '#1A1414', img: 'assets/menu/pasta.jpg', creditText: 'Photo: Dllu, Wikimedia Commons, CC BY-SA 4.0' },
   { id: 'wings', name: 'Wings & sides', sub: 'Wings, tandoori, salads, sides', bg: '#7A2E1D', fg: '#fff', img: 'assets/ingredients/tandoori-chicken.png' },
   { id: 'juice', name: 'Drinks', sub: 'Juice, lassi, coffee, beer', bg: '#1E6E6A', fg: '#fff', img: 'assets/menu/juice-mix.png', creditText: 'Photo: JIP, Wikimedia Commons, CC BY-SA 4.0' },
@@ -53,6 +55,8 @@ export const TILES: Tile[] = [
 ];
 
 /** Toppings already on each house special when it opens in the builder. */
+// Same toppings as the shared pricing data (PIZZAS), listed in the homepage's own order (it sets the scatter on the live pizza).
+// Prices never depend on this order: the builder and the server count toppings from the spec.
 export const BASE_TOPS: Record<string, string[]> = {
   'shahi-paneer': ['paneer', 'green-peppers', 'red-onions', 'jalapenos'],
   'butter-chicken': ['tandoori-chicken', 'green-peppers', 'red-onions'],

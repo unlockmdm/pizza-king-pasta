@@ -1,6 +1,7 @@
 import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
 import { creditOf, pricesFor, SHOP, U } from '../lib/catalog';
 import { money } from '../lib/format';
+import { COMBOS } from '../lib/pricing';
 import { Hov, IconArrow, IconPlus, Photo } from '../lib/ui';
 import { BYO_SETS, DEALS, SPECIALS, TILES, type Tile } from './data';
 
@@ -149,14 +150,14 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
               <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase' }}>Pickup combo</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: ph ? 12 : 16, maxWidth: 300 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <span style={{ fontWeight: 900, fontSize: ph ? 38 : 46, lineHeight: 0.9, letterSpacing: '-.05em' }}>Two Large<br />$36.00</span>
+                  <span style={{ fontWeight: 900, fontSize: ph ? 38 : 46, lineHeight: 0.9, letterSpacing: '-.05em' }}>Two Large<br />{money(COMBOS['two-large'].price)}</span>
                   <span style={{ fontSize: ph ? 14 : 15, fontWeight: 600, lineHeight: 1.4 }}>2 large pizzas, 4 toppings each,<br />2 dips and 2 pops</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <Hov
                     as="button"
                     onClick={h.onTwoLarge}
-                    aria-label="Customize Two Large combo, $36.00"
+                    aria-label={'Customize Two Large combo, ' + money(COMBOS['two-large'].price)}
                     style={{ height: 44, padding: '0 20px', border: 0, borderRadius: 999, background: '#fff', color: '#D7192D', fontFamily: 'inherit', fontWeight: 900, fontSize: 15, display: 'flex', alignItems: 'center', flex: 'none', cursor: 'pointer', transition: 'transform .2s' }}
                     hover={{ transform: 'scale(1.04)' }}
                   >

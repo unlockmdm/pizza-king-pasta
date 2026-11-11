@@ -1,6 +1,5 @@
 // Shared business facts and pricing that more than one screen needs.
 // Screen-specific menu data stays at the top of each component, mirroring the prototype.
-import type { SizeKey, SizePrices } from './types';
 
 export const SHOP = {
   name: 'Pizza King & Pasta',
@@ -21,26 +20,9 @@ export const SHOP = {
   ubereatsLogo: 'assets/brands/ubereats.svg',
 } as const;
 
-// Prices below match the shop's Square catalog (checked Nov 10, 2026). Square is the source of truth.
-/** Build Your Own / Custom Pizza and the classic specials. */
-export const SIZE_PRICES: SizePrices = { S: 12.0, M: 14.6, L: 16.5, XL: 22.8 };
-const DESI: SizePrices = { S: 13.0, M: 15.5, L: 17.3, XL: 23.8 };
-const CLASSIC_XL_2250: SizePrices = { S: 12.0, M: 14.6, L: 16.5, XL: 22.5 };
-/** Per-pizza size prices where they differ from SIZE_PRICES. */
-export const PIZZA_PRICES: Record<string, SizePrices> = {
-  'butter-chicken': DESI,
-  'shahi-paneer': DESI,
-  'chicken-shawarma': DESI,
-  'tandoori-fish': DESI,
-  pepperoni: { S: 12.0, M: 15.5, L: 17.3, XL: 23.8 },
-  bismark: CLASSIC_XL_2250,
-  'non-veg': CLASSIC_XL_2250,
-  'sea-food': CLASSIC_XL_2250,
-};
-export const pricesFor = (id: string): SizePrices => PIZZA_PRICES[id] || SIZE_PRICES;
-export const SIZE_NAMES: Record<SizeKey, string> = { S: 'Small', M: 'Medium', L: 'Large', XL: 'X-Large' };
+// Prices live in ./pricing (shared with the payment server). Re-exported here for existing imports.
+export { HST, PIZZA_PRICES, SIZE_NAMES, SIZE_PRICES, pricesFor } from './pricing';
 
-export const HST = 0.13;
 export const DELIVERY_FEE = 4.99;
 
 /** Unsplash image URL, same params as the prototype. */
