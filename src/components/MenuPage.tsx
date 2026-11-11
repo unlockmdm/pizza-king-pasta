@@ -1,7 +1,7 @@
 // Port of design_handoff_pizza_king_website/prototype/MenuPage.dc.html
 // Full menu with a sticky section bar (scroll-spy), walk-in specials with composed pizza scenes,
 // and the photo-card grid for every other section. Renders inside the homepage shell.
-import { useCallback, useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
 import type { BuilderItem, MenuPageProps, NewLine } from '../lib/types';
 import { Hov, Photo } from '../lib/ui';
 import { useEscape, useWidth } from '../lib/hooks';
@@ -269,12 +269,24 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
         const el = document.getElementById(id);
         if (el && el.getBoundingClientRect().top <= SPY_LINE) cur = id;
       }
+      // At the very bottom the last short section never reaches the line: count it once you hit the end.
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = NAV[NAV.length - 1][0];
       setActive(cur);
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // Keep the highlighted section tab in view: slide the bar sideways so it sits near the middle.
+  const barRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const bar = barRef.current;
+    const tab = bar?.querySelector<HTMLElement>('[aria-current="true"]');
+    if (!bar || !tab || bar.scrollWidth <= bar.clientWidth) return;
+    const target = tab.offsetLeft - (bar.clientWidth - tab.offsetWidth) / 2;
+    bar.scrollTo({ left: Math.max(0, Math.min(target, bar.scrollWidth - bar.clientWidth)), behavior: 'smooth' });
+  }, [active]);
 
   const closePicker = useCallback(() => setPickerState(null), []);
   useEscape(!!picker, closePicker);
@@ -347,7 +359,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
       {/* Sticky section bar, directly under the shell header (68px). z-index 60 keeps it above every price tag. */}
       <div style={{ position: 'sticky', top: 68, zIndex: 60, background: 'rgba(255,255,255,.96)', backdropFilter: 'saturate(1.6) blur(16px)', WebkitBackdropFilter: 'saturate(1.6) blur(16px)' }}>
         <nav aria-label="Menu sections" style={{ borderBottom: '1px solid #E9E9EC' }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(16px,3vw,32px)', display: 'flex', gap: 28, overflowX: 'auto', scrollbarWidth: 'none' }}>
+          <div ref={barRef} style={{ position: 'relative', maxWidth: 1200, margin: '0 auto', padding: '0 clamp(16px,3vw,32px)', display: 'flex', gap: 28, overflowX: 'auto', scrollbarWidth: 'none' }}>
             {NAV.map(([id, label]) => {
               const on = active === id;
               return (
