@@ -12,5 +12,5 @@
     "resolveJsonModule": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "server", "functions", "vite.config.ts"]
+  "include": ["src", "server", "worker", "vite.config.ts"]
 }

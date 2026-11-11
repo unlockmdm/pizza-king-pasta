@@ -32,12 +32,12 @@ public/assets/         logo, pizza base, topping cut-outs, dips, pops, menu phot
 
 ## Square checkout (pickup orders)
 
-Pickup orders are charged through Square. The browser uses Square's Web Payments SDK (card form and Google Pay; Apple Pay once the shop's domain is verified). A small server function, `functions/api/pay.ts` → `server/square.ts`, creates a PICKUP order in Square and charges it, so orders show up in the shop's Square Order Manager. Declined payments cancel their order automatically. Delivery is handed off to DoorDash and Uber Eats.
+Pickup orders are charged through Square. The browser uses Square's Web Payments SDK (card form and Google Pay; Apple Pay once the shop's domain is verified). A small server function, `worker/index.ts` → `server/square.ts`, creates a PICKUP order in Square and charges it, so orders show up in the shop's Square Order Manager. Declined payments cancel their order automatically. Delivery is handed off to DoorDash and Uber Eats.
 
 - **Local:** put the keys in `.env.local` (never committed):
   `VITE_SQUARE_APP_ID`, `VITE_SQUARE_LOCATION_ID`, `SQUARE_ACCESS_TOKEN`, `SQUARE_ENV` (`sandbox` or `production`).
   `npm run dev` serves `/api/pay` from the Vite dev server.
-- **Hosting (free):** Cloudflare Pages. It runs `functions/api/pay.ts` automatically. Build command `npm run build`, output folder `dist`. Add `VITE_SQUARE_APP_ID`, `VITE_SQUARE_LOCATION_ID` and `SQUARE_ENV` as variables, and `SQUARE_ACCESS_TOKEN` as an encrypted secret.
+- **Hosting (free):** a Cloudflare Worker with static assets (`wrangler.jsonc`). Build command `npm run build`, deploy command `npx wrangler deploy`. Build variables: `VITE_SQUARE_APP_ID`, `VITE_SQUARE_LOCATION_ID`. Worker variables: `SQUARE_ENV`, `VITE_SQUARE_LOCATION_ID`, and `SQUARE_ACCESS_TOKEN` as a secret.
 - **GitHub Pages** has no server, so that build has no Square keys and stays a demo checkout that charges nothing.
 - Test mode card: `4111 1111 1111 1111`, any future date, CVV `111`, ZIP `94103`.
 
