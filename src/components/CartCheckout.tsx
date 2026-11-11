@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 import type { CartCheckoutProps, CartLine, Mode } from '../lib/types';
 import { HST, SHOP } from '../lib/catalog';
-import { CARD_STYLE, isSafari, loadSquare, newKey, slotToIso, SQUARE_ENABLED, SQUARE_SANDBOX, submitPayment, type SqCard, type SqPaymentRequest, type SqWallet } from '../lib/square';
+import { CARD_STYLE, isSafari, loadSquare, newKey, slotToIso, SQUARE_ENABLED, SQUARE_SANDBOX, submitPayment, type SqCard, type SqCardEvent, type SqCardState, type SqPaymentRequest, type SqWallet } from '../lib/square';
 import { money } from '../lib/format';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
@@ -77,19 +77,42 @@ const PlusSvg = () => (
 function Field({
   label,
   bg,
+  error,
+  errId,
   children,
 }: {
   label: string;
   bg: string;
+  error?: string;
+  errId?: string;
   children: ReactNode;
 }) {
   return (
-    <label style={{ ...fieldLabel, background: bg }}>
-      <span style={fieldCaption}>{label}</span>
-      {children}
-    </label>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
+      <label style={{ ...fieldLabel, background: error ? '#FFF5F6' : bg, boxShadow: error ? 'inset 0 0 0 1.5px #D7192D' : 'none', transition: 'box-shadow .15s, background .15s' }}>
+        <span style={{ ...fieldCaption, color: error ? '#C11425' : fieldCaption.color }}>{label}</span>
+        {children}
+      </label>
+      {error ? (
+        <span id={errId} style={fieldErr}>
+          <ErrIcon />
+          {error}
+        </span>
+      ) : null}
+    </div>
   );
 }
+
+const fieldErr: CSSProperties = { display: 'flex', alignItems: 'flex-start', gap: 6, padding: '0 4px', fontSize: 13, lineHeight: 1.35, fontWeight: 700, color: '#C11425' };
+const ErrIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true" style={{ flex: 'none', marginTop: 1 }}><circle cx="12" cy="12" r="9.5" /><path d="M12 7.5v5.5M12 16.5v.01" /></svg>
+);
+
+// Customer-facing messages for Square's card fields (we hide Square's own message line so every error looks the same).
+const CARD_FIELDS = ['cardNumber', 'expirationDate', 'cvv', 'postalCode'] as const;
+const CARD_EMPTY: Record<string, string> = { cardNumber: 'Enter your card number.', expirationDate: 'Enter the expiry date (MM/YY).', cvv: 'Enter the security code (CVV).', postalCode: 'Enter your billing postal code.' };
+const CARD_BAD: Record<string, string> = { cardNumber: 'Check your card number.', expirationDate: 'Check the expiry date. It should be MM/YY and in the future.', cvv: 'Check the security code (CVV).', postalCode: 'Check your billing postal code.' };
+const joinList = (a: string[]) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]);
 
 const hexToRgba = (hex: string, a: number) => {
   const n = parseInt(hex.slice(1), 16);
@@ -108,7 +131,14 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const [tip, setTip] = useState<number>(DEFAULT_TIP);
   const [f, setF] = useState<Form>(EMPTY_FORM);
   const [tried, setTried] = useState(false);
-  const [triedX, setTriedX] = useState(false);
+  const [triedX, setTriedX] = useState('');
+  const [touched, setTouched] = useState<Partial<Record<'name' | 'phone' | 'email', boolean>>>({});
+  const nameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const cardSt = useRef<Record<string, SqCardState>>({});
+  const cardForce = useRef(false);
+  const [cardErr, setCardErr] = useState('');
   const [done, setDone] = useState<Done | null>(null);
   // Square (live checkout) state
   const [busy, setBusy] = useState(false);
@@ -146,20 +176,48 @@ export default function CartCheckout(p: CartCheckoutProps) {
   };
   const digits = f.card.replace(/\D/g, '');
   const errs = {
-    email: !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email.trim()),
-    name: !f.name.trim(),
-    phone: f.phone.replace(/\D/g, '').length < 10,
+    email: !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(f.email.trim()),
+    name: f.name.trim().length < 2,
+    phone: !/^1?\d{10}$/.test(f.phone.replace(/\D/g, '')),
     street: !pickup && !f.street.trim(),
     card: pay === 'card' && !SQUARE_ENABLED && (digits.length < 15 || !/\d{2}\s*\/\s*\d{2}/.test(f.exp) || f.cvc.replace(/\D/g, '').length < 3),
   };
   const show = (k: keyof typeof errs) => tried && errs[k];
+  // Contact fields: show an error after a submit attempt, or once someone leaves a field they started filling in.
+  const showC = (k: 'name' | 'phone' | 'email') => errs[k] && (tried || (!!touched[k] && f[k].trim() !== ''));
+  const msg = {
+    name: showC('name') ? (f.name.trim() ? 'Enter your full name.' : 'Enter your name so we know whose order it is.') : '',
+    phone: showC('phone') ? (f.phone.trim() ? 'Enter a 10-digit phone number, like 905-555-0123.' : 'Enter your phone number in case we need to reach you.') : '',
+    email: showC('email') ? (f.email.trim() ? 'Check your email. It should look like name@example.com.' : 'Enter your email for your receipt.') : '',
+  };
+  const missing = [errs.name && 'name', errs.phone && 'phone number', errs.email && 'email'].filter(Boolean) as string[];
+  const blur = (k: 'name' | 'phone' | 'email') => () => setTouched((t) => (t[k] ? t : { ...t, [k]: true }));
+  // Scroll to (and focus) the first contact field that needs fixing.
+  const goToFirstError = () => {
+    const el = errs.name ? nameRef.current : errs.phone ? phoneRef.current : errs.email ? emailRef.current : null;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      el.focus({ preventScroll: true });
+    });
+  };
+  const cardMessage = (force: boolean) => {
+    const st = cardSt.current;
+    for (const k of CARD_FIELDS) {
+      const s = st[k];
+      if (k === 'postalCode' && !s) continue; // Square only shows postal code for some cards
+      if (s?.hasErrors) return CARD_BAD[k];
+      if (force && !s?.isCompletelyValid) return s && !s.isEmpty ? CARD_BAD[k] : CARD_EMPTY[k];
+    }
+    return '';
+  };
+  const goToCard = () => requestAnimationFrame(() => document.getElementById('sq-card')?.scrollIntoView({ block: 'center', behavior: 'smooth' }));
   const err = {
     street: show('street'),
     cardB: show('card') ? '#D7192D' : 'transparent',
     card: show('card'),
     express: triedX && (errs.name || errs.phone || errs.email || errs.street),
-    any: show('name') || show('phone') || show('email'),
-    detailsMsg: show('name') ? 'Enter your name.' : show('phone') ? 'Enter a 10-digit phone number.' : 'Enter a valid email for your receipt.',
+
   };
 
   const pageBg = p.pageBg || '#FFFFFF';
@@ -187,6 +245,13 @@ export default function CartCheckout(p: CartCheckoutProps) {
         const card = await payments.card({ style: CARD_STYLE });
         if (cancelled) { void card.destroy(); return; }
         await card.attach('#sq-card');
+        const onCard = (e: SqCardEvent) => {
+          const d = e.detail;
+          if (!d?.field) return;
+          cardSt.current[d.field] = d.currentState || {};
+          setCardErr(cardMessage(cardForce.current));
+        };
+        for (const ev of ['errorClassAdded', 'errorClassRemoved', 'focusClassRemoved', 'cardBrandChanged', 'postalCodeChanged']) card.addEventListener?.(ev, onCard);
         st.card = card;
         setSqReady(true);
         const req = payments.paymentRequest({ countryCode: 'CA', currencyCode: 'CAD', total: { amount: totalRef.current, label: SHOP.name } });
@@ -222,11 +287,18 @@ export default function CartCheckout(p: CartCheckoutProps) {
 
   const charge = async (method: 'card' | 'gpay' | 'apple') => {
     if (busy || !count) return;
+    if (method === 'card') {
+      // Check the card too, so every problem shows at once (not one per tap).
+      cardForce.current = true;
+      setCardErr(cardMessage(true));
+    }
     if (errs.name || errs.phone || errs.email) {
       setTried(true);
-      if (method !== 'card') setTriedX(true);
+      setTriedX(method === 'apple' ? 'Apple Pay' : method === 'gpay' ? 'Google Pay' : '');
+      goToFirstError();
       return;
     }
+    setTriedX('');
     const st = sq.current;
     const src = method === 'card' ? st.card : method === 'gpay' ? st.gpay : st.apple;
     if (!src) return;
@@ -240,7 +312,11 @@ export default function CartCheckout(p: CartCheckoutProps) {
       };
       const t = method === 'card' ? await (src as SqCard).tokenize(verification) : await src.tokenize();
       if (t.status !== 'OK' || !t.token) {
-        if (method === 'card') setPayErr('Check your card details.');
+        if (method === 'card') {
+          const f0 = t.errors?.find((x) => x.field)?.field;
+          setCardErr(cardMessage(true) || (f0 && CARD_BAD[f0]) || 'Check your card details and try again.');
+          goToCard();
+        }
         setBusy(false);
         return;
       }
@@ -263,7 +339,10 @@ export default function CartCheckout(p: CartCheckoutProps) {
       setDone({ no: 'Order #' + String(r.orderNumber || '').toUpperCase(), items: lines.map((l) => ({ ...l })), email: f.email.trim(), phone: f.phone.trim(), name: firstName, when: doneWhen, pay: method, cardBrand: r.cardBrand || undefined, last4: r.cardLast4 || undefined, receiptUrl: r.receiptUrl || undefined });
       setStep('cart');
       setTried(false);
-      setTriedX(false);
+      setTriedX('');
+      setTouched({});
+      cardForce.current = false;
+      setCardErr('');
       setBusy(false);
       p.onPlaced();
     } catch {
@@ -276,13 +355,14 @@ export default function CartCheckout(p: CartCheckoutProps) {
     if (!count) return;
     if (errs.name || errs.phone || errs.email || errs.street) {
       setTried(true);
-      setTriedX(true);
+      setTriedX(method);
+      goToFirstError();
       return;
     }
     setDone({ no: newOrderNo(), items: lines.map((l) => ({ ...l })), email: f.email.trim(), phone: f.phone.trim(), name: firstName, when: doneWhen, pay: method === 'Apple Pay' ? 'apple' : 'gpay' });
     setStep('cart');
     setTried(false);
-    setTriedX(false);
+    setTriedX('');
     p.onPlaced();
   };
   const place = () => {
@@ -290,6 +370,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
     if (SQUARE_ENABLED) { void charge('card'); return; }
     if (Object.values(errs).some(Boolean)) {
       setTried(true);
+      goToFirstError();
       return;
     }
     setDone({ no: newOrderNo(), items: lines.map((l) => ({ ...l })), email: f.email.trim(), phone: f.phone.trim(), name: firstName, when: doneWhen, pay: pay === 'store' ? 'store' : 'card', cardBrand: f.card.replace(/\D/g, '') });
@@ -609,7 +690,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
           aria-label="Checkout"
           style={{ position: 'fixed', inset: 0, zIndex: 90, background: pageBg, overflow: 'auto', animation: 'ccFade .2s ease both', fontFamily: FONT, color: '#1A1414' }}
         >
-          <header style={{ position: 'sticky', top: 0, zIndex: 2, background: pageBgA, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
+          <header style={{ position: 'sticky', top: 0, zIndex: 10, background: pageBgA, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
             <div style={{ maxWidth: 1080, margin: '0 auto', height: 68, padding: '0 clamp(16px,3vw,32px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
               <button
                 onClick={backToCart}
@@ -634,7 +715,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
             style={{
               maxWidth: 1080,
               margin: '0 auto',
-              padding: '12px clamp(16px,3vw,32px) 120px',
+              padding: '12px clamp(16px,3vw,32px) ' + (!wide && tried && missing.length ? 170 : 130) + 'px',
               display: 'grid',
               gridTemplateColumns: wide ? 'minmax(0,1fr) 360px' : 'minmax(0,1fr)',
               gap: 'clamp(24px,4vw,48px)',
@@ -666,19 +747,18 @@ export default function CartCheckout(p: CartCheckoutProps) {
               <section>
                 <h2 style={h2}>Contact</h2>
                 <div style={card}>
-                  <Field label="Full name" bg={fieldBg}>
-                    <input value={f.name} onChange={set('name')} autoComplete="name" placeholder="First and last name" style={fieldInput} />
+                  <Field label="Full name" bg={fieldBg} error={msg.name} errId="err-name">
+                    <input ref={nameRef} value={f.name} onChange={set('name')} onBlur={blur('name')} autoComplete="name" autoCapitalize="words" enterKeyHint="next" placeholder="First and last name" aria-invalid={!!msg.name} aria-describedby={msg.name ? 'err-name' : undefined} style={fieldInput} />
                   </Field>
-                  <div style={{ display: 'grid', gridTemplateColumns: twoCols, gap: 10 }}>
-                    <Field label="Phone" bg={fieldBg}>
-                      <input value={f.phone} onChange={set('phone')} type="tel" autoComplete="tel" placeholder="(905) 555-0123" style={fieldInput} />
+                  <div style={{ display: 'grid', gridTemplateColumns: twoCols, gap: 10, alignItems: 'start' }}>
+                    <Field label="Phone" bg={fieldBg} error={msg.phone} errId="err-phone">
+                      <input ref={phoneRef} value={f.phone} onChange={set('phone')} onBlur={blur('phone')} type="tel" inputMode="tel" autoComplete="tel" enterKeyHint="next" placeholder="(905) 555-0123" aria-invalid={!!msg.phone} aria-describedby={msg.phone ? 'err-phone' : undefined} style={fieldInput} />
                     </Field>
-                    <Field label="Email" bg={fieldBg}>
-                      <input value={f.email} onChange={set('email')} type="email" autoComplete="email" placeholder="you@example.com" style={fieldInput} />
+                    <Field label="Email" bg={fieldBg} error={msg.email} errId="err-email">
+                      <input ref={emailRef} value={f.email} onChange={set('email')} onBlur={blur('email')} type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} enterKeyHint="done" placeholder="you@example.com" aria-invalid={!!msg.email} aria-describedby={msg.email ? 'err-email' : undefined} style={fieldInput} />
                     </Field>
                   </div>
                 </div>
-                {err.any ? <span style={errText}>{err.detailsMsg}</span> : null}
               </section>
 
               {/* Note */}
@@ -722,7 +802,12 @@ export default function CartCheckout(p: CartCheckoutProps) {
                         {/* Square renders the official Google Pay button into this box. */}
                         <div id="sq-gpay" onClick={() => void charge('gpay')} style={{ height: wallets.gpay ? 52 : 0, overflow: wallets.gpay ? 'visible' : 'hidden' }} />
                       </div>
-                      {err.express ? <span style={{ fontSize: 13, fontWeight: 700, color: '#C11425', marginTop: -6 }}>Fill in your details above first.</span> : null}
+                      {err.express ? (
+                        <span role="alert" style={{ ...fieldErr, background: '#FDECEE', borderRadius: 12, padding: '10px 12px' }}>
+                          <ErrIcon />
+                          {'Add your ' + joinList(missing) + ' above, then tap ' + triedX + ' again.'}
+                        </span>
+                      ) : null}
                       {wallets.apple || wallets.gpay ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 13, fontWeight: 700, color: '#818184' }}>
                           <span style={{ flex: 1, height: 1, background: '#E8E8EB' }} />
@@ -731,7 +816,13 @@ export default function CartCheckout(p: CartCheckoutProps) {
                         </div>
                       ) : null}
                       {/* Square's secure card fields (an iframe): card numbers never touch our code or server. */}
-                      <div id="sq-card" style={{ minHeight: sqReady ? undefined : 90 }} />
+                      <div id="sq-card" style={{ minHeight: sqReady ? undefined : 90, scrollMarginTop: 90 }} />
+                      {cardErr ? (
+                        <span role="alert" style={{ ...fieldErr, marginTop: -6 }}>
+                          <ErrIcon />
+                          {cardErr}
+                        </span>
+                      ) : null}
                       {!sqReady && !sqLoadErr ? <span style={{ fontSize: 13, color: '#818184', marginTop: -70, paddingLeft: 4 }}>Loading secure card form…</span> : null}
                       {sqLoadErr ? <span style={{ fontSize: 13, fontWeight: 700, color: '#C11425' }}>{sqLoadErr}</span> : null}
                       {payErr ? <span role="alert" style={{ fontSize: 14, fontWeight: 700, color: '#C11425', background: '#FDECEE', borderRadius: 12, padding: '10px 12px' }}>{payErr}</span> : null}
@@ -804,7 +895,12 @@ export default function CartCheckout(p: CartCheckoutProps) {
                       <span>Pay</span>
                     </Hov>
                   </div>
-                  {err.express ? <span style={{ fontSize: 13, fontWeight: 700, color: '#C11425', marginTop: -6 }}>Fill in your details above first.</span> : null}
+                  {err.express ? (
+                        <span role="alert" style={{ ...fieldErr, background: '#FDECEE', borderRadius: 12, padding: '10px 12px' }}>
+                          <ErrIcon />
+                          {'Add your ' + joinList(missing) + ' above, then tap ' + triedX + ' again.'}
+                        </span>
+                      ) : null}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 13, fontWeight: 700, color: '#818184' }}>
                     <span style={{ flex: 1, height: 1, background: '#E8E8EB' }} />
                     or pay another way
@@ -982,7 +1078,13 @@ export default function CartCheckout(p: CartCheckoutProps) {
           </div>
 
           {!wide && pickup ? (
-            <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, padding: '12px 16px calc(12px + env(safe-area-inset-bottom))', background: pageBgA, backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}>
+            <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 10, display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 16px calc(12px + env(safe-area-inset-bottom))', background: pageBgA, backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', boxShadow: '0 -1px 0 rgba(26,20,20,.06)' }}>
+              {tried && (missing.length || cardErr) ? (
+                <span role="status" style={{ ...fieldErr, justifyContent: 'center' }}>
+                  <ErrIcon />
+                  {missing.length ? 'Add your ' + joinList(missing) + ' to place your order.' : cardErr}
+                </span>
+              ) : null}
               <button
                 onClick={place}
                 disabled={busy}

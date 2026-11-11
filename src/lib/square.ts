@@ -17,8 +17,10 @@ export function isSafari(): boolean {
 const SDK_URL = SQUARE_SANDBOX ? 'https://sandbox.web.squarecdn.com/v1/square.js' : 'https://web.squarecdn.com/v1/square.js';
 
 /* Minimal typings for the parts of the Web Payments SDK we use. */
-export interface TokenResult { status: string; token?: string; errors?: { message?: string }[]; details?: unknown }
-export interface SqCard { attach(sel: string | HTMLElement): Promise<void>; tokenize(v?: unknown): Promise<TokenResult>; destroy(): Promise<boolean> }
+export interface TokenResult { status: string; token?: string; errors?: { message?: string; field?: string }[]; details?: unknown }
+export interface SqCardState { isCompletelyValid?: boolean; isEmpty?: boolean; hasErrors?: boolean }
+export interface SqCardEvent { detail?: { field?: string; currentState?: SqCardState } }
+export interface SqCard { attach(sel: string | HTMLElement): Promise<void>; addEventListener?(name: string, cb: (e: SqCardEvent) => void): void; tokenize(v?: unknown): Promise<TokenResult>; destroy(): Promise<boolean> }
 export interface SqWallet { attach?(sel: string | HTMLElement, o?: unknown): Promise<void>; tokenize(): Promise<TokenResult>; destroy(): Promise<boolean> }
 export interface SqPaymentRequest { update(o: unknown): boolean }
 export interface SqPayments {
