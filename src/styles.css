@@ -37,3 +37,6 @@ img { max-width: none; }
     scroll-behavior: auto !important;
   }
 }
+
+/* Horizontal chip rows: hide the scrollbar but keep swipe scrolling */
+.pk-noscroll::-webkit-scrollbar { display: none; }

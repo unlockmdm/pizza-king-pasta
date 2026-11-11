@@ -506,7 +506,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
                       <span aria-hidden="true" style={{ position: 'absolute', right: o.r, bottom: o.b, width: o.w, height: o.h, aspectRatio: o.ar, backgroundImage: "url('" + o.img + "')", backgroundSize: o.fit, backgroundPosition: o.pos, backgroundRepeat: 'no-repeat', transform: 'scale(' + (on ? 1.05 : 1) + ')', transition: 'transform .6s cubic-bezier(.3,.8,.3,1)' }} />
                       <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(18,11,8,0) 35%,rgba(18,11,8,.85) 100%)' }} />
                       <span style={{ position: 'absolute', left: 18, right: 18, bottom: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <span style={{ fontWeight: 900, fontSize: 'clamp(20px,2.2vw,26px)', lineHeight: 1, letterSpacing: '-.03em' }}>{o.v}</span>
+                        <span style={{ fontWeight: 900, fontSize: w < 400 ? 18 : 'clamp(20px,2.2vw,26px)', lineHeight: 1, letterSpacing: '-.03em' }}>{o.v}</span>
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>{o.desc}</span>
                       </span>
                       {on ? <Badge size={30} inset={14} icon={15} iconStroke={3.6} extra={{ boxShadow: '0 4px 12px rgba(0,0,0,.25)', animation: 'pbPop .3s ease both' }} /> : null}

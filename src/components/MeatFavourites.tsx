@@ -120,8 +120,8 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
 
       <section style={{ maxWidth: 1320, margin: '0 auto', padding: '0 clamp(16px,3vw,32px)' }}>
         {/* Filters + full menu link */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, padding: '36px 0 24px' }}>
-          <div role="tablist" aria-label="Filter pizzas" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: ph ? 12 : 16, padding: ph ? '24px 0 18px' : '36px 0 24px' }}>
+          <div role="tablist" aria-label="Filter pizzas" className="pk-noscroll" style={ph ? { display: 'flex', gap: 8, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', margin: '0 -16px', padding: '2px 16px', width: 'calc(100% + 32px)', WebkitOverflowScrolling: 'touch' } : { display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {FILTERS.map(([id, label, fn]) => {
               const on = filter === id;
               return (

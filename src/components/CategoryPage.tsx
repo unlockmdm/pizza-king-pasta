@@ -330,9 +330,9 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
       </section>
 
       <section style={S.listSection}>
-        <div style={S.bar}>
+        <div style={ph ? { ...S.bar, padding: '24px 0 18px', gap: 12 } : S.bar}>
           {filters ? (
-            <div role="tablist" aria-label="Filter" style={S.tabs}>
+            <div role="tablist" aria-label="Filter" className="pk-noscroll" style={ph ? { display: 'flex', gap: 8, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', margin: '0 -16px', padding: '2px 16px', width: 'calc(100% + 32px)', WebkitOverflowScrolling: 'touch' } : S.tabs}>
               {filters.map(([id, label]) => {
                 const on = filter === id;
                 const count = id === 'all' ? cat.items.length : cat.items.filter((i) => i.f === id).length;

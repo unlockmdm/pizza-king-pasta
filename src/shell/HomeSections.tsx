@@ -63,7 +63,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
   const desk = w >= 1000, tab = w >= 600, ph = !tab;
   const clamp2 = { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as const;
   const bentoCols = desk ? '1.55fr 1fr 1fr' : '1fr 1fr';
-  const bentoRows = desk ? 'minmax(0,1fr) minmax(0,1fr)' : tab ? '560px 320px 300px' : '480px 250px 220px';
+  const bentoRows = desk ? 'minmax(0,1fr) minmax(0,1fr)' : tab ? '560px 320px 300px' : '480px 290px 220px';
   const bentoAreas = desk ? '"hero deal deal" "hero byo pasta"' : '"hero hero" "deal deal" "byo pasta"';
   const bentoH = desk ? 'clamp(640px,calc(100vh - 110px),800px)' : 'auto';
   const bentoFont = desk ? 'clamp(64px,6.8vw,96px)' : tab ? '84px' : '15vw';
@@ -111,20 +111,20 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
 
           {/* Pickup combo tile */}
           <Hov style={{ gridArea: 'deal', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, background: '#D7192D', color: '#fff', overflow: 'hidden', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
-            <div style={{ position: 'absolute', right: -60, top: -90, width: 330, height: 330, filter: 'drop-shadow(0 24px 40px rgba(0,0,0,.35))' }}>
+            <div style={{ position: 'absolute', right: ph ? -46 : -60, top: ph ? -40 : -90, width: ph ? 200 : 330, height: ph ? 200 : 330, filter: 'drop-shadow(0 24px 40px rgba(0,0,0,.35))' }}>
               <img src="assets/pizza-base.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 40s linear infinite' }} />
             </div>
-            <div style={{ position: 'absolute', right: 170, top: 110, width: 300, height: 300, filter: 'drop-shadow(0 24px 40px rgba(0,0,0,.35))', display: tab ? 'block' : 'none' }}>
+            <div style={{ position: 'absolute', right: ph ? 54 : 170, top: ph ? 104 : 110, width: ph ? 176 : 300, height: ph ? 176 : 300, filter: 'drop-shadow(0 24px 40px rgba(0,0,0,.35))' }}>
               <img src="assets/pizza-base.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 50s linear reverse infinite' }} />
             </div>
-            <div aria-hidden="true" style={{ position: 'absolute', right: 18, bottom: 14, width: 236, height: 128, display: tab ? 'flex' : 'none', pointerEvents: 'none' }}>
+            <div aria-hidden="true" style={{ position: 'absolute', right: ph ? 8 : 18, bottom: ph ? 10 : 14, width: 236, height: 128, display: 'flex', pointerEvents: 'none', transform: ph ? (w < 380 ? 'scale(.5)' : 'scale(.64)') : undefined, transformOrigin: 'right bottom' }}>
               <span style={{ position: 'absolute', left: 14, right: 8, bottom: -4, height: 20, borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(60,0,8,.5),rgba(60,0,8,0))' }} />
               <img src="assets/combo/coke.png" alt="" style={{ position: 'absolute', left: 68, bottom: 10, height: 108, filter: PRODUCT_SHADOW }} />
               <img src="assets/combo/coke.png" alt="" style={{ position: 'absolute', left: 118, bottom: 4, height: 112, filter: PRODUCT_SHADOW }} />
               <img src="assets/combo/pk-garlic-dip.png" alt="" style={{ position: 'absolute', left: 0, bottom: 8, width: 84, filter: PRODUCT_SHADOW }} />
               <img src="assets/combo/pk-garlic-dip.png" alt="" style={{ position: 'absolute', right: 0, bottom: 6, width: 84, filter: PRODUCT_SHADOW }} />
             </div>
-            <div style={{ position: 'absolute', inset: 0, padding: ph ? '22px 22px' : '26px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'linear-gradient(90deg,rgba(215,25,45,.92) 0%,rgba(215,25,45,.6) 34%,rgba(215,25,45,0) 52%)' }}>
+            <div style={{ position: 'absolute', inset: 0, padding: ph ? '22px 22px' : '26px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: ph ? 'linear-gradient(90deg,rgba(215,25,45,.96) 0%,rgba(215,25,45,.82) 42%,rgba(215,25,45,0) 72%)' : 'linear-gradient(90deg,rgba(215,25,45,.92) 0%,rgba(215,25,45,.6) 34%,rgba(215,25,45,0) 52%)' }}>
               <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase' }}>Pickup combo</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: ph ? 12 : 16, maxWidth: 300 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -188,11 +188,11 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
             const c = creditOf(t);
             return (
               <Hov key={t.id} as="button" onClick={() => h.onTile(t)} style={{ position: 'relative', border: 0, padding: 0, textAlign: 'left', cursor: 'pointer', background: t.bg, color: t.fg, borderRadius: 28, overflow: 'hidden', aspectRatio: '3/4', display: 'flex', flexDirection: 'column', transition: 'transform .25s ease' }} hover={{ transform: 'translateY(-4px)' }}>
-                <div style={{ position: 'relative', zIndex: 2, padding: '20px 20px 0', display: 'flex', flexDirection: 'column', gap: 3, pointerEvents: 'none' }}>
-                  <span style={{ fontWeight: 900, fontSize: 21, lineHeight: 1.05, letterSpacing: '-.025em' }}>{t.name}</span>
-                  <span style={{ fontSize: 14, fontWeight: 600, opacity: 0.8 }}>{t.sub}</span>
+                <div style={{ position: 'relative', zIndex: 2, padding: w < 400 ? '16px 16px 0' : '20px 20px 0', display: 'flex', flexDirection: 'column', gap: 3, pointerEvents: 'none' }}>
+                  <span style={{ fontWeight: 900, fontSize: w < 400 ? 18 : 21, lineHeight: 1.05, letterSpacing: '-.025em' }}>{t.name}</span>
+                  <span style={{ fontSize: w < 400 ? 13 : 14, fontWeight: 600, opacity: 0.8, lineHeight: 1.3 }}>{t.sub}</span>
                 </div>
-                <div style={{ position: 'absolute', left: '9%', right: '9%', bottom: '-13%', aspectRatio: '1/1', borderRadius: '50%', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,.28)' }}>
+                <div style={{ position: 'absolute', left: w < 400 ? '17%' : '9%', right: w < 400 ? '17%' : '9%', bottom: w < 400 ? '-10%' : '-13%', aspectRatio: '1/1', borderRadius: '50%', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,.28)' }}>
                   <Photo src={t.img} shape="circle" credit={c.credit} creditHref={c.creditHref} />
                 </div>
               </Hov>
