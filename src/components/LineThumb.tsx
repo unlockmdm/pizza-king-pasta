@@ -23,7 +23,7 @@ const JUICE: Record<string, Photo> = {
   guava: un('1497534446932-c925b458314e'),
 };
 const DIP: Record<string, string> = { 'dip-garlic': 'garlic', 'dip-ranch': 'ranch', 'dip-chipotle': 'chipotle', 'dip-jalapeno': 'jalapeno-cheddar', 'dip-marinara': 'marinara' };
-const WINGS: Record<string, string> = { hot: '1608039755401-742074f0548d', honey: '1567620832903-9fc6debc209f', bbq: '1527477396000-e27163b481c2' };
+const WINGS: Record<string, string> = { hot: '1608039755401-742074f0548d', honey: '1567620832903-9fc6debc209f', 'honey-garlic': '1567620832903-9fc6debc209f', garlic: '1567620832903-9fc6debc209f', bbq: '1527477396000-e27163b481c2' };
 
 /** Photo for a menu / category item id (both pages use the same ids for most things). */
 function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Photo | null {

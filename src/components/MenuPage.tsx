@@ -2,13 +2,14 @@
 // Full menu with a sticky section bar (scroll-spy), walk-in specials with composed pizza scenes,
 // and the photo-card grid for every other section. Renders inside the homepage shell.
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
-import type { BuilderItem, MenuPageProps, NewLine } from '../lib/types';
+import type { BuilderItem, CategoryId, MenuPageProps, NewLine } from '../lib/types';
 import { Hov, Photo } from '../lib/ui';
 import { useEscape, useWidth } from '../lib/hooks';
 import { pricesFor, SIZE_PRICES, U } from '../lib/catalog';
-import { COMBOS, MENU_SECTIONS, PIZZAS as PIZZA_DATA, SPICES, mustPrice, type LineSpec, type MenuOpt, type MenuRow, type MenuSection } from '../lib/pricing';
+import { CAT_MENU, COMBOS, MENU_SECTIONS, PIZZAS as PIZZA_DATA, SPICES, mustPrice, type LineSpec, type PastaBaseId, type PastaSauceId, type MenuOpt, type MenuRow, type MenuSection } from '../lib/pricing';
 import { money } from '../lib/format';
 import PizzaBuilder from './PizzaBuilder';
+import MenuOptionsSheet, { type SheetTarget } from './MenuOptionsSheet';
 import './MenuPage.css';
 
 // ---------- Data (the prototype's const arrays are the spec) ----------
@@ -238,6 +239,21 @@ interface Tile {
   cta: string;
   act: () => void;
 }
+/** Menu rows that are the same item as a category-page item (so they get the same options): row key → [category, item id]. */
+const CAT_TWIN: Record<string, [CategoryId, string]> = {
+  wings: ['wings', 'wings'], leg: ['wings', 'leg'], fish: ['wings', 'fish'], wedges: ['wings', 'wedges'], 'garlic-bread': ['wings', 'garlic-bread'],
+  sub: ['wings', 'sub'], 'nv-salad': ['wings', 'nv-salad'], 'v-salad': ['wings', 'v-salad'], corn: ['wings', 'corn'], chaat: ['wings', 'chaat'],
+  'fruit-juice': ['juice', 'fresh'], sugarcane: ['juice', 'sugarcane'], lemonade: ['juice', 'lemonade'], coconut: ['juice', 'coconut'], lassi: ['juice', 'lassi'],
+  espresso: ['juice', 'espresso'], hot: ['juice', 'hot'], pop: ['juice', 'pop'], water: ['juice', 'water'], beer: ['juice', 'beer'],
+  cone: ['gelato', 'cone'], cup: ['gelato', 'cup'], shake: ['gelato', 'shake'],
+};
+/** Pasta rows → [base, sauce] for the pasta options (spice, extras, leave out). */
+const PASTA_ROW: Record<string, [PastaBaseId, PastaSauceId]> = {
+  'pasta-rose': ['classic', 'rose'], 'pasta-alfredo': ['classic', 'alfredo'],
+  'veg-pasta-rose': ['veggie', 'rose'], 'veg-pasta-tomato': ['veggie', 'tomato'], 'veg-pasta-alfredo': ['veggie', 'alfredo'],
+  'ch-pasta-rose': ['chicken', 'rose'], 'ch-pasta-tomato': ['chicken', 'tomato'], 'ch-pasta-alfredo': ['chicken', 'alfredo'],
+};
+
 interface Picker { name: string; spicy?: boolean; opts: { label: string; priceText: string; add: (spice?: string) => void }[] }
 
 const VegMark = () => (
@@ -259,6 +275,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
   const [active, setActive] = useState<string>(NAV[0][0]);
   const [builder, setBuilder] = useState<BuilderItem | null>(null);
   const [picker, setPickerState] = useState<Picker | null>(null);
+  const [sheet, setSheet] = useState<SheetTarget | null>(null);
   const [spice, setSpice] = useState(SPICES[0]);
   const setPicker = (p: Picker | null) => { setSpice(SPICES[0]); setPickerState(p); };
 
@@ -290,6 +307,8 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
 
   const closePicker = useCallback(() => setPickerState(null), []);
   useEscape(!!picker, closePicker);
+  const closeSheet = useCallback(() => setSheet(null), []);
+  useEscape(!!sheet, closeSheet);
 
   const go = (id: string, e?: MouseEvent) => {
     if (e) e.preventDefault();
@@ -336,6 +355,24 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
       };
       const multi = opts.length > 1 || !!spicy;
       const min = Math.min(...opts.map((o) => o[1]));
+      // Items with their own options (flavour, sauce, sugar, ice, pasta extras...) open the same choices as their own page.
+      const twin = CAT_TWIN[key];
+      const pasta = PASTA_ROW[key];
+      const twinItem = twin ? CAT_MENU[twin[0]].items.find((x) => x.id === twin[1]) : undefined;
+      if (twin && twinItem) {
+        const hasOpts = !!twinItem.groups?.length;
+        return {
+          key, img: ROW_PIC[key] || '', name, desc, veg: false,
+          priceText: (hasOpts && multi ? 'From ' : '') + money(min),
+          cta: hasOpts ? 'Choose' : 'Add',
+          act: hasOpts
+            ? () => setSheet({ kind: 'cat', cat: twin[0], id: twin[1] })
+            : () => { const spec: LineSpec = { k: 'cat', cat: twin[0], id: twin[1], opts: {} }; const q = mustPrice(spec); add({ key: twin[1], name: q.name, summary: q.summary, unit: q.unit, spec }); },
+        };
+      }
+      if (pasta) {
+        return { key, img: ROW_PIC[key] || '', name, desc, veg: false, priceText: 'From ' + money(min), cta: 'Choose', act: () => setSheet({ kind: 'pasta', name, base: pasta[0], sauce: pasta[1] }) };
+      }
       return {
         key,
         img: ROW_PIC[key] || '',
@@ -527,6 +564,8 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
           </div>
         </div>
       ) : null}
+
+      {sheet ? <MenuOptionsSheet target={sheet} onClose={() => setSheet(null)} onAdd={(line, qty) => { setSheet(null); add(line, qty); }} /> : null}
 
       {builder ? (
         <PizzaBuilder

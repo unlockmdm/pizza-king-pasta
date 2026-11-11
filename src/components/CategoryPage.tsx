@@ -16,6 +16,8 @@ interface Opt {
   price?: number;
   long?: string;
   img?: string;
+  /** Default "no change" choice: not shown on the cart line. */
+  quiet?: boolean;
 }
 interface Group {
   id: string;
@@ -80,7 +82,9 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   shake: { img: '1505252585461-04db1eb84625' },
 };
 /** Option groups shown as wrapping chips instead of a segmented control ("item.group"; spice is always chips). */
-const CHIPS = new Set(['lassi.flav', 'hot.kind', 'pop.brand', 'beer.brand', 'cone.flav', 'cup.flav', 'shake.flav']);
+const CHIPS = new Set(['lassi.flav', 'hot.kind', 'pop.brand', 'beer.brand', 'cone.flav', 'cup.flav', 'shake.flav', 'wings.flav', 'fish.w']);
+/** Groups shown as chips wherever they appear (Square drink adjustments, second gelato flavour). */
+const CHIP_GROUPS = new Set(['sugar', 'ice', 'salt', 'flav2']);
 /** Option photos ("item.option" → Unsplash id). */
 const OPT_IMG: Record<string, string> = {
   'wings.hot': '1608039755401-742074f0548d', 'wings.honey': '1567620832903-9fc6debc209f', 'wings.bbq': '1527477396000-e27163b481c2',
@@ -101,7 +105,7 @@ const withUi = (cat: CategoryId): Item[] =>
     ...ITEM_UI[it.id],
     groups: it.groups?.map((g) => ({
       ...g,
-      chips: g.id === 'spice' || CHIPS.has(it.id + '.' + g.id) || undefined,
+      chips: g.id === 'spice' || CHIP_GROUPS.has(g.id) || CHIPS.has(it.id + '.' + g.id) || undefined,
       opts: g.opts.map((x) => (OPT_IMG[it.id + '.' + x.id] ? { ...x, img: OPT_IMG[it.id + '.' + x.id] } : x)),
     })),
   }));
@@ -240,7 +244,7 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
     const priced = chosen.filter((c) => c.price != null).pop();
     const price = (priced ? priced.price : it.price) ?? 0;
     const pic = chosen.filter((c) => c.img).pop();
-    const sub = chosen.map((c) => c.long || c.label).join(' · ');
+    const sub = chosen.filter((c) => !c.quiet).map((c) => c.long || c.label).join(' · ').replace(/ · and /g, ' and ');
     const justAdded = added === it.id;
     const hasOpts = groups.length > 0;
     const minP = hasOpts

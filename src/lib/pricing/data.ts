@@ -134,7 +134,8 @@ const LEMONADE: [number, number, number] = [5.8, 7, 9];
 const WINGS: [number, number][] = [[8, 10], [12, 12], [16, 14], [24, 22], [34, 31], [48, 42]];
 const LEG_EACH = 5;
 const FISH_PER_LB = 12.5;
-const FISH_LBS: [number, string][] = [[1, '1 lb'], [1.5, '1.5 lb'], [2, '2 lb']];
+// Square: Tandoori Fish 0.5 lb to 5 lb in half pounds, $12.50 a pound.
+const FISH_LBS: [number, string][] = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((n): [number, string] => [n, n + ' lb']);
 const CORN = 5;
 const GELATO_SCOOP = 6;
 
@@ -199,7 +200,8 @@ export const MENU_SECTIONS: MenuSection[] = [
 // Category pages (Wings & sides, Drinks, Gelato & shakes)
 // ---------------------------------------------------------------------------
 
-export interface CatOpt { id: string; label: string; price?: number; long?: string }
+/** `quiet`: the default "no change" choice (Regular sugar, No ice...), left off the cart line and kitchen ticket. */
+export interface CatOpt { id: string; label: string; price?: number; long?: string; quiet?: boolean }
 export interface CatGroup { id: string; label?: string; opts: CatOpt[] }
 export interface CatItem {
   id: string;
@@ -218,9 +220,16 @@ const CSIZES3 = (p: [number, number, number]): CatOpt[] => [
   o('XL', 'XL', { price: p[2], long: 'X-Large' }),
 ];
 const money2 = (n: number) => '$' + n.toFixed(2);
+// Free drink adjustments, named as in the shop's Square modifier lists. First option = default, kept off the ticket.
+const SUGAR_GROUP: CatGroup = { id: 'sugar', label: 'Sugar', opts: [o('reg', 'Regular', { quiet: true }), o('none', 'No sugar'), o('less', 'Less sugar'), o('extra', 'Extra sugar')] };
+const ADD_ICE_GROUP: CatGroup = { id: 'ice', label: 'Ice', opts: [o('none', 'No ice', { quiet: true }), o('add', 'Add ice')] };
+const LEMONADE_ICE_GROUP: CatGroup = { id: 'ice', label: 'Ice', opts: [o('reg', 'Regular', { quiet: true }), o('none', 'No ice'), o('less', 'Less ice'), o('extra', 'Extra ice')] };
+const BLACK_SALT_GROUP: CatGroup = { id: 'salt', label: 'Black salt', opts: [o('reg', 'Regular', { quiet: true }), o('none', 'No black salt'), o('less', 'Less black salt'), o('extra', 'Extra black salt')] };
 const SPICE_GROUP: CatGroup = { id: 'spice', label: 'Spice level', opts: SPICES.map((v) => o(v.toLowerCase().replace(/\s+/g, '-'), v)) };
 export const GELATO_FLAVOURS = ['Vanilla', 'Mango', 'Strawberry', 'Banana', 'Pistachio', 'Black cherry', 'Cappuccino', 'Chocolate', 'Red velvet', 'Rum & raisin'];
 const GELATO_OPTS: CatOpt[] = GELATO_FLAVOURS.map((f) => o(f.toLowerCase().replace(/[^a-z]+/g, '-'), f));
+// Square lets the counter pick more than one gelato flavour: offer an optional second one.
+const GELATO_SECOND: CatGroup = { id: 'flav2', label: 'Second flavour (optional)', opts: [o('none', 'None', { quiet: true }), ...GELATO_FLAVOURS.map((f) => o(f.toLowerCase().replace(/[^a-z]+/g, '-'), f, { long: 'and ' + f.toLowerCase() }))] };
 
 /** Each category's fallback summary (its hero eyebrow) and its items. */
 export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> = {
@@ -228,9 +237,10 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
     label: 'Wings & sides',
     items: [
       {
-        id: 'wings', name: 'Tandoori wings', desc: 'Hot, honey garlic or BBQ. Extra dip ' + money2(EXTRA_DIP) + '.', def: { n: '12' },
+        id: 'wings', name: 'Tandoori wings', desc: 'Hot wing, honey garlic, BBQ, honey or garlic. Extra dip ' + money2(EXTRA_DIP) + '.', def: { n: '12' },
         groups: [
-          { id: 'flav', label: 'Flavour', opts: [o('hot', 'Hot'), o('honey', 'Honey garlic'), o('bbq', 'BBQ')] },
+          // Square "Wing Sauce": No Sauce, BBQ, Honey, Garlic, Hot Wing (honey + garlic together = honey garlic).
+          { id: 'flav', label: 'Sauce', opts: [o('hot', 'Hot wing'), o('honey-garlic', 'Honey garlic'), o('bbq', 'BBQ'), o('honey', 'Honey'), o('garlic', 'Garlic'), o('none', 'No sauce')] },
           { id: 'n', label: 'Wings', opts: WINGS.map(([n, p]) => o(String(n), String(n), { price: p, long: n + ' wings' })) },
           SPICE_GROUP,
         ],
@@ -260,14 +270,16 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
         groups: [
           { id: 'flav', label: 'Flavour', opts: [o('orange', 'Orange'), o('pineapple', 'Pineapple'), o('guava', 'Guava'), o('mix', 'Mix')] },
           { id: 'size', label: 'Size', opts: CSIZES3(JUICE) },
+          BLACK_SALT_GROUP,
+          ADD_ICE_GROUP,
         ],
       },
-      { id: 'sugarcane', name: 'Sugarcane juice', def: { size: 'L' }, groups: [{ id: 'size', label: 'Size', opts: CSIZES3(JUICE) }] },
-      { id: 'lemonade', name: 'Lemonade', def: { size: 'L' }, groups: [{ id: 'size', label: 'Size', opts: CSIZES3(LEMONADE) }] },
+      { id: 'sugarcane', name: 'Sugarcane juice', def: { size: 'L' }, groups: [{ id: 'size', label: 'Size', opts: CSIZES3(JUICE) }, BLACK_SALT_GROUP, ADD_ICE_GROUP] },
+      { id: 'lemonade', name: 'Lemonade', def: { size: 'L' }, groups: [{ id: 'size', label: 'Size', opts: CSIZES3(LEMONADE) }, SUGAR_GROUP, LEMONADE_ICE_GROUP] },
       { id: 'coconut', name: 'Fresh coconut juice', price: 8.01 },
       { id: 'lassi', name: 'Lassi', price: 6.8, groups: [{ id: 'flav', label: 'Flavour', opts: [o('mango', 'Mango'), o('mint', 'Mint'), o('strawberry', 'Strawberry'), o('sweet', 'Sweet'), o('salty', 'Salty')] }] },
-      { id: 'espresso', name: 'Italian espresso', price: 3.1 },
-      { id: 'hot', name: 'Hot drinks', price: 3.1, groups: [{ id: 'kind', label: 'Drink', opts: [o('coffee', 'Indian coffee'), o('cappuccino', 'Cappuccino'), o('choc', 'Hot chocolate'), o('masala', 'Masala tea')] }] },
+      { id: 'espresso', name: 'Italian espresso', price: 3.1, groups: [SUGAR_GROUP] },
+      { id: 'hot', name: 'Hot drinks', price: 3.1, groups: [{ id: 'kind', label: 'Drink', opts: [o('coffee', 'Indian coffee'), o('cappuccino', 'Cappuccino'), o('choc', 'Hot chocolate'), o('masala', 'Masala tea')] }, SUGAR_GROUP] },
       {
         id: 'pop', name: 'Pop', desc: 'Can or 2 L bottle',
         groups: [
@@ -288,14 +300,16 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
   gelato: {
     label: 'Gelato & shakes',
     items: [
-      { id: 'cone', name: 'Gelato cone', price: GELATO_SCOOP, groups: [{ id: 'flav', label: 'Flavour', opts: GELATO_OPTS }] },
+      { id: 'cone', name: 'Gelato cone', price: GELATO_SCOOP, groups: [{ id: 'flav', label: 'Flavour', opts: GELATO_OPTS }, GELATO_SECOND] },
       // Square calls gelato "Ice Cream": Cone $6.00, Medium Bowl $6.00 (Large Bowl has no price set yet).
-      { id: 'cup', name: 'Gelato cup', desc: 'Medium cup', price: GELATO_SCOOP, groups: [{ id: 'flav', label: 'Flavour', opts: GELATO_OPTS }] },
+      { id: 'cup', name: 'Gelato cup', desc: 'Medium cup', price: GELATO_SCOOP, groups: [{ id: 'flav', label: 'Flavour', opts: GELATO_OPTS }, GELATO_SECOND] },
       {
         id: 'shake', name: 'Thick shake',
         groups: [
           { id: 'flav', label: 'Flavour', opts: [o('mango', 'Mango'), o('strawberry', 'Strawberry'), o('banana', 'Banana'), o('badam', 'Badam'), o('papaya', 'Papaya')] },
           { id: 'size', label: 'Size', opts: CSIZES3(SHAKE) },
+          SUGAR_GROUP,
+          ADD_ICE_GROUP,
         ],
       },
     ],
@@ -316,6 +330,10 @@ export const PASTA_BASES: { id: PastaBaseId; name: string; desc: string; p: Part
   { id: 'veggie', name: 'Veggie', desc: 'Green peppers, onions, broccoli, mushrooms', p: { rose: 13.27, tomato: 12.5, alfredo: 13.72 } },
   { id: 'chicken', name: 'Chicken', desc: 'Chicken, green peppers, onions', p: { rose: 14.6, tomato: 14, alfredo: 15.04 } },
 ];
+/** Square "Extra Pasta Topping(s)": [id, name, price]. */
+export const PASTA_EXTRAS: [string, string, number][] = [['chicken', 'Extra chicken', 1.5], ['sauce', 'Extra sauce', 1.5], ['green-pepper', 'Extra green pepper', 1], ['onion', 'Extra onion', 1], ['broccoli', 'Extra broccoli', 1], ['mushroom', 'Extra mushroom', 1]];
+/** Square "Remove Pasta Toppings": [id, name, bases that have it]. */
+export const PASTA_REMOVE: [string, string, PastaBaseId[]][] = [['chicken', 'No chicken', ['chicken']], ['green-pepper', 'No green pepper', ['veggie', 'chicken']], ['onion', 'No onion', ['veggie', 'chicken']], ['broccoli', 'No broccoli', ['veggie']], ['mushroom', 'No mushroom', ['veggie']]];
 export type MomoId = 'veg' | 'nonveg';
 export const MOMOS: [MomoId, string, number][] = [['veg', 'Veggie', 9], ['nonveg', 'Non-veggie', 11]];
 

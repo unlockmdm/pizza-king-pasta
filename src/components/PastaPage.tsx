@@ -6,7 +6,7 @@ import { Hov, Photo, IconBack, IconCheck, IconMinus, IconPlus } from '../lib/ui'
 import { useWidth } from '../lib/hooks';
 import { U } from '../lib/catalog';
 import { money } from '../lib/format';
-import { MOMOS as MOMO_DATA, PASTA_BASES, PASTA_SAUCES, SPICES as SPICE_LIST, mustPrice, type LineSpec } from '../lib/pricing';
+import { MOMOS as MOMO_DATA, PASTA_BASES, PASTA_EXTRAS, PASTA_REMOVE, PASTA_SAUCES, SPICES as SPICE_LIST, mustPrice, type LineSpec } from '../lib/pricing';
 
 // ---------- Data (the prototype's `const` arrays are the spec) ----------
 
@@ -153,6 +153,8 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
   const [baseId, setBase] = useState<BaseId>('classic');
   const [qty, setQty] = useState(1);
   const [spice, setSpice] = useState(SPICES[0]);
+  const [extras, setExtras] = useState<string[]>([]);
+  const [remove, setRemove] = useState<string[]>([]);
   const [added, setAdded] = useState(false);
   const [addedM, setAddedM] = useState<MomoId | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>();
@@ -168,7 +170,12 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
   const wide = w >= 980;
   const base = BASES.find((b) => b.id === baseId) || BASES[0];
   const sauce = SAUCES.find((x) => x[0] === sauceId) || SAUCES[0];
-  const price = base.p[sauceId] ?? 0;
+  // Removals only make sense for what's in this base (e.g. no "No chicken" on veggie pasta).
+  const removable = PASTA_REMOVE.filter((x) => x[2].includes(baseId));
+  const removeNow = remove.filter((id) => removable.some((x) => x[0] === id));
+  const extraCost = extras.reduce((a, id) => a + (PASTA_EXTRAS.find((x) => x[0] === id)?.[2] || 0), 0);
+  const price = (base.p[sauceId] ?? 0) + extraCost;
+  const toggle = (set: (f: (v: string[]) => string[]) => void, id: string) => set((v) => (v.includes(id) ? v.filter((x) => x !== id) : [...v, id]));
   const raw = PHOTO[`${baseId}-${sauceId}`] || sauce[3];
   const img = raw.indexOf('assets/') === 0 ? raw : U(raw, 900);
   const rawTitle = (base.id === 'classic' ? '' : base.name + ' ') + 'pasta, ' + sauce[1].toLowerCase() + ' sauce';
@@ -181,10 +188,10 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
     setBase((cur) => (BASES.find((b) => b.id === cur)?.p[id] != null ? cur : 'veggie'));
   };
   const add = () => {
-    const spec: LineSpec = { k: 'pasta', base: baseId, sauce: sauceId, spice };
+    const spec: LineSpec = { k: 'pasta', base: baseId, sauce: sauceId, spice, ...(extras.length ? { extras } : {}), ...(removeNow.length ? { remove: removeNow } : {}) };
     const q = mustPrice(spec);
-    onAdd?.({ key: 'pasta-' + baseId + '-' + sauceId + '-' + spice, name: q.name, summary: q.summary, unit: q.unit, spec }, qty);
-    flash(() => { setAdded(true); setQty(1); });
+    onAdd?.({ key: ['pasta', baseId, sauceId, spice, ...[...extras].sort(), ...removeNow.map((r) => 'no-' + r)].join('-'), name: q.name, summary: q.summary, unit: q.unit, spec }, qty);
+    flash(() => { setAdded(true); setQty(1); setExtras([]); setRemove([]); });
   };
   const addMomo = () => {
     const m = momoSel;
@@ -343,6 +350,35 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
                 })}
               </div>
             </div>
+            {/* Square "Extra Pasta Topping(s)" and "Remove Pasta Toppings". */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#9C928C' }}>Extras</span>
+              <div role="group" aria-label="Extras" style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {PASTA_EXTRAS.map(([id, name, p]) => {
+                  const on = extras.includes(id);
+                  return (
+                    <button key={id} type="button" aria-pressed={on} onClick={() => toggle(setExtras, id)} style={{ height: 38, padding: '0 12px', border: 0, borderRadius: 999, background: on ? '#fff' : 'rgba(255,255,255,.08)', color: on ? '#1A1414' : '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                      {name.replace(/^Extra /, '').replace(/^./, (c) => c.toUpperCase())} <span style={{ opacity: 0.7, fontWeight: 600 }}>+{money(p)}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            {removable.length ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#9C928C' }}>Leave out</span>
+                <div role="group" aria-label="Leave out" style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {removable.map(([id, name]) => {
+                    const on = removeNow.includes(id);
+                    return (
+                      <button key={id} type="button" aria-pressed={on} onClick={() => toggle(setRemove, id)} style={{ height: 38, padding: '0 12px', border: 0, borderRadius: 999, background: on ? '#fff' : 'rgba(255,255,255,.08)', color: on ? '#1A1414' : '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                        {name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
             <div style={S.bowlActions}>
               <div style={S.stepper}>
                 <Hov as="button" type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease quantity" style={S.stepBtn} hover={S.stepBtnHover}>

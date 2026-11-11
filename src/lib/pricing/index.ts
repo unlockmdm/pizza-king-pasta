@@ -4,7 +4,7 @@
 import type { CategoryId, SizeKey, SizePrices } from '../types';
 import {
   CAT_MENU, CHEESES, COMBOS, COMBO_DIPS, COMBO_POPS, COMBO_SIDES, CRUSTS, CUTS, DONENESS, EXTRA_CHEESE, EXTRA_DIP, HALVES, HST_PERCENT,
-  MENU_SECTIONS, MOMOS, NOTES_MAX, OVENS, PASTA_BASES, PASTA_SAUCES, PIZZAS, PIZZA_SAUCES, SEASONINGS, SIZE_KEYS, SIZE_NAMES,
+  MENU_SECTIONS, MOMOS, NOTES_MAX, OVENS, PASTA_BASES, PASTA_EXTRAS, PASTA_REMOVE, PASTA_SAUCES, PIZZAS, PIZZA_SAUCES, SEASONINGS, SIZE_KEYS, SIZE_NAMES,
   SPICES, TOPPINGS, TOP_PRICE, UPSELLS, includedFor, pricesFor, type CatItem,
 } from './data';
 
@@ -46,7 +46,8 @@ export type LineSpec =
   | { k: 'menu'; id: string; opt: string; spice?: string }
   /** An item on a category page, with one option id per group. */
   | { k: 'cat'; cat: CategoryId; id: string; opts: Record<string, string> }
-  | { k: 'pasta'; base: string; sauce: string; spice: string }
+  /** `extras` / `remove`: Square's Extra Pasta Topping(s) and Remove Pasta Toppings (ids from PASTA_EXTRAS / PASTA_REMOVE). */
+  | { k: 'pasta'; base: string; sauce: string; spice: string; extras?: string[]; remove?: string[] }
   | { k: 'momo'; id: string }
   /** Cart upsell with its flavour. */
   | { k: 'upsell'; id: string; flavour: string };
@@ -282,10 +283,12 @@ function price(spec: unknown): PricedLine {
       if (!isObj(s.opts)) bad('options');
       const sel = s.opts as Record<string, unknown>;
       if (Object.keys(sel).some((g) => !groups.some((x) => x.id === g))) bad('option group');
-      const chosen = groups.map((g) => g.opts.find((x) => x.id === sel[g.id]) || bad('option'));
+      // A group whose first choice is the quiet default (sugar, ice, black salt...) may be left out: carts saved before it existed still work.
+      const chosen = groups.map((g) => (sel[g.id] == null && g.opts[0].quiet ? g.opts[0] : g.opts.find((x) => x.id === sel[g.id]) || bad('option')));
       const priced = chosen.filter((c) => c.price != null).pop();
       const unit = (priced ? priced.price : it.price) ?? 0;
-      const sub = chosen.map((c) => c.long || c.label).join(' · ');
+      // Default "no change" choices (Regular sugar, No ice...) stay off the line and the kitchen ticket.
+      const sub = chosen.filter((c) => !c.quiet).map((c) => c.long || c.label).join(' · ').replace(/ · and /g, ' and ');
       const summary = sub || it.desc || cat.label;
       return { unit, name: it.name, summary, note: summary };
     }
@@ -294,9 +297,18 @@ function price(spec: unknown): PricedLine {
       const sauce = PASTA_SAUCES.find((x) => x[0] === s.sauce) || bad('pasta sauce');
       const unit = base.p[sauce[0]] ?? bad('pasta combination');
       if (!oneOf(s.spice, SPICES)) bad('spice');
+      const pick = (v: unknown, ids: string[], what: string): string[] => {
+        if (v == null) return [];
+        if (!Array.isArray(v) || v.length > ids.length || new Set(v).size !== v.length || v.some((x) => !oneOf(x, ids))) bad(what);
+        return ids.filter((id) => (v as string[]).includes(id)); // canonical order
+      };
+      const extras = pick(s.extras, PASTA_EXTRAS.map((x) => x[0]), 'pasta extras');
+      const remove = pick(s.remove, PASTA_REMOVE.filter((x) => x[2].includes(base.id)).map((x) => x[0]), 'pasta remove');
+      const extraCost = extras.reduce((a, id) => a + PASTA_EXTRAS.find((x) => x[0] === id)![2], 0);
       const raw = (base.id === 'classic' ? '' : base.name + ' ') + 'pasta, ' + lc(sauce[1]) + ' sauce';
-      const summary = base.desc + ' · ' + s.spice;
-      return { unit, name: raw.charAt(0).toUpperCase() + raw.slice(1), summary, note: summary };
+      const changes = [...remove.map((id) => PASTA_REMOVE.find((x) => x[0] === id)![1]), ...extras.map((id) => PASTA_EXTRAS.find((x) => x[0] === id)![1])];
+      const summary = [base.desc, s.spice as string, ...changes].join(' · ');
+      return { unit: round2(unit + extraCost), name: raw.charAt(0).toUpperCase() + raw.slice(1), summary, note: summary };
     }
     case 'momo': {
       const m = MOMOS.find((x) => x[0] === s.id) || bad('momos');
