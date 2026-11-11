@@ -344,6 +344,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
                 <AppPill href={SHOP.doordash} logo={SHOP.doordashLogo} name="DoorDash" h={14} />
                 <AppPill href={SHOP.ubereats} logo={SHOP.ubereatsLogo} name="Uber Eats" h={18} off={!SHOP.ubereatsAvailable} />
               </div>
+              {SHOP.ubereatsAvailable ? null : <span style={{ fontSize: 13, lineHeight: 1.45, color: '#636366' }}>Ordering delivery through Uber Eats is currently unavailable.</span>}
             </div>
           </div>
           <div style={{ position: 'relative', borderRadius: 32, overflow: 'hidden', minHeight: 380, background: '#2A1E1A', display: ph ? 'none' : undefined }}>
@@ -367,10 +368,11 @@ function InfoBlock({ label, children }: { label: string; children: React.ReactNo
 /** White pill linking to the shop's page in a delivery app (Hours & location). */
 function AppPill({ href, logo, name, h, off }: { href: string; logo: string; name: string; h: number; off?: boolean }) {
   if (off) {
+    // Same pill, greyed out and not clickable (the note under the pills explains why).
     return (
-      <span role="note" aria-label={name + ' delivery is currently unavailable'} style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 50, maxWidth: '100%', minWidth: 0, background: '#F4F4F5', color: '#8E8E93', borderRadius: 999, padding: '8px 18px', boxShadow: '0 0 0 1px rgba(26,20,20,.08)', cursor: 'not-allowed' }}>
-        <img src={logo} alt={name} style={{ display: 'block', height: h, width: 'auto', flex: 'none', filter: 'grayscale(1)', opacity: 0.45 }} />
-        <span style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.2, minWidth: 0 }}>Currently unavailable</span>
+      <span aria-disabled="true" aria-label={'Order delivery on ' + name + ' (currently unavailable)'} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 50, background: '#F7F7F8', color: '#AEAEB2', borderRadius: 999, padding: '0 20px', boxShadow: '0 0 0 1px rgba(26,20,20,.08)', cursor: 'not-allowed', userSelect: 'none' }}>
+        <img src={logo} alt={name} style={{ display: 'block', height: h, width: 'auto', flex: 'none', filter: 'grayscale(1)', opacity: 0.4 }} />
+        <IconArrowUpRight />
       </span>
     );
   }

@@ -104,7 +104,10 @@ export default function StartSheet({
                 <AppButton href={SHOP.doordash} logo={SHOP.doordashLogo} name="DoorDash" h={15} />
                 <AppButton href={SHOP.ubereats} logo={SHOP.ubereatsLogo} name="Uber Eats" h={20} off={!SHOP.ubereatsAvailable} />
               </div>
-              <span style={{ fontSize: 13, lineHeight: 1.45, color: '#636366' }}>Delivery fees and tips are paid in the app.</span>
+              <span style={{ fontSize: 13, lineHeight: 1.45, color: '#636366' }}>
+                Delivery fees and tips are paid in the app.
+                {SHOP.ubereatsAvailable ? null : <><br />Ordering delivery through Uber Eats is currently unavailable.</>}
+              </span>
             </div>
           )}
 
@@ -184,12 +187,14 @@ function WhenRow({ bg, on, border, title, sub, onClick }: { bg: string; on: bool
 /** "Order delivery on [logo] ↗" button for the Delivery tab. */
 function AppButton({ href, logo, name, h, off }: { href: string; logo: string; name: string; h: number; off?: boolean }) {
   if (off) {
+    // Same button, greyed out and not clickable (the note under the buttons explains why).
     return (
-      <div role="note" aria-label={name + ' delivery is currently unavailable'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 60, padding: '0 20px', borderRadius: 14, background: '#F4F4F5', color: '#8E8E93', boxShadow: 'inset 0 0 0 1px #E4E4E7', cursor: 'not-allowed' }}>
+      <div aria-disabled="true" aria-label={'Order delivery on ' + name + ' (currently unavailable)'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 60, padding: '0 20px', borderRadius: 14, background: '#F7F7F8', color: '#AEAEB2', boxShadow: 'inset 0 0 0 1px #E4E4E7', cursor: 'not-allowed', userSelect: 'none' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', minWidth: 0 }}>
-          <img src={logo} alt={name} style={{ display: 'block', height: h, width: 'auto', flex: 'none', filter: 'grayscale(1)', opacity: 0.45 }} />
+          <span style={{ fontWeight: 700, fontSize: 15, color: '#AEAEB2', whiteSpace: 'nowrap' }}>Order delivery on</span>
+          <img src={logo} alt={name} style={{ display: 'block', height: h, width: 'auto', flex: 'none', filter: 'grayscale(1)', opacity: 0.4 }} />
         </span>
-        <span style={{ fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>Currently unavailable</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flex: 'none' }} aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
       </div>
     );
   }
