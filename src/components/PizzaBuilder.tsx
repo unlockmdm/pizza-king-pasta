@@ -105,23 +105,25 @@ const HV: [Half, string, string][] = [['left', 'Left half', 'M12 3.5a8.5 8.5 0 0
 const DONENESS_FILTER: Record<string, string> = { Light: 'brightness(1.1) saturate(.7) contrast(.95)', Regular: 'none', 'Well done': 'brightness(.78) saturate(1.25) contrast(1.12) sepia(.12)' };
 /** Knife lines, in the 76x76 box of the pizza photo. */
 /**
- * Knife cuts for the live pizza, like a real sliced pie: straight, crisp cuts that meet in the centre and run
- * right through the crust to the edge (viewBox 0 0 76 76; the pizza photo's edge is a circle of radius ~37.6).
- * Each cut is a thin dark gap with a light cheese edge on one side and a soft shadow on the other.
+ * Real slices for the live pizza (viewBox 0 0 76 76; the photo's pizza is a circle of radius ~37.6 at the centre).
+ * The cuts are actual hairline gaps cut out of the pizza with a CSS mask, so the background shows through,
+ * the gaps open up slightly toward the crust and break the rim, like a sliced pie. A soft shading band along
+ * each cut gives the slice edges some depth.
  */
-const PIE_C = 37.96, PIE_R = 37.6;
-function naturalCuts(slices: number): { gap: string; hi: string; sh: string } {
-  const cuts = slices / 2, f = (n: number) => n.toFixed(2);
-  let gap = '', hi = '', sh = '';
-  for (let i = 0; i < cuts; i++) {
-    const a = (Math.PI * i) / cuts - Math.PI / 2;
-    const dx = Math.cos(a) * PIE_R, dy = Math.sin(a) * PIE_R, nx = -Math.sin(a), ny = Math.cos(a);
-    const seg = (o: number) => 'M' + f(PIE_C + dx + nx * o) + ' ' + f(PIE_C + dy + ny * o) + 'L' + f(PIE_C - dx + nx * o) + ' ' + f(PIE_C - dy + ny * o);
-    gap += seg(0);
-    hi += seg(0.42);
-    sh += seg(-0.4);
+const PIE_C = 37.96;
+function naturalCuts(slices: number): { mask: string; edges: string } {
+  const f = (n: number) => n.toFixed(2);
+  let holes = '', edges = '';
+  for (let i = 0; i < slices; i++) {
+    const a = (Math.PI * 2 * i) / slices - Math.PI / 2;
+    const ux = Math.cos(a), uy = Math.sin(a), nx = -uy, ny = ux;
+    // A hairline wedge from near the centre out past the rim, opening slightly toward the crust.
+    const p = (r: number, w: number) => f(PIE_C + ux * r + nx * w) + ' ' + f(PIE_C + uy * r + ny * w);
+    holes += 'M' + p(0.7, 0.04) + 'L' + p(40, 0.42) + 'L' + p(40, -0.42) + 'L' + p(0.7, -0.04) + 'Z';
+    edges += 'M' + f(PIE_C) + ' ' + f(PIE_C) + 'L' + f(PIE_C + ux * 40) + ' ' + f(PIE_C + uy * 40);
   }
-  return { gap, hi, sh };
+  const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 76'><path fill-rule='evenodd' fill='#000' d='M-2 -2H78V78H-2Z" + holes + "'/></svg>";
+  return { mask: 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")', edges };
 }
 // Cut is not a customer choice: every pizza is cut into triangles.
 const CHIP_GROUPS: ['doneness', string, string[]][] = [['doneness', 'Bake', ['Regular', 'Light', 'Well done']]];
@@ -242,32 +244,36 @@ function PizzaLayers({ pieces, label, sauce, doneness, slices }: { pieces: Piece
     <>
       {/* Cheap static shadow instead of a CSS drop-shadow filter (filters repaint on every change). */}
       <span aria-hidden="true" style={{ position: 'absolute', left: '6%', right: '6%', bottom: '-4%', height: '16%', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(26,20,20,.24),rgba(26,20,20,0))', pointerEvents: 'none' }} />
-      <img
-        src={base}
-        alt={label || ''}
-        aria-hidden={label ? undefined : true}
-        decoding="async"
-        draggable={false}
-        style={{ position: 'relative', display: 'block', width: '100%', height: '100%', objectFit: 'cover', filter: tone === 'none' ? undefined : tone, transition: 'filter .2s' }}
-      />
-      {pieces.map((pc) => (
-        <span
-          key={pc.key}
-          aria-hidden="true"
-          style={{ display: 'block', flex: 'none', backgroundImage: "url('" + pc.src + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'absolute', left: pc.x, top: pc.y, width: pc.w, aspectRatio: '1/1', backgroundSize: 'contain', transform: pc.tf, filter: tone === 'none' ? undefined : tone, pointerEvents: 'none' }}
+      {/* Shadow under the slices: what you see through the gaps (white only shows right at the rim). */}
+      <span aria-hidden="true" style={{ position: 'absolute', inset: '2.2%', borderRadius: '50%', background: 'radial-gradient(closest-side, rgba(62,24,6,.82) 0%, rgba(62,24,6,.74) 88%, rgba(62,24,6,0) 100%)', pointerEvents: 'none' }} />
+      {/* The pizza itself, with the slice gaps masked out (see naturalCuts). */}
+      <div style={{ position: 'absolute', inset: 0, WebkitMaskImage: cuts.mask, maskImage: cuts.mask, WebkitMaskSize: '100% 100%', maskSize: '100% 100%' } as CSSProperties}>
+        <img
+          src={base}
+          alt={label || ''}
+          aria-hidden={label ? undefined : true}
+          decoding="async"
+          draggable={false}
+          style={{ position: 'relative', display: 'block', width: '100%', height: '100%', objectFit: 'cover', filter: tone === 'none' ? undefined : tone, transition: 'filter .2s' }}
         />
-      ))}
-      {/* Knife cuts: straight, crisp, edge to edge (see naturalCuts). */}
-      <svg key={slices} aria-hidden="true" width="100%" height="100%" viewBox="0 0 76 76" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', animation: 'pbIn .25s ease both' }}>
-        <defs>
-          <clipPath id={'c' + uid}><circle cx={PIE_C} cy={PIE_C} r={PIE_R - 0.7} /></clipPath>
-        </defs>
-        <g clipPath={'url(#c' + uid + ')'} fill="none" strokeLinecap="butt">
-          <path d={cuts.sh} stroke="rgba(60,22,6,.28)" strokeWidth={0.7} />
-          <path d={cuts.hi} stroke="rgba(255,244,222,.75)" strokeWidth={0.32} />
-          <path d={cuts.gap} stroke="rgba(52,20,6,.82)" strokeWidth={0.4} />
-        </g>
-      </svg>
+        {pieces.map((pc) => (
+          <span
+            key={pc.key}
+            aria-hidden="true"
+            style={{ display: 'block', flex: 'none', backgroundImage: "url('" + pc.src + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'absolute', left: pc.x, top: pc.y, width: pc.w, aspectRatio: '1/1', backgroundSize: 'contain', transform: pc.tf, filter: tone === 'none' ? undefined : tone, pointerEvents: 'none' }}
+          />
+        ))}
+        {/* Slice edges: cheese and crust darken a little where they were cut. */}
+        <svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 76 76" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          <defs>
+            <filter id={'b' + uid} x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation=".3" /></filter>
+            <clipPath id={'c' + uid}><circle cx={PIE_C} cy={PIE_C} r={36.9} /></clipPath>
+          </defs>
+          <g clipPath={'url(#c' + uid + ')'}>
+            <path d={cuts.edges} filter={'url(#b' + uid + ')'} fill="none" stroke="rgba(95,38,12,.26)" strokeWidth={1.3} />
+          </g>
+        </svg>
+      </div>
     </>
   );
 }
