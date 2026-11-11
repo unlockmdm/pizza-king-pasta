@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 import type { CartCheckoutProps, CartLine, Mode } from '../lib/types';
 import { SHOP } from '../lib/catalog';
-import { canOrderAsap, isValidWhen, slotToIso } from '../lib/hours';
+import { canOrderAsap, isValidWhen, slotToIso, timeSlots } from '../lib/hours';
 import { UPSELLS as UPSELL_DATA, mustPrice, orderTotals, type LineSpec } from '../lib/pricing';
 import { CARD_STYLE, isSafari, loadSquare, newKey, SQUARE_ENABLED, SQUARE_SANDBOX, submitPayment, type SqCard, type SqCardEvent, type SqCardState, type SqPaymentRequest, type SqWallet } from '../lib/square';
 import { money } from '../lib/format';
@@ -730,7 +730,22 @@ export default function CartCheckout(p: CartCheckoutProps) {
                       <span style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: 600, color: timeOk ? '#1A1414' : '#C11425' }}>
                         {timeOk ? doneWhen : canOrderAsap() ? 'Choose a time' : 'Closed now'}
                       </span>
-                      {p.onChangeTime ? (
+                      {p.onWhen ? (
+                        // A real <select> under a "Change" pill: phones open their own time wheel, right here in checkout.
+                        <label style={{ position: 'relative', flex: 'none', height: 36, padding: '0 14px', borderRadius: 999, border: '1px solid #E4E4E7', background: '#fff', color: '#1A1414', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                          Change
+                          <select
+                            aria-label="Pickup time"
+                            value={timeOk ? p.when || 'asap' : ''}
+                            onChange={(e) => p.onWhen?.(e.target.value)}
+                            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer', fontSize: 16 }}
+                          >
+                            {!timeOk ? <option value="" disabled>Choose a time</option> : null}
+                            {canOrderAsap() ? <option value="asap">As soon as possible</option> : null}
+                            {timeSlots(new Date(), 48).map((t) => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                        </label>
+                      ) : p.onChangeTime ? (
                         <button onClick={p.onChangeTime} style={{ flex: 'none', height: 36, padding: '0 14px', borderRadius: 999, border: '1px solid #E4E4E7', background: '#fff', color: '#1A1414', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                           Change
                         </button>

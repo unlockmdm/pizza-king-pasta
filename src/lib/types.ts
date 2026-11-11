@@ -163,4 +163,6 @@ export interface CartCheckoutProps {
   onChangeTime?: () => void;
   /** Pickup time from the start sheet: 'asap' or a slot label like "7:30 PM". */
   when?: string;
+  /** Set the pickup time right from checkout ('asap' or a slot label). */
+  onWhen?: (when: string) => void;
 }

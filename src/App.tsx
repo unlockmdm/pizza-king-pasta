@@ -395,6 +395,7 @@ export default function App() {
         onBrowse={() => { setCartOpen(false); goSection('bestsellers')(); }}
         onPlaced={() => { setCart([]); setCartOpen(false); }}
         onChangeTime={() => { setCartOpen(false); openStart(); reopenCart.current = true; }}
+        onWhen={setWhen}
         when={when}
       />
     </>
