@@ -44,17 +44,17 @@ function friendly(errors: { code?: string; detail?: string }[] = []): string {
   const map: Record<string, string> = {
     CARD_DECLINED: 'Your card was declined. Try another card.',
     GENERIC_DECLINE: 'Your card was declined. Try another card.',
-    INSUFFICIENT_FUNDS: 'Your card was declined for insufficient funds.',
-    CVV_FAILURE: 'The security code (CVV) is incorrect.',
-    ADDRESS_VERIFICATION_FAILURE: 'The postal code doesn’t match your card.',
-    INVALID_EXPIRATION: 'The card expiry date is invalid.',
-    EXPIRATION_FAILURE: 'Your card has expired.',
-    INVALID_CARD: 'The card number is invalid.',
-    CARD_DECLINED_VERIFICATION_REQUIRED: 'Your bank needs to verify this payment. Try again.',
+    INSUFFICIENT_FUNDS: 'Your card was declined for insufficient funds. Try another card.',
+    CVV_FAILURE: 'Check the security code (CVV) and try again.',
+    ADDRESS_VERIFICATION_FAILURE: 'The postal code doesn’t match this card. Check it and try again.',
+    INVALID_EXPIRATION: 'Check the card’s expiry date and try again.',
+    EXPIRATION_FAILURE: 'This card has expired. Try another card.',
+    INVALID_CARD: 'Check the card number and try again.',
+    CARD_DECLINED_VERIFICATION_REQUIRED: 'Your bank needs to verify this payment. Try again and follow your bank’s prompt.',
     INVALID_PHONE_NUMBER: 'Enter a valid phone number.',
     INVALID_EMAIL_ADDRESS: 'Enter a valid email address.',
   };
-  return map[code] || 'Payment didn’t go through. Please try again.';
+  return map[code] || 'Your payment didn’t go through. Please try again, or call 905-460-9494.';
 }
 
 export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
@@ -63,24 +63,24 @@ export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
   if (!token || !locationId) {
     // Names only (never values), so a misconfigured host is easy to diagnose.
     const missing = [!token && 'SQUARE_ACCESS_TOKEN', !locationId && 'VITE_SQUARE_LOCATION_ID'].filter(Boolean);
-    return fail(500, 'Online payments aren’t set up yet.', { missing });
+    return fail(500, 'Online payment is unavailable right now. Please call 905-460-9494 to order.', { missing });
   }
   const base = env.SQUARE_ENV === 'production' ? 'https://connect.squareup.com' : 'https://connect.squareupsandbox.com';
 
   // ---- validate input ----
   const b = (raw || {}) as Partial<PayBody>;
-  if (!b.sourceId || typeof b.sourceId !== 'string') return fail(400, 'Missing payment details.');
-  if (!b.idempotencyKey || typeof b.idempotencyKey !== 'string') return fail(400, 'Missing request key.');
+  if (!b.sourceId || typeof b.sourceId !== 'string') return fail(400, 'We didn’t receive your payment details. Please enter them again.');
+  if (!b.idempotencyKey || typeof b.idempotencyKey !== 'string') return fail(400, 'Something went wrong on our end. Please refresh the page and try again.');
   const lines = Array.isArray(b.lines) ? b.lines : [];
-  if (!lines.length || lines.length > 60) return fail(400, 'Your order is empty.');
+  if (!lines.length || lines.length > 60) return fail(400, 'Your order is empty. Add an item to continue.');
   for (const l of lines) {
-    if (typeof l?.name !== 'string' || !l.name.trim()) return fail(400, 'An item in your order is invalid.');
-    if (!Number.isFinite(l.unit) || l.unit <= 0 || l.unit > 500) return fail(400, 'An item price is invalid.');
-    if (!Number.isInteger(l.qty) || l.qty < 1 || l.qty > 50) return fail(400, 'An item quantity is invalid.');
+    if (typeof l?.name !== 'string' || !l.name.trim()) return fail(400, 'One item in your order couldn’t be processed. Remove it and add it again.');
+    if (!Number.isFinite(l.unit) || l.unit <= 0 || l.unit > 500) return fail(400, 'One item price couldn’t be confirmed. Remove it and add it again.');
+    if (!Number.isInteger(l.qty) || l.qty < 1 || l.qty > 50) return fail(400, 'Each item quantity must be between 1 and 50.');
   }
   const c = b.customer || ({} as PayBody['customer']);
   if (!c.name?.trim() || (c.phone || '').replace(/\D/g, '').length < 10 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email || '')) {
-    return fail(400, 'Enter your name, phone and email.');
+    return fail(400, 'Enter your name, a 10-digit phone number and a valid email.');
   }
   // TODO before going live: re-price every line on the server from the menu (Square catalog)
   // instead of trusting `unit` from the browser.
@@ -126,7 +126,7 @@ export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
   const o = order.j.order;
   const total = Number(o?.total_money?.amount ?? 0);
   if (Number.isFinite(b.expectedTotal) && Math.abs(total - Number(b.expectedTotal)) > 1) {
-    return fail(409, 'Prices changed while you were ordering. Please review your order and try again.', { total });
+    return fail(409, 'Some prices changed while you were ordering. Review your order and try again.', { total });
   }
 
   // ---- 2. charge the card against the order ----

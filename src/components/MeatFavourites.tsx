@@ -27,14 +27,14 @@ interface MeatPizza {
 }
 
 const PIZZAS: MeatPizza[] = [
-  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausages', tops: ['pepperoni', 'ham', 'bacon', 'sausage'], pic: '1692737580547-b45bb4a02356', by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
-  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green pepper, onion', tops: ['tandoori-chicken', 'green-peppers', 'red-onions'], pic: '1604382354936-07c5d9983bd3', by: 'Shourav Sheikh', h: 'shouravsheikh', chicken: true },
-  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, onions', tops: ['shawarma-chicken', 'hot-peppers', 'red-onions'], pic: '1590947132387-155cc02f3212', by: 'Vit Ch', h: 'v_uk_europe', chicken: true, tag: 'Spicy' },
+  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', tops: ['pepperoni', 'ham', 'bacon', 'sausage'], pic: '1692737580547-b45bb4a02356', by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
+  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', tops: ['tandoori-chicken', 'green-peppers', 'red-onions'], pic: '1604382354936-07c5d9983bd3', by: 'Shourav Sheikh', h: 'shouravsheikh', chicken: true },
+  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', tops: ['shawarma-chicken', 'hot-peppers', 'red-onions'], pic: '1590947132387-155cc02f3212', by: 'Vit Ch', h: 'v_uk_europe', chicken: true, tag: 'Spicy' },
   { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', tops: ['grilled-chicken', 'sausage', 'hot-salami', 'ham'], pic: '1593560708920-61dd98c46a4e', by: 'Saundarya Srinivasan', h: 'saundiii', chicken: true, cured: true },
   { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', tops: ['pepperoni'], pic: '1611915365928-565c527a0590', by: 'Tamas Pap', h: 'tamasp', cured: true },
-  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushroom, bacon', tops: ['pepperoni', 'mushrooms', 'bacon'], pic: '1565299624946-b28f40a0ae38', by: 'Chad Montano', h: 'briewilly', cured: true },
+  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', tops: ['pepperoni', 'mushrooms', 'bacon'], pic: '1565299624946-b28f40a0ae38', by: 'Chad Montano', h: 'briewilly', cured: true },
   { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', tops: ['pineapple', 'bacon', 'ham'], pic: '1594007654729-407eedc4be65', by: 'Saahil Khatkhate', h: 'saahilkhatkhate', cured: true },
-  { id: 'bismark', name: 'Bismark', desc: 'Sun dried tomatoes, grilled chicken, sausage', tops: ['sun-dried', 'grilled-chicken', 'sausage'], pic: '1655673654158-9f7285b7d1ea', by: 'RUSU CIPRIAN', h: 'tehnosign', chicken: true, cured: true },
+  { id: 'bismark', name: 'Bismark', desc: 'Sun-dried tomatoes, grilled chicken, sausage', tops: ['sun-dried', 'grilled-chicken', 'sausage'], pic: '1655673654158-9f7285b7d1ea', by: 'RUSU CIPRIAN', h: 'tehnosign', chicken: true, cured: true },
   { id: 'four-seasons', name: 'Four Seasons', desc: 'Ham, mushrooms, artichokes, black olives', tops: ['ham', 'mushrooms', 'olives'], pic: '1604382355076-af4b0eb60143', by: 'Shourav Sheikh', h: 'shouravsheikh', cured: true },
 ];
 
@@ -106,13 +106,13 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
               Back
             </Hov>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: '#FF8A80' }}>Pizza · {PIZZAS.length} recipes</span>
+              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: '#FF8A80' }}>{PIZZAS.length} pizzas</span>
               <h1 style={{ margin: 0, fontWeight: 900, fontSize: 'clamp(52px,7.4vw,104px)', lineHeight: 0.9, letterSpacing: '-.055em' }}>
                 Meat
                 <br />
-                <span style={{ color: '#FF5A4E' }}>Favourites.</span>
+                <span style={{ color: '#FF5A4E' }}>favourites.</span>
               </h1>
-              <p style={{ margin: 0, maxWidth: 520, fontSize: 'clamp(16px,1.4vw,18px)', lineHeight: 1.5, color: '#DADADD', textWrap: 'pretty' }}>Pepperoni, ham, bacon, sausage and chicken on our wood-fired crust.</p>
+              <p style={{ margin: 0, maxWidth: 520, fontSize: 'clamp(16px,1.4vw,18px)', lineHeight: 1.5, color: '#DADADD', textWrap: 'pretty' }}>Pepperoni, ham, bacon, sausage and chicken, from the wood-fired or conventional oven.</p>
             </div>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
             style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 15, color: '#1A1414', textDecoration: 'none' }}
             hover={{ color: '#D7192D' }}
           >
-            Full menu
+            View full menu
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
           </Hov>
         </div>
@@ -165,11 +165,11 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: ph ? 14 : 20, padding: ph ? 16 : 22 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <span style={{ fontWeight: 900, fontSize: ph ? 24 : 'clamp(30px,2.8vw,38px)', lineHeight: 0.95, letterSpacing: '-.05em' }}>
-                  Your meats.
+                  Choose your
                   <br />
-                  Your way.
+                  toppings.
                 </span>
-                <span style={{ fontSize: 14, lineHeight: 1.45, color: '#EDEDF0' }}>Pick any 4 toppings, from {money(SIZE_PRICES.S)}.</span>
+                <span style={{ fontSize: 14, lineHeight: 1.45, color: '#EDEDF0' }}>Any 4 toppings, from {money(SIZE_PRICES.S)}.</span>
               </div>
               <Hov
                 as="button"

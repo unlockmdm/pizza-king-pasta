@@ -207,7 +207,7 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
             <div style={S.heroText}>
               <span style={S.eyebrow}>Pasta & momos</span>
               <h1 style={S.h1}>
-                Fresh pasta,
+                Hot pasta,
                 <br />
                 <span style={{ color: '#F2B53A' }}>cooked to order.</span>
               </h1>
