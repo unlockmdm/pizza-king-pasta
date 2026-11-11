@@ -705,11 +705,11 @@ export default function CartCheckout(p: CartCheckoutProps) {
           style={{ position: 'fixed', inset: 0, zIndex: 90, background: pageBg, overflow: 'auto', animation: 'ccFade .2s ease both', fontFamily: FONT, color: '#1A1414' }}
         >
           <header style={{ position: 'sticky', top: 0, zIndex: 10, background: pageBgA, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
-            <div style={{ maxWidth: 1080, margin: '0 auto', height: 68, padding: '0 clamp(16px,3vw,32px)', display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 12 }}>
+            <div style={{ maxWidth: 1080, margin: '0 auto', height: 68, padding: '0 clamp(16px,3vw,32px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
               <button
                 onClick={backToCart}
                 aria-label="Back to order"
-                style={{ justifySelf: 'start', width: 44, height: 44, flex: 'none', border: 0, borderRadius: '50%', background: '#fff', boxShadow: '0 0 0 1px #EAEAED', color: '#1A1414', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ width: 44, height: 44, flex: 'none', border: 0, borderRadius: '50%', background: '#fff', boxShadow: '0 0 0 1px #EAEAED', color: '#1A1414', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 6l-6 6 6 6" />
@@ -721,16 +721,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
                   Pizza King <span style={{ color: '#D7192D' }}>&amp;</span> Pasta
                 </span>
               </div>
-              {/* Trust badge: the connection is HTTPS and card details go straight to Square. */}
-              <span
-                role="img"
-                aria-label="Secure checkout: encrypted connection, payments processed by Square"
-                title="Encrypted connection. Payments are processed securely by Square."
-                style={{ justifySelf: 'end', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 34, minWidth: 34, padding: w >= 400 ? '0 12px 0 10px' : 0, borderRadius: 999, background: '#EAF7EF', color: '#12663A', fontSize: 13, fontWeight: 800, whiteSpace: 'nowrap' }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
-                {w >= 600 ? 'Secure checkout' : w >= 400 ? 'Secure' : null}
-              </span>
+              <span aria-hidden="true" style={{ width: 44 }} />
             </div>
           </header>
 
