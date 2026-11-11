@@ -7,6 +7,11 @@
   "workers_dev": true,
   // Keep variables added in the dashboard (wrangler deploy would otherwise remove them).
   "keep_vars": true,
+  // Custom domain (zone lives in this Cloudflare account). Cloudflare creates the DNS records and SSL cert.
+  "routes": [
+    { "pattern": "pizzakingandpasta.ca", "custom_domain": true },
+    { "pattern": "www.pizzakingandpasta.ca", "custom_domain": true }
+  ],
   // Non-secret Square settings (the location ID is public; it is also in the browser bundle).
   // SQUARE_ACCESS_TOKEN stays a dashboard secret and is never committed.
   "vars": {
