@@ -5,6 +5,14 @@
   "main": "worker/index.ts",
   "compatibility_date": "2025-06-01",
   "workers_dev": true,
+  // Keep variables added in the dashboard (wrangler deploy would otherwise remove them).
+  "keep_vars": true,
+  // Non-secret Square settings (the location ID is public; it is also in the browser bundle).
+  // SQUARE_ACCESS_TOKEN stays a dashboard secret and is never committed.
+  "vars": {
+    "SQUARE_ENV": "sandbox",
+    "VITE_SQUARE_LOCATION_ID": "LGN3E2XQ2FP3G"
+  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
