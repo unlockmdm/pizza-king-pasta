@@ -1,11 +1,13 @@
 // Opening hours, in shop time (Toronto). Pure TS: shared by the browser and the payment server,
 // so both agree on when ASAP orders are allowed and which pickup times are valid.
 //
-// Open every day 11 AM to 2 AM. Last orders 15 minutes before close.
+// Open every day 4 PM to 2 AM. Last orders 15 minutes before close.
 
 export const SHOP_TZ = 'America/Toronto';
-const OPEN_MIN = 11 * 60; // 11:00 AM
-const OPEN_LENGTH = 15 * 60; // until 2:00 AM
+const OPEN_MIN = 16 * 60; // 4:00 PM
+const OPEN_LENGTH = 10 * 60; // until 2:00 AM
+/** Shown to customers wherever the opening time is mentioned. */
+export const OPENS_AT = '4 PM';
 const LAST_ORDER = OPEN_LENGTH - 15; // 1:45 AM, in minutes after opening
 const SLOT_MIN = 30;
 const MIN = 60_000;
@@ -22,7 +24,7 @@ function parts(t: Date): Parts {
   return { y: o.year, mo: o.month, d: o.day, h: o.hour % 24, mi: o.minute };
 }
 
-/** Minutes since today's opening (11 AM), wrapping past midnight: 0 = 11:00 AM, 900 = 2:00 AM. */
+/** Minutes since today's opening (4 PM), wrapping past midnight: 0 = 4:00 PM, 600 = 2:00 AM. */
 function sinceOpen(t: Date): number {
   const p = parts(t);
   return (p.h * 60 + p.mi - OPEN_MIN + 1440) % 1440;
@@ -61,9 +63,9 @@ export function pickupSlots(now = new Date(), count = 8): { label: string; at: D
     const soonest = now.getTime() + 30 * MIN;
     t = new Date(Math.ceil(soonest / (SLOT_MIN * MIN)) * SLOT_MIN * MIN);
   } else {
-    // Closed (1:45 AM to 11 AM, always after midnight): first slot is 11:00 AM today.
+    // Closed (1:45 AM to 4 PM, always after midnight): first slot is opening time today.
     const p = parts(now);
-    t = torontoTime(p.y, p.mo, p.d, 11, 0);
+    t = torontoTime(p.y, p.mo, p.d, Math.floor(OPEN_MIN / 60), OPEN_MIN % 60);
   }
   const out: { label: string; at: Date }[] = [];
   while (out.length < count && sinceOpen(t) <= LAST_ORDER) {
@@ -96,7 +98,7 @@ export function isValidWhen(when: string | undefined, now = new Date()): boolean
  */
 export function pickupProblem(pickupAt: string | undefined, now = new Date()): string | null {
   if (!pickupAt) {
-    return canOrderAsap(now) ? null : 'We’re closed right now. We open at 11 AM. Please choose a pickup time and try again.';
+    return canOrderAsap(now) ? null : 'We’re closed right now. We open at ' + OPENS_AT + '. Please choose a pickup time and try again.';
   }
   const t = new Date(pickupAt);
   if (Number.isNaN(t.getTime())) return 'That pickup time isn’t valid. Please choose another time.';
@@ -104,6 +106,6 @@ export function pickupProblem(pickupAt: string | undefined, now = new Date()): s
   // 20 minutes of slack for someone who sat on the checkout page; a full day ahead at most.
   if (ahead < -20 * MIN) return 'That pickup time has passed. Please choose a new time.';
   if (ahead > 26 * 60 * MIN) return 'Please choose a pickup time within the next day.';
-  if (sinceOpen(t) > LAST_ORDER) return 'We’re closed at that time. We’re open 11 AM to 2 AM. Please choose another time.';
+  if (sinceOpen(t) > LAST_ORDER) return 'We’re closed at that time. We’re open ' + OPENS_AT + ' to 2 AM. Please choose another time.';
   return null;
 }

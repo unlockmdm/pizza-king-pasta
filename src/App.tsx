@@ -19,7 +19,7 @@ import Footer from './shell/Footer';
 import Header from './shell/Header';
 import HomeSections from './shell/HomeSections';
 import StartSheet from './shell/StartSheet';
-import { isValidWhen } from './lib/hours';
+import { isValidWhen, OPENS_AT } from './lib/hours';
 import { AddedToast, InfoToast, type Added } from './shell/Toasts';
 
 type View = 'home' | 'menu' | 'pasta' | 'meat' | 'wings' | 'juice' | 'gelato' | 'terms' | 'privacy';
@@ -261,7 +261,7 @@ export default function App() {
   })();
   const comboDeal = combo ? DEALS.find((d) => d.id === combo) ?? null : null;
 
-  const modeLabel = w < 480 ? 'Pickup' : when === 'asap' ? 'Pickup · ' + (open ? 'ASAP' : '11 AM') : 'Pickup · ' + when;
+  const modeLabel = w < 480 ? 'Pickup' : when === 'asap' ? 'Pickup · ' + (open ? 'ASAP' : OPENS_AT) : 'Pickup · ' + when;
   const toastBottom = count > 0 ? '100px' : '24px';
   const ctaText = open ? 'Start your order' : 'Order for later';
 

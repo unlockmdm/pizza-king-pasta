@@ -853,7 +853,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
       </div>
 
       {!wide ? (
-        <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 7, background: '#fff', borderTop: '1px solid #E9E9EC', padding: '12px 16px 16px', display: 'flex', flexDirection: 'column', gap: 10, boxShadow: '0 -10px 30px rgba(26,20,20,.08)' }}>
+        <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 30, background: '#fff', borderTop: '1px solid #E9E9EC', padding: '12px 16px 16px', display: 'flex', flexDirection: 'column', gap: 10, boxShadow: '0 -10px 30px rgba(26,20,20,.08)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: sizeCols, gap: 6 }}>
             {sizes.map((o) => (
               <button key={o.k} onClick={() => set({ size: o.k })} aria-pressed={o.on} aria-label={o.label} style={{ border: '1.5px solid ' + o.mBorder, background: '#fff', borderRadius: 12, height: 44, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#1A1414' }}>

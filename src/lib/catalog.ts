@@ -8,7 +8,7 @@ export const SHOP = {
   phoneText: '905-460-9494',
   phoneHref: 'tel:+19054609494',
   hoursDays: 'Every day',
-  hoursText: '11 AM – 2 AM',
+  hoursText: '4 PM – 2 AM',
   mapsSearch: 'https://www.google.com/maps/search/?api=1&query=511+Ray+Lawson+Blvd+Brampton+ON',
   mapsDirections: 'https://www.google.com/maps/dir/?api=1&destination=511+Ray+Lawson+Blvd+Brampton+ON',
   mapsEmbed: 'https://www.google.com/maps?q=511+Ray+Lawson+Blvd,+Brampton,+ON+L6Y+0N2&z=15&output=embed',
@@ -36,12 +36,5 @@ export const creditOf = (o: { by?: string; h?: string; creditText?: string; cred
     ? { credit: o.creditText, creditHref: o.creditHref || '' }
     : { credit: o.by ? 'Photo by ' + o.by + ' on Unsplash' : '', creditHref: o.h ? 'https://unsplash.com/@' + o.h : '' };
 
-/** Is the shop open right now (11:00–02:00, America/Toronto)? */
-export function isShopOpen(): boolean {
-  try {
-    const h = +new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Toronto', hour: 'numeric', hourCycle: 'h23' }).format(new Date());
-    return h >= 11 || h < 2;
-  } catch {
-    return true;
-  }
-}
+/** Is the shop open for ASAP orders right now (shared hours module, Toronto time). */
+export { canOrderAsap as isShopOpen } from './hours';

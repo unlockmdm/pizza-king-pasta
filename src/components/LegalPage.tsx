@@ -53,7 +53,7 @@ const terms = (goOther: (e?: MouseEvent) => void): Section[] => [
       <>
         <P>
           This website is operated by Pizza King &amp; Pasta, a restaurant located at 10-511 Ray Lawson Blvd, Brampton, ON L6Y 0N2, Canada.
-          You can reach us by phone at <Tel /> during our opening hours (daily, 11 AM to 2 AM, subject to holiday changes), or by mail at
+          You can reach us by phone at <Tel /> during our opening hours (daily, 4 PM to 2 AM, subject to holiday changes), or by mail at
           the address above.
         </P>
       </>
@@ -442,7 +442,7 @@ const terms = (goOther: (e?: MouseEvent) => void): Section[] => [
     title: 'Contact us',
     body: (
       <P>
-        Questions about these Terms or an order? Call us at <Tel /> (daily, 11 AM to 2 AM), or write to us at {ADDRESS}.
+        Questions about these Terms or an order? Call us at <Tel /> (daily, 4 PM to 2 AM), or write to us at {ADDRESS}.
       </P>
     ),
   },
@@ -774,7 +774,7 @@ const privacy = (goOther: (e?: MouseEvent) => void): Section[] => [
     title: 'Contact us',
     body: (
       <P>
-        Privacy questions or requests: call <Tel /> (daily, 11 AM to 2 AM), or write to {ADDRESS}, marked “Attention: Privacy”.
+        Privacy questions or requests: call <Tel /> (daily, 4 PM to 2 AM), or write to {ADDRESS}, marked “Attention: Privacy”.
       </P>
     ),
   },
