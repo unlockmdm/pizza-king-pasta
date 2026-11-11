@@ -310,6 +310,9 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   useLockBody(true);
   useEscape(true, onClose);
   useEffect(preloadPizzaImages, []);
+  const crustRows = w < 600; // phone: crust options as full-width rows
+  const compactSteps = w < 700; // phone: only the current step shows its name
+  const navRef = useRef<HTMLElement>(null);
 
   const baseTops = () => {
     const t: Record<string, Half> = {};
@@ -394,6 +397,12 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
 
   const pieces = useMemo(() => buildPieces(s.tops), [s.tops]);
   const curStep = Math.max(0, SECS.findIndex((x) => x[0] === s.sec));
+  // Keep the current step visible in the sticky bar as the user scrolls through sections.
+  useEffect(() => {
+    const nav = navRef.current;
+    const btn = nav?.querySelector<HTMLElement>('[data-step="' + curStep + '"]');
+    if (nav && btn && nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: btn.offsetLeft - nav.clientWidth / 2 + btn.offsetWidth / 2, behavior: 'smooth' });
+  }, [curStep]);
 
   // ----- section status pills -----
   const url = (u: string | null) => (u ? 'url("' + u + '")' : 'none');
@@ -512,16 +521,17 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
             </div>
           ) : null}
 
-          <nav className="pb-nav" aria-label="Steps" style={{ position: 'sticky', top: 64, zIndex: 20, transform: 'translateZ(40px)', background: '#fff', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 0', borderBottom: '1px solid #EFEFF2', boxShadow: '-8px 0 0 #fff,8px 0 0 #fff', overflowX: 'auto', scrollbarWidth: 'none' }}>
+          <nav ref={navRef} className="pb-nav" aria-label="Steps" style={{ position: 'sticky', top: 64, zIndex: 20, transform: 'translateZ(40px)', background: '#fff', display: 'flex', alignItems: 'center', gap: compactSteps ? 6 : 12, padding: '14px 0', borderBottom: '1px solid #EFEFF2', boxShadow: '-8px 0 0 #fff,8px 0 0 #fff', overflowX: 'auto', scrollbarWidth: 'none' }}>
             {SECS.map(([k, label], i) => {
               const on = i === curStep, dn = i < curStep;
+              const showLabel = !compactSteps || on;
               return (
                 <Fragment key={k}>
-                  <button onClick={() => goSec(k)} aria-current={on ? 'step' : 'false'} style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 10, height: 44, padding: '0 2px', border: 0, background: 'transparent', fontFamily: 'inherit', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  <button data-step={i} onClick={() => goSec(k)} aria-current={on ? 'step' : 'false'} aria-label={compactSteps && !on ? 'Step ' + (i + 1) + ': ' + label : undefined} style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 10, height: 44, padding: '0 2px', border: 0, background: 'transparent', fontFamily: 'inherit', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                     <span style={{ width: 28, height: 28, borderRadius: '50%', background: on ? '#D7192D' : dn ? '#1A1414' : '#fff', color: on || dn ? '#fff' : '#8E8E93', boxShadow: 'inset 0 0 0 1.5px ' + (on ? '#D7192D' : dn ? '#1A1414' : '#D5D5D9'), fontWeight: 800, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .25s,color .25s,box-shadow .25s' }}>{i + 1}</span>
-                    <span style={{ fontWeight: on ? 900 : 700, fontSize: 15, color: on || dn ? '#1A1414' : '#8E8E93', transition: 'color .25s' }}>{label}</span>
+                    {showLabel ? <span style={{ fontWeight: on ? 900 : 700, fontSize: 15, color: on || dn ? '#1A1414' : '#8E8E93', transition: 'color .25s', whiteSpace: 'nowrap' }}>{label}</span> : null}
                   </button>
-                  {i < SECS.length - 1 ? <span aria-hidden="true" style={{ flex: '1 0 20px', minWidth: 20, maxWidth: 64, height: 2, borderRadius: 2, background: dn ? '#1A1414' : '#E3E3E7', transition: 'background .25s' }} /> : null}
+                  {i < SECS.length - 1 ? <span aria-hidden="true" style={{ flex: compactSteps ? '1 0 10px' : '1 0 20px', minWidth: compactSteps ? 10 : 20, maxWidth: 64, height: 2, borderRadius: 2, background: dn ? '#1A1414' : '#E3E3E7', transition: 'background .25s' }} /> : null}
                 </Fragment>
               );
             })}
@@ -549,19 +559,38 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
               </div>
             </div>
             <SectionHead title="Crust" st={crT} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: crustRows ? 'minmax(0,1fr)' : 'repeat(3,minmax(0,1fr))', gap: crustRows ? 10 : 12 }}>
               {CRUSTS.map(([val, sub, t]) => {
                 const on = s.crust === val;
+                const disc = (
+                  <span style={{ position: 'relative', width: crustRows ? '78%' : '58%', aspectRatio: '1/1', transformStyle: 'preserve-3d', transform: 'rotateX(64deg) rotateZ(-10deg) scale(' + (on ? 1.06 : 1) + ')', transition: 'transform .6s cubic-bezier(.3,.8,.3,1)' }}>
+                    {crustLayers(t).map((l, j) => (
+                      <span key={j} style={{ position: 'absolute', inset: '3%', borderRadius: '50%', background: l.bg, transform: 'translateZ(' + l.z + ')' }} />
+                    ))}
+                    <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', backgroundImage: "url('" + BASE_IMG + "')", backgroundSize: 'cover', backgroundPosition: 'center', transform: 'translateZ(0px)' }} />
+                  </span>
+                );
+                const shadow = <span style={{ position: 'absolute', left: '50%', top: '62%', width: '66%', height: '26%', transform: 'translateX(-50%)', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(60,30,10,.32),rgba(60,30,10,0))' }} />;
+                if (crustRows) {
+                  return (
+                    <button key={val} onClick={() => set({ crust: val })} aria-pressed={on} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14, minHeight: 88, border: 0, padding: '6px 52px 6px 6px', borderRadius: 20, cursor: 'pointer', background: '#F4EFEA', outline: on ? '3px solid #D7192D' : '3px solid transparent', outlineOffset: 2, fontFamily: 'inherit', textAlign: 'left', transition: 'outline-color .15s' }}>
+                      <span aria-hidden="true" style={{ position: 'relative', flex: 'none', width: 96, height: 76, display: 'flex', alignItems: 'center', justifyContent: 'center', perspective: 520, isolation: 'isolate', zIndex: 0 }}>
+                        {shadow}
+                        {disc}
+                      </span>
+                      <span style={{ display: 'flex', flexDirection: 'column', gap: 3, color: '#1A1414', minWidth: 0 }}>
+                        <span style={{ fontWeight: 900, fontSize: 19, lineHeight: 1.05, letterSpacing: '-.03em' }}>{val}</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#6E6E73' }}>{sub}</span>
+                      </span>
+                      {on ? <Badge size={28} inset={30} icon={14} iconStroke={3.6} extra={{ top: '50%', right: 16, marginTop: -14, boxShadow: '0 4px 12px rgba(0,0,0,.2)', animation: 'pbPop .3s ease both' }} /> : null}
+                    </button>
+                  );
+                }
                 return (
                   <button key={val} onClick={() => set({ crust: val })} aria-pressed={on} style={{ position: 'relative', aspectRatio: '16/11', border: 0, padding: 0, borderRadius: 20, overflow: 'hidden', cursor: 'pointer', background: '#F4EFEA', outline: on ? '3px solid #D7192D' : '3px solid transparent', outlineOffset: 3, transition: 'outline-color .15s', fontFamily: 'inherit', textAlign: 'left' }}>
                     <span aria-hidden="true" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '72%', display: 'flex', alignItems: 'center', justifyContent: 'center', perspective: 520, isolation: 'isolate', zIndex: 0 }}>
-                      <span style={{ position: 'absolute', left: '50%', top: '62%', width: '66%', height: '26%', transform: 'translateX(-50%)', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(60,30,10,.32),rgba(60,30,10,0))' }} />
-                      <span style={{ position: 'relative', width: '58%', aspectRatio: '1/1', transformStyle: 'preserve-3d', transform: 'rotateX(64deg) rotateZ(-10deg) scale(' + (on ? 1.06 : 1) + ')', transition: 'transform .6s cubic-bezier(.3,.8,.3,1)' }}>
-                        {crustLayers(t).map((l, j) => (
-                          <span key={j} style={{ position: 'absolute', inset: '3%', borderRadius: '50%', background: l.bg, transform: 'translateZ(' + l.z + ')' }} />
-                        ))}
-                        <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', backgroundImage: "url('" + BASE_IMG + "')", backgroundSize: 'cover', backgroundPosition: 'center', transform: 'translateZ(0px)' }} />
-                      </span>
+                      {shadow}
+                      {disc}
                     </span>
                     <span style={{ position: 'absolute', left: 16, right: 16, bottom: 14, display: 'flex', flexDirection: 'column', gap: 2, color: '#1A1414' }}>
                       <span style={{ fontWeight: 900, fontSize: 'clamp(17px,1.9vw,22px)', lineHeight: 1, letterSpacing: '-.03em' }}>{val}</span>
