@@ -12,3 +12,4 @@ research/
 !.env.example
 *.tsbuildinfo
 /*.dc.html
+/restaurant-pizza-oven-*.webp

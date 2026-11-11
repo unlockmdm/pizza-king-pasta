@@ -87,7 +87,7 @@ const crustLayers = (t: number) => Array.from({ length: t }, (_, j) => {
 interface OvenCard { v: string; desc: string; img: string; bg: string; r: string; b: string; w: string; h: string; fit: string; pos: string; ar: string }
 const OVENS: OvenCard[] = [
   { v: 'Wood-fired', desc: 'Smoky, blistered crust. Our default.', img: 'assets/oven-wood-fired.png', bg: '#120B08', r: '0', b: '0', w: '100%', h: '100%', fit: 'cover', pos: '40% 45%', ar: 'auto' },
-  { v: 'Conventional', desc: 'Even bake, softer crust. Same price.', img: BASE_IMG, bg: 'radial-gradient(120% 100% at 75% 15%,#5A4F4A 0%,#2A2321 60%,#1A1514 100%)', r: '-6%', b: '-34%', w: '64%', h: 'auto', fit: 'contain', pos: 'center', ar: '1 / 1' },
+  { v: 'Conventional', desc: 'Even bake, softer crust. Same price.', img: 'assets/oven-conventional.webp', bg: '#120B08', r: '0', b: '0', w: '100%', h: '100%', fit: 'cover', pos: '50% 60%', ar: 'auto' },
 ];
 const CHEESES = ['Light', 'Regular', 'None'];
 /** Cheese level: [meter bars, photo width]. */
