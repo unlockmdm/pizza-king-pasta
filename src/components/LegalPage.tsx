@@ -331,12 +331,22 @@ const terms = (goOther: (e?: MouseEvent) => void): Section[] => [
     id: 'ip',
     title: 'Our content',
     body: (
-      <P>
-        The Pizza King &amp; Pasta name and logo, and the website’s text, design and original photos, belong to us or to the people who
-        licensed them to us. Some photos are used under licence from Unsplash and Wikimedia Commons contributors, as credited on the website.
-        You may view and share pages for personal, non-commercial use, but you may not copy, reproduce or reuse our content for commercial
-        purposes without our written permission.
-      </P>
+      <>
+        <P>
+          The Pizza King &amp; Pasta name and logo, and the website’s text, design and original photos, belong to us or to the people who
+          licensed them to us. Some photos are used under licence from Unsplash and Wikimedia Commons contributors, as credited below.
+          You may view and share pages for personal, non-commercial use, but you may not copy, reproduce or reuse our content for commercial
+          purposes without our written permission.
+        </P>
+        <H3>Photo credits</H3>
+        <P>
+          Food and stock photos from <Ext href="https://unsplash.com">Unsplash</Ext>, used under the{' '}
+          <Ext href="https://unsplash.com/license">Unsplash License</Ext>. Pasta photo by Dllu and juice photo by JIP, both licensed under{' '}
+          <Ext href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</Ext>; gelato photo by Rizka Budiati, licensed under{' '}
+          <Ext href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</Ext>; all via{' '}
+          <Ext href="https://commons.wikimedia.org">Wikimedia Commons</Ext>. Some photos have been cropped or edited.
+        </P>
+      </>
     ),
   },
   {

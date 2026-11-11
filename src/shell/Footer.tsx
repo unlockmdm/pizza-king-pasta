@@ -65,12 +65,7 @@ export default function Footer({
           Pizza King &amp; Pasta
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '12px 32px', paddingTop: 22, borderTop: '1px solid #362C2C', fontSize: 13, color: '#87878A' }}>
-          <span style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <span>© 2026 Pizza King &amp; Pasta · Prices exclude HST</span>
-            <span style={{ fontSize: 12, color: '#6E6E72', lineHeight: 1.5 }}>
-              Photos: Unsplash; pasta by Dllu (CC BY-SA 4.0), juice by JIP (CC BY-SA 4.0) and gelato by Rizka Budiati (CC BY 2.0), via Wikimedia Commons.
-            </span>
-          </span>
+          <span>© 2026 Pizza King &amp; Pasta · Prices exclude HST</span>
           <nav aria-label="Legal" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px' }}>
             <Hov as="a" href="?view=terms" onClick={onTerms} style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Terms of service</Hov>
             <Hov as="a" href="?view=privacy" onClick={onPrivacy} style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Privacy policy</Hov>
