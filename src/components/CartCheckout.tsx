@@ -32,10 +32,12 @@ interface Upsell {
   unit: number;
   img: string;
   summary: string;
+  flavours: string[];
 }
+// Upsells ask for a flavour before adding, so the kitchen always knows what to make.
 const UPSELLS: Upsell[] = [
-  { key: 'fruit-juice', name: 'Fresh fruit juice', unit: 6.81, img: 'assets/menu/juice-mix.png', summary: 'Medium' },
-  { key: 'gelato-cone', name: 'Gelato cone', unit: 6, img: 'assets/menu/gelato.jpg', summary: 'Vanilla' },
+  { key: 'fruit-juice', name: 'Fresh fruit juice', unit: 6.81, img: 'assets/menu/juice-mix.png', summary: 'Medium', flavours: ['Orange', 'Pineapple', 'Guava', 'Mix'] },
+  { key: 'gelato-cone', name: 'Gelato cone', unit: 6, img: 'assets/menu/gelato.jpg', summary: '', flavours: ['Vanilla', 'Mango', 'Strawberry', 'Banana', 'Pistachio', 'Black cherry', 'Cappuccino', 'Chocolate', 'Red velvet', 'Rum & raisin'] },
 ];
 
 const TIP_PRESETS = [0, 10, 15, 18] as const;
@@ -101,6 +103,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const w = useWidth();
   const wide = w >= 900;
   const [step, setStep] = useState<Step>('cart');
+  const [upPick, setUpPick] = useState<string | null>(null);
   const [pay, setPay] = useState<Pay>('card');
   const [tip, setTip] = useState<number>(DEFAULT_TIP);
   const [f, setF] = useState<Form>(EMPTY_FORM);
@@ -310,7 +313,8 @@ export default function CartCheckout(p: CartCheckoutProps) {
     const [thumb, thumbW, thumbFit] = thumbFor(l);
     return { ...l, thumb, thumbW, thumbFit, totalText: money(l.unit * l.qty), isOne: l.qty === 1 };
   });
-  const upsells = UPSELLS.filter((u) => !lines.some((l) => l.key === u.key));
+  const upsells = UPSELLS.filter((u) => !lines.some((l) => l.key.startsWith(u.key)));
+  const pickU = upsells.find((u) => u.key === upPick);
 
   const modeCards: { id: Mode; label: string; sub: string }[] = [
     { id: 'pickup', label: 'Pickup', sub: 'Ready as soon as possible' },
@@ -518,7 +522,8 @@ export default function CartCheckout(p: CartCheckoutProps) {
                         {upsells.map((u) => (
                           <button
                             key={u.key}
-                            onClick={() => p.onAdd({ key: u.key, name: u.name, summary: u.summary, unit: u.unit })}
+                            onClick={() => setUpPick((k) => (k === u.key ? null : u.key))}
+                            aria-expanded={upPick === u.key}
                             style={{
                               position: 'relative',
                               flex: 1,
@@ -528,6 +533,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
                               borderRadius: 22,
                               overflow: 'hidden',
                               background: '#EFEFF2',
+                              boxShadow: upPick === u.key ? 'inset 0 0 0 2px #1A1414' : 'none',
                               fontFamily: 'inherit',
                               textAlign: 'left',
                               cursor: 'pointer',
@@ -552,6 +558,25 @@ export default function CartCheckout(p: CartCheckoutProps) {
                           </button>
                         ))}
                       </div>
+                      {pickU ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: '#636366' }}>Choose a flavour for your {pickU.name.toLowerCase()}</span>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                            {pickU.flavours.map((f) => (
+                              <button
+                                key={f}
+                                onClick={() => {
+                                  p.onAdd({ key: pickU.key + '-' + f.toLowerCase().replace(/[^a-z]+/g, '-'), name: pickU.name, summary: [pickU.summary, f].filter(Boolean).join(' · '), unit: pickU.unit });
+                                  setUpPick(null);
+                                }}
+                                style={{ height: 38, padding: '0 14px', borderRadius: 999, border: '1px solid #E4E4E7', background: '#fff', color: '#1A1414', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+                              >
+                                {f}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
                   ) : null}
                 </div>
