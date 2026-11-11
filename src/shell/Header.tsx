@@ -3,8 +3,10 @@ import { Hov, IconCart, IconChevronDown } from '../lib/ui';
 
 type Nav = (e?: MouseEvent) => void;
 
+// Longhand border properties on purpose: mixing the `borderBottom` shorthand with a `borderBottomColor` override
+// makes React drop the override later, and the line falls back to the text colour (a stuck black underline).
 const navLink = {
-  color: '#1A1414', textDecoration: 'none', padding: '10px 0', borderBottom: '2px solid transparent', transition: 'border-color .2s,color .2s',
+  color: '#1A1414', textDecoration: 'none', padding: '10px 0', borderBottomWidth: 2, borderBottomStyle: 'solid', borderBottomColor: 'transparent', transition: 'border-color .2s,color .2s',
 } as const;
 const navOn = { ...navLink, borderBottomColor: '#D7192D' } as const;
 
