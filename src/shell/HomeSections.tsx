@@ -78,6 +78,16 @@ export interface HomeHandlers {
   onDeal: (id: string) => void;
 }
 
+/** Homepage FAQ: short, factual answers (also what people tend to search for). */
+const FAQ: [string, string][] = [
+  ['What is Indian-style (desi) pizza?', 'Pizza with Indian flavours: butter chicken or shahi paneer sauce, tandoori chicken or paneer, green chilli, ginger and coriander. Pick a desi pizza from the menu, or build your own with these toppings.'],
+  ['What are your hours?', 'Every day, 4 PM to 2 AM. You can also order ahead online and pick a later pickup time.'],
+  ['Do you deliver?', 'Delivery is through DoorDash. For pickup, order on this website and pay online, then collect your order at the counter.'],
+  ['Where are you located?', '10-511 Ray Lawson Blvd, Brampton, ON L6Y 0N2. Call us at 905-460-9494.'],
+  ['Can I choose the oven?', 'Yes. Every pizza can be baked in our wood-fired oven or a conventional oven, at the same price.'],
+  ['How many slices are in each size?', 'Small 6, medium 8, large 10 and X-large 12. Every pizza is cut into triangles.'],
+];
+
 export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
 
   const desk = w >= 1000, tab = w >= 600, ph = !tab;
@@ -99,10 +109,11 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
         <div style={{ display: 'grid', gridTemplateColumns: bentoCols, gridTemplateRows: bentoRows, gridTemplateAreas: bentoAreas, gap: ph ? 10 : 14, height: bentoH }}>
           {/* Hero tile */}
           <div style={{ gridArea: 'hero', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, overflow: 'hidden', color: '#fff', background: '#1A1414' }}>
-            <img src={U('1565299624946-b28f40a0ae38', 1800).replace('q=72', 'q=75')} alt="Wood-fired pizza" {...{ fetchpriority: "high" }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: 'pkZoom 18s ease-in-out infinite alternate' }} />
+            <img src={U('1565299624946-b28f40a0ae38', 1800).replace('q=72', 'q=75')} alt="Wood-fired pizza at Pizza King & Pasta in Brampton" {...{ fetchpriority: "high" }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: 'pkZoom 18s ease-in-out infinite alternate' }} />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(14,8,8,.9),rgba(14,8,8,.1) 62%)' }} />
             <div style={{ position: 'absolute', left: 'clamp(22px,3vw,40px)', right: 'clamp(22px,3vw,40px)', bottom: 'clamp(22px,3vw,40px)', display: 'flex', flexDirection: 'column', gap: 24 }}>
               <h1 style={{ margin: 0, fontWeight: 900, fontSize: bentoFont, lineHeight: 0.86, letterSpacing: '-.065em' }}>
+                <span style={{ display: 'block', marginBottom: ph ? 12 : 16, fontSize: ph ? 12 : 14, fontWeight: 800, lineHeight: 1.3, letterSpacing: ph ? '.08em' : '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.82)', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) both' }}>{w < 440 ? 'Desi & wood-fired pizza · Brampton' : 'Indian-style & wood-fired pizza · Brampton'}</span>
                 <span style={{ display: 'block', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) both' }}>Wood-fired.</span>
                 <span style={{ display: 'block', color: '#FF4B57', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) .12s both' }}>Made to order.</span>
               </h1>
@@ -322,6 +333,33 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
       </section>
 
       {/* ---------- Hours & location ---------- */}
+      {/* ---------- About + FAQ (plain answers to what people search for) ---------- */}
+      <section id="about" style={{ ...SECTION, display: 'block' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: w >= 900 ? '1fr 1fr' : '1fr', gap: ph ? 28 : 'clamp(32px,5vw,72px)', alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <h2 style={H2}>Indian-style pizza in Brampton, open late</h2>
+            <p style={{ ...LEAD, margin: 0 }}>
+              Pizza King &amp; Pasta is on Ray Lawson Blvd in Brampton. We make desi pizzas like butter chicken, shahi paneer, shawarma chicken and
+              tandoori fish, alongside classics like Meat Lover, Hawaiian and Greek. Every pizza is made to order and baked in our wood-fired oven or a
+              conventional oven, your choice.
+            </p>
+            <p style={{ ...LEAD, margin: 0 }}>
+              Beyond pizza: rosé and Alfredo pasta, steamed momos, tandoori wings, fresh fruit and sugarcane juice, lassi, masala tea and gelato.
+              We{'\u2019'}re open every day until 2 AM, so we{'\u2019'}re an easy late-night stop.
+            </p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <h3 style={{ margin: '0 0 8px', fontSize: ph ? 20 : 24, fontWeight: 900, letterSpacing: '-.03em' }}>Questions</h3>
+            {FAQ.map(([q, a]) => (
+              <details key={q} style={{ borderTop: '1px solid rgba(26,20,20,.1)', padding: '14px 0' }}>
+                <summary style={{ cursor: 'pointer', fontWeight: 800, fontSize: ph ? 16 : 17, listStyle: 'revert' }}>{q}</summary>
+                <p style={{ margin: '10px 0 0', fontSize: ph ? 15 : 16, lineHeight: 1.55, color: '#4A4A4E' }}>{a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="visit" style={{ ...SECTION, display: 'block', padding: 'clamp(56px,7vw,96px) clamp(16px,3vw,32px)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: ovenCols, gap: 16 }}>
           <div style={{ background: '#F2F2F5', borderRadius: 32, padding: 'clamp(28px,4vw,56px)', display: 'flex', flexDirection: 'column', gap: 32 }}>

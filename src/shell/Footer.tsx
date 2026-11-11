@@ -67,8 +67,8 @@ export default function Footer({
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '12px 32px', paddingTop: 22, borderTop: '1px solid #362C2C', fontSize: 13, color: '#87878A' }}>
           <span>© 2026 Pizza King &amp; Pasta · Prices exclude HST</span>
           <nav aria-label="Legal" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px' }}>
-            <Hov as="a" href="?view=terms" onClick={onTerms} style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Terms of service</Hov>
-            <Hov as="a" href="?view=privacy" onClick={onPrivacy} style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Privacy policy</Hov>
+            <Hov as="a" href="terms" onClick={onTerms} style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Terms of service</Hov>
+            <Hov as="a" href="privacy" onClick={onPrivacy} style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Privacy policy</Hov>
           </nav>
         </div>
       </div>

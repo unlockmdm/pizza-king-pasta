@@ -1,4 +1,4 @@
-// Terms of Service and Privacy Policy (views `?view=terms` and `?view=privacy`).
+// Terms of Service and Privacy Policy (pages /terms and /privacy).
 // Every statement here must match how the site actually works: pickup-only ordering,
 // payments through Square (server/square.ts), hosting on Cloudflare (worker/index.ts),
 // cart + pickup choice in localStorage (App.tsx), Cloudflare Web Analytics (cookieless), no cookies of our own.
@@ -435,7 +435,7 @@ const terms = (goOther: (e?: MouseEvent) => void): Section[] => [
       <UL>
         <li>
           These Terms, our{' '}
-          <a href="?view=privacy" onClick={goOther} style={S.a}>Privacy Policy</a> and the details shown in your order confirmation are the
+          <a href="privacy" onClick={goOther} style={S.a}>Privacy Policy</a> and the details shown in your order confirmation are the
           whole agreement between you and us about your use of the website and your online order.
         </li>
         <li>If any part of these Terms is found to be invalid or unenforceable, the rest of the Terms remain in effect.</li>
@@ -775,7 +775,7 @@ const privacy = (goOther: (e?: MouseEvent) => void): Section[] => [
       <P>
         We may update this policy, for example if the website or the services we use change. The updated version will be posted on this
         page with a new effective date. If we want to use your personal information for a new purpose, we will ask for your consent first.
-        Please also see our <a href="?view=terms" onClick={goOther} style={S.a}>Terms of Service</a>.
+        Please also see our <a href="terms" onClick={goOther} style={S.a}>Terms of Service</a>.
       </P>
     ),
   },
@@ -867,7 +867,7 @@ export default function LegalPage({ doc, onBack, onOther }: { doc: LegalDoc; onB
           <span>Effective date: {EFFECTIVE}</span>
           <span>
             See also our{' '}
-            <a href={'?view=' + (doc === 'terms' ? 'privacy' : 'terms')} onClick={onOther} style={S.a}>{d.other}</a>.
+            <a href={doc === 'terms' ? 'privacy' : 'terms'} onClick={onOther} style={S.a}>{d.other}</a>.
           </span>
         </div>
       </article>

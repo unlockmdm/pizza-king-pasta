@@ -20,6 +20,7 @@ import Header from './shell/Header';
 import HomeSections from './shell/HomeSections';
 import StartSheet from './shell/StartSheet';
 import { isValidWhen, OPENS_AT } from './lib/hours';
+import { canonicalUrl, pageForSlug, PAGES } from './lib/seo';
 import { AddedToast, InfoToast, type Added } from './shell/Toasts';
 
 type View = 'home' | 'menu' | 'pasta' | 'meat' | 'wings' | 'juice' | 'gelato' | 'terms' | 'privacy';
@@ -42,10 +43,27 @@ const writeJSON = (k: string, v: unknown) => {
     /* storage unavailable (private mode): the site still works, it just won't remember */
   }
 };
+/** Current page from the URL: a path like /menu or /pizza (old ?view= links still work). */
 const viewFromUrl = (): View => {
-  const v = new URLSearchParams(window.location.search).get('view') as View | null;
+  const legacy = new URLSearchParams(window.location.search).get('view') as View | null;
+  if (legacy && VIEWS.includes(legacy)) return legacy;
+  const seg = window.location.pathname.replace(/\/+$/, '').split('/').pop() || '';
+  const v = pageForSlug(seg.replace(/\.html$/, '')) as View | undefined;
   return v && VIEWS.includes(v) ? v : 'home';
 };
+/** Relative URL for a page, so it works at the domain root and under a sub-path (GitHub Pages demo). */
+const urlFor = (v: View) => (v === 'home' ? './' : PAGES[v].slug);
+/** Keep the tab title, description and canonical link in step with the page (Google reads the rendered page). */
+function applyMeta(v: View) {
+  const m = PAGES[v];
+  document.title = m.title;
+  const set = (sel: string, attr: string, val: string) => { const el = document.head.querySelector(sel); if (el) el.setAttribute(attr, val); };
+  set('meta[name="description"]', 'content', m.description);
+  set('link[rel="canonical"]', 'href', canonicalUrl(v));
+  set('meta[property="og:title"]', 'content', m.title);
+  set('meta[property="og:description"]', 'content', m.description);
+  set('meta[property="og:url"]', 'content', canonicalUrl(v));
+}
 
 /** Thumbnail for the "Added" toast when a line doesn't bring its own image. */
 function guessImg(t: string) {
@@ -141,9 +159,14 @@ export default function App() {
   const pushed = useRef(0);
   const setView = useCallback((v: View) => {
     setViewState(v);
-    const url = v === 'home' ? window.location.pathname : '?view=' + v;
-    if (viewFromUrl() !== v) { window.history.pushState({ view: v }, '', url); pushed.current++; }
+    if (viewFromUrl() !== v) { window.history.pushState({ view: v }, '', urlFor(v)); pushed.current++; }
   }, []);
+  // Old ?view= links: switch the address bar to the clean path without adding a history entry.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('view')) window.history.replaceState({ view }, '', urlFor(view));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => { applyMeta(view); }, [view]);
   useEffect(() => {
     const onPop = () => { setViewState(viewFromUrl()); pushed.current = Math.max(0, pushed.current - 1); };
     window.addEventListener('popstate', onPop);
