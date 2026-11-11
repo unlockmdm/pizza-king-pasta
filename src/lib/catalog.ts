@@ -14,7 +14,8 @@ export const SHOP = {
   mapsEmbed: 'https://www.google.com/maps?q=511+Ray+Lawson+Blvd,+Brampton,+ON+L6Y+0N2&z=15&output=embed',
   // Delivery is handled by the apps (the shop has no drivers). Swap in the commission-free
   // DoorDash Online Ordering / Uber Eats Webshop links once the owner turns them on.
-  doordash: 'https://www.doordash.com/store/pizza-king-and-pasta-brampton-24430450/',
+  // DoorDash Storefront (commission-free web ordering; customer pays delivery). Store 24430450.
+  doordash: 'https://order.online/business/pizza-king-and-pasta-38819',
   ubereats: 'https://www.ubereats.com/ca/store/pizza-king-&-pasta/j1VSW4wkX02MplHbVNOSpg',
   doordashLogo: 'assets/brands/doordash.svg',
   ubereatsLogo: 'assets/brands/ubereats.svg',
