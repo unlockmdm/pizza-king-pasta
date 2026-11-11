@@ -202,12 +202,20 @@ export default function App() {
   const changeQty = (key: string, d: number) => setCart((c) => c.map((l) => (l.key === key ? { ...l, qty: l.qty + d } : l)).filter((l) => l.qty > 0));
 
   // ---- start sheet ----
-  const openStart = (tab: Mode = 'pickup') => { setWMode(tab); setAddrErr(''); setWelcome(true); };
+  // "Start your order" on the homepage: ask pickup/time only once. After that it goes straight to the menu.
+  const thenMenu = useRef(false);
+  const openStart = (tab: Mode = 'pickup') => { thenMenu.current = false; setWMode(tab); setAddrErr(''); setWelcome(true); };
+  const startOrder = () => {
+    if (mode) { scrollToId('menu'); return; }
+    openStart();
+    thenMenu.current = true;
+  };
   const confirmWelcome = () => {
     setMode('pickup');
     setWelcome(false);
     setAddrErr('');
     showToast('Pickup' + (when === 'asap' ? ', as soon as possible' : ' at ' + when));
+    if (thenMenu.current) { thenMenu.current = false; setTimeout(() => scrollToId('menu'), 250); }
   };
 
   // ---- combos (pickup only) ----
@@ -254,7 +262,7 @@ export default function App() {
         <HomeSections
           w={w}
           h={{
-            onStart: () => openStart(),
+            onStart: startOrder,
             onMenu: openMenu,
             onTwoLarge: () => addDeal('two-large'),
             onByo: () => setItem({ id: 'byo' }),
