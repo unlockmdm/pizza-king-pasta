@@ -78,3 +78,13 @@ export const BYO_SETS: [string, string[], number][][] = [
   [['Broccoli', ['broc-0'], 40], ['Tomatoes', ['tomato-0'], 40], ['Green olives', ['gol-0'], 24], ['Sweet corn', ['corn-0', 'corn-2', 'corn-4', 'corn-6'], 16]],
   [['Grilled chicken', ['grilled-0', 'grilled-1'], 44], ['Mushrooms', ['mushroom-0', 'mushroom-1'], 40], ['Red onions', ['onion-0', 'onion-1'], 34], ['Jalapeños', ['jal-0'], 28]],
 ];
+
+/** Footer FAQ: short, factual answers (also what people tend to search for). */
+export const FAQ: [string, string][] = [
+  ['What is Indian-style (desi) pizza?', 'Pizza with Indian flavours: butter chicken or shahi paneer sauce, tandoori chicken or paneer, green chilli, ginger and coriander. Pick a desi pizza from the menu, or build your own with these toppings.'],
+  ['What are your hours?', 'Every day, 4 PM to 2 AM. You can also order ahead online and pick a later pickup time.'],
+  ['Do you deliver?', 'Delivery is through DoorDash. For pickup, order on this website and pay online, then collect your order at the counter.'],
+  ['Where are you located?', '511 Ray Lawson Blvd, Unit 10, Brampton, ON L6Y 0N2. Call us at 905-460-9494.'],
+  ['Can I choose the oven?', 'Yes. Every pizza can be baked in our wood-fired oven or a conventional oven, at the same price.'],
+  ['How many slices are in each size?', 'Small 6, medium 8, large 10 and X-large 12. Every pizza is cut into triangles.'],
+];

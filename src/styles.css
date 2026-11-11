@@ -45,3 +45,8 @@ img { max-width: none; }
 
 /* Horizontal chip rows: hide the scrollbar but keep swipe scrolling */
 .pk-noscroll::-webkit-scrollbar { display: none; }
+
+/* Footer FAQ: hide the default disclosure triangle, rotate the + into an x when open */
+.pk-faq summary { list-style: none; }
+.pk-faq summary::-webkit-details-marker { display: none; }
+.pk-faq details[open] .pk-plus { transform: rotate(45deg); }

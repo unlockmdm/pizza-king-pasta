@@ -1,4 +1,5 @@
 import type { CSSProperties, MouseEvent } from 'react';
+import { FAQ } from './data';
 import { SHOP } from '../lib/catalog';
 import { Hov } from '../lib/ui';
 
@@ -35,6 +36,10 @@ export default function Footer({
               </span>
               <span style={{ fontWeight: 900, fontSize: 24, letterSpacing: '-.03em' }}>Pizza King <span style={{ color: '#FF5A6A' }}>&amp;</span> Pasta</span>
             </div>
+            <p style={{ margin: 0, maxWidth: 380, fontSize: 14, lineHeight: 1.6, color: '#A9A9AE' }}>
+              Indian-style and wood-fired pizza in Brampton, open every day until 2 AM. Desi favourites like butter chicken and shahi paneer,
+              classic pizzas, pasta, momos and tandoori wings.
+            </p>
             <Hov as="button" onClick={onStart} style={{ border: 0, background: '#D7192D', color: '#fff', borderRadius: 999, padding: '16px 28px', fontWeight: 800, fontSize: 16, cursor: 'pointer' }} hover={{ background: '#B5121F' }}>
               {ctaText}
             </Hov>
@@ -59,6 +64,21 @@ export default function Footer({
             <span>{SHOP.street}<br />{SHOP.cityLine}</span>
             <span>{SHOP.hoursDays}, {SHOP.hoursText}</span>
             <Hov as="a" href={SHOP.phoneHref} style={link} hover={linkHover}>{SHOP.phoneText}</Hov>
+          </div>
+        </div>
+        {/* Questions: compact, in the footer's style */}
+        <div className="pk-faq" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <span style={colHead}>Questions</span>
+          <div style={{ display: 'grid', gridTemplateColumns: w >= 900 ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)', columnGap: 32 }}>
+            {FAQ.map(([q, a]) => (
+              <details key={q} style={{ borderTop: '1px solid #362C2C' }}>
+                <summary style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '14px 0', cursor: 'pointer', fontSize: 15, fontWeight: 700, color: '#EDEDF0' }}>
+                  {q}
+                  <span className="pk-plus" aria-hidden="true" style={{ flex: 'none', width: 22, height: 22, borderRadius: '50%', border: '1.5px solid #4A3F3F', color: '#C9C9CE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, lineHeight: 1, transition: 'transform .2s' }}>+</span>
+                </summary>
+                <p style={{ margin: '0 0 16px', maxWidth: 560, fontSize: 14, lineHeight: 1.6, color: '#A9A9AE' }}>{a}</p>
+              </details>
+            ))}
           </div>
         </div>
         <div aria-hidden="true" style={{ fontWeight: 900, fontSize: 'clamp(44px,9.2vw,136px)', lineHeight: 0.85, letterSpacing: '-.06em', color: '#2A2222', textWrap: 'balance', userSelect: 'none' } as CSSProperties}>
