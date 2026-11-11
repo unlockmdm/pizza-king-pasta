@@ -189,9 +189,9 @@ const SCENE_ALT = ['One large pepperoni pizza', 'Two large pizzas with two dips 
 /** [key, name, price, description, combo-builder deal id] */
 const WALKINS: [string, string, number, string, string][] = ([
   ['walkin-1l', '1 large pizza with 1 topping, wood-fired or conventional oven', 'one-large'],
-  ['walkin-2l', '2 large pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-large'],
-  ['walkin-2m', '2 medium pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-medium'],
-  ['walkin-2s', '2 small pizzas with 4 toppings each and 2 dips', 'two-small'],
+  ['walkin-2l', '2 large pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-large'],
+  ['walkin-2m', '2 medium pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-medium'],
+  ['walkin-2s', '2 small pizzas with 4 toppings each (meat counts as 2) and 2 dips', 'two-small'],
 ] as const).map(([key, desc, deal]) => [key, COMBOS[deal].name, COMBOS[deal].price, desc, deal]);
 
 /** [id, name, description, builder topping ids, vegetarian]. Toppings come from the shared pricing data. */
@@ -299,7 +299,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
 
   const byo: BuilderItem = { id: 'byo', name: 'Build Your Own', tops: [], included: 4, img: PIZZA_IMG };
   const pizzaRows: Tile[] = [
-    { key: 'byo', img: PIZZA_PICS[0], name: 'Build Your Own', desc: 'Any 4 toppings', veg: false, priceText: 'From ' + money(SIZE_PRICES.S), cta: 'Customize', act: () => setBuilder(byo) },
+    { key: 'byo', img: PIZZA_PICS[0], name: 'Build Your Own', desc: '4 toppings included (meat counts as 2)', veg: false, priceText: 'From ' + money(SIZE_PRICES.S), cta: 'Customize', act: () => setBuilder(byo) },
     ...PIZZAS.map(([id, name, desc, tops, veg], i): Tile => {
       const photo = PIZZA_PHOTO[id];
       return {

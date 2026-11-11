@@ -40,16 +40,21 @@ export const BYO_INCLUDED = 4;
 export const EXTRA_CHEESE = 0;
 
 export type TopCat = 'Veggie' | 'Meat';
-/** [id, name, category, weight]. Weight = how many toppings it counts as. */
+/**
+ * [id, name, category, weight]. Weight = how many of the included toppings it uses.
+ * Owner rule (Nov 2026): every meat, Shahi/Tandoori paneer (marked "(2 Toppings)" in Square) and extra cheese count as 2;
+ * other veggies count as 1. So 4 included toppings = 4 veggies, 1 meat + 2 veggies, or 2 meats.
+ * Past the included toppings, each extra topping costs TOP_PRICE once, meat or veggie (matches Square's counter prices).
+ */
 export const TOPPING_ROWS: [string, string, TopCat, number][] = [
   ['mushrooms', 'Mushrooms', 'Veggie', 1], ['green-peppers', 'Green pepper', 'Veggie', 1], ['red-pepper', 'Red pepper', 'Veggie', 1], ['tomatoes', 'Tomatoes', 'Veggie', 1],
   ['green-olives', 'Green olives', 'Veggie', 1], ['soya-champ', 'Soya champ', 'Veggie', 1], ['olives', 'Black olives', 'Veggie', 1], ['red-onions', 'Onions', 'Veggie', 1],
   ['hot-peppers', 'Hot pepper', 'Veggie', 1], ['pineapple', 'Pineapple', 'Veggie', 1], ['jalapenos', 'Jalapeño pepper', 'Veggie', 1], ['sun-dried', 'Sun dried tomatoes', 'Veggie', 1],
-  ['broccoli', 'Broccoli', 'Veggie', 1], ['corn', 'Sweet corn', 'Veggie', 1], ['shahi-paneer', 'Shahi paneer', 'Veggie', 1], ['paneer', 'Tandoori paneer', 'Veggie', 1],
+  ['broccoli', 'Broccoli', 'Veggie', 1], ['corn', 'Sweet corn', 'Veggie', 1], ['shahi-paneer', 'Shahi paneer', 'Veggie', 2], ['paneer', 'Tandoori paneer', 'Veggie', 2],
   ['veg-pepperoni', 'Veggie pepperoni', 'Veggie', 1], ['extra-mozz', 'Extra cheese', 'Veggie', 2], ['feta', 'Feta cheese', 'Veggie', 1], ['zucchini', 'Zucchini', 'Veggie', 1], ['eggplant', 'Eggplant', 'Veggie', 1],
-  ['pepperoni', 'Pepperoni', 'Meat', 1], ['anchovies', 'Anchovies', 'Meat', 1], ['bacon', 'Bacon', 'Meat', 1], ['ham', 'Ham', 'Meat', 1], ['sausage', 'Hot Italian sausage', 'Meat', 1],
-  ['grilled-chicken', 'Grilled chicken', 'Meat', 2], ['tandoori-chicken', 'Tandoori chicken', 'Meat', 2], ['butter-chicken', 'Butter chicken', 'Meat', 1],
-  ['shawarma-chicken', 'Shawarma chicken', 'Meat', 1], ['seafood-mix', 'Sea food mix', 'Meat', 1], ['shrimp', 'Shrimp', 'Meat', 1], ['chicken-kabab', 'Chicken kabab', 'Meat', 1], ['hot-salami', 'Hot salami', 'Meat', 1],
+  ['pepperoni', 'Pepperoni', 'Meat', 2], ['anchovies', 'Anchovies', 'Meat', 2], ['bacon', 'Bacon', 'Meat', 2], ['ham', 'Ham', 'Meat', 2], ['sausage', 'Hot Italian sausage', 'Meat', 2],
+  ['grilled-chicken', 'Grilled chicken', 'Meat', 2], ['tandoori-chicken', 'Tandoori chicken', 'Meat', 2], ['butter-chicken', 'Butter chicken', 'Meat', 2],
+  ['shawarma-chicken', 'Shawarma chicken', 'Meat', 2], ['seafood-mix', 'Sea food mix', 'Meat', 2], ['shrimp', 'Shrimp', 'Meat', 2], ['chicken-kabab', 'Chicken kabab', 'Meat', 2], ['hot-salami', 'Hot salami', 'Meat', 2],
 ];
 export interface ToppingInfo { id: string; name: string; cat: TopCat; wt: number }
 export const TOPPINGS: Record<string, ToppingInfo> = Object.fromEntries(TOPPING_ROWS.map(([id, name, cat, wt]) => [id, { id, name, cat, wt }]));

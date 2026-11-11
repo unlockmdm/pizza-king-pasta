@@ -374,9 +374,8 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   const P: SizePrices = pricesFor(pid);
   const q = pizzaQuote(pid, s.size, keys, s.cheese, combo && item?.included != null ? item.included : undefined, P);
   const { included, used, extraCount, topCost, cheeseCost, unit, extra } = q;
-  const wOf = (k: string) => TOPMAP[k]?.wt || 1;
-  const cumOf: Record<string, number> = {};
-  keys.reduce((a, k) => (cumOf[k] = a + wOf(k)), 0);
+  // What adding a topping would cost (meat and paneer use 2 of the included toppings; each extra costs the same).
+  const addsExtra = (id: string) => pizzaQuote(pid, s.size, [...keys, id], s.cheese, q.included, P).extraCount > extraCount;
   const hasExtra = extra > 0.001;
   const sizeName = SIZES.find((x) => x[0] === s.size)![1];
   const topOf = (id: string) => TOPMAP[id] || ({ name: id } as Topping);
@@ -418,7 +417,11 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
       aria: n + ' of ' + included + ' included toppings chosen' + (extraCount ? ', ' + extraCount + ' extra' : ''),
       bg: full ? '#E8F5EC' : '#F2F2F5',
       fg: full ? '#1E7A3C' : '#1A1414',
-      slots: Array.from({ length: Math.max(included, keys.length) }, (_, i) => (i < keys.length ? slot(topImgs[i], topImgs[i] ? '#fff' : '#E6E6EA', '82%') : slot(null))),
+      // One dot per included topping; meat and paneer fill two.
+      slots: (() => {
+        const filled = keys.flatMap((k, i) => Array.from({ length: TOPMAP[k]?.wt || 1 }, () => slot(topImgs[i], topImgs[i] ? '#fff' : '#E6E6EA', '82%')));
+        return filled.concat(Array.from({ length: Math.max(0, included - filled.length) }, () => slot(null)));
+      })(),
     };
   } else {
     tp = { done: false, text: money(TOP_PRICE[s.size]) + ' each', aria: keys.length + ' toppings chosen', bg: '#F2F2F5', fg: '#1A1414', slots: keys.length ? keys.map((_, i) => slot(topImgs[i], '#E6E6EA', '82%')) : [slot(null)] };
@@ -656,6 +659,18 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
           {/* ----- Toppings ----- */}
           <section ref={refTops} style={sectionStyle(false)}>
             <SectionHead title="Toppings" st={tp} />
+            {included ? (
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 14, background: '#F6F6F8', fontSize: 14, lineHeight: 1.45, color: '#3A3A3C' }}>
+                <span aria-hidden="true" style={{ flex: 'none', marginTop: 1, height: 20, padding: '0 7px', borderRadius: 999, background: '#1A1414', color: '#fff', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center' }}>×2</span>
+                <span>
+                  <strong>Meat and paneer count as 2 toppings.</strong>{' '}
+                  {included === 4
+                    ? 'Your 4 included toppings can be 4 veggies, 1 meat and 2 veggies, or 2 meats.'
+                    : 'This pizza includes ' + included + ' topping' + (included === 1 ? '' : 's') + '.'}{' '}
+                  Extra toppings are {money(TOP_PRICE[s.size])} each.
+                </span>
+              </div>
+            ) : null}
             <div role="tablist" className="pb-nav" style={{ display: 'flex', gap: 24, borderBottom: '1px solid #E9E9EC', overflowX: 'auto', scrollbarWidth: 'none' }}>
               {(['Veggie', 'Meat'] as TopCat[]).map((c) => {
                 const n = keys.filter((k) => topOf(k).cat === c).length;
@@ -673,9 +688,9 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,156px),1fr))', gap: 12 }}>
               {TOPS.filter((t) => t.cat === s.cat).map((t) => {
                 const on = !!s.tops[t.id];
-                const free = on ? cumOf[t.id] <= included : used + t.wt <= included;
+                const free = on ? !q.extraIds.includes(t.id) : !addsExtra(t.id);
                 const tl = tile(on);
-                const priceText = free ? (t.wt > 1 ? 'Included · counts as 2' : 'Included') : '+' + money(TOP_PRICE[s.size] * (on ? Math.min(t.wt, cumOf[t.id] - included) : t.wt));
+                const priceText = free ? 'Included' : '+' + money(TOP_PRICE[s.size]);
                 return (
                   <div key={t.id} style={{ position: 'relative', display: 'flex', flexDirection: 'column', borderRadius: 20, border: tl.border, background: tl.bg, transition: 'background .15s,border-color .15s', animation: 'pbRise .25s ease both' }}>
                     <button onClick={() => toggleTop(t.id)} aria-pressed={on} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, border: 0, background: 'transparent', padding: '18px 10px 8px', cursor: 'pointer', fontFamily: 'inherit', color: '#1A1414' }}>
@@ -689,6 +704,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
                       <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, textAlign: 'center' }}>
                         <span style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.25 }}>{t.name}</span>
                         <span style={{ fontSize: 13, fontWeight: 600, color: free ? '#12663A' : '#636366' }}>{priceText}</span>
+                        {t.wt > 1 ? <span style={{ marginTop: 2, height: 20, padding: '0 8px', borderRadius: 999, background: '#F1F1F4', color: '#3A3A3C', fontSize: 11, fontWeight: 800, display: 'inline-flex', alignItems: 'center' }}>Counts as 2</span> : null}
                       </span>
                     </button>
                     <div style={{ height: 46, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 10px 12px' }}>

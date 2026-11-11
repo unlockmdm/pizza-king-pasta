@@ -50,7 +50,7 @@ function ByoTile({ ph, onClick }: { ph: boolean; onClick: () => void }) {
     return () => clearInterval(t);
   }, []);
   return (
-    <Hov as="button" onClick={onClick} aria-label="Build your own pizza, any 4 toppings" style={{ gridArea: 'byo', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: ph ? 24 : 36, overflow: 'hidden', background: '#1A1414', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
+    <Hov as="button" onClick={onClick} aria-label="Build your own pizza, 4 toppings included, meat counts as 2" style={{ gridArea: 'byo', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: ph ? 24 : 36, overflow: 'hidden', background: '#1A1414', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
       <span style={{ position: 'absolute', left: '50%', top: ph ? 78 : 120, width: 360, height: 360, marginLeft: -180, transform: ph ? 'scale(.62)' : undefined, transformOrigin: '50% 0' }}>
         <span style={{ position: 'absolute', inset: 0, animation: 'pkSpin 60s linear infinite' }}>
           <img src="assets/pizza-base.webp" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -59,7 +59,7 @@ function ByoTile({ ph, onClick }: { ph: boolean; onClick: () => void }) {
       </span>
       <span style={{ position: 'absolute', left: ph ? 16 : 24, right: ph ? 16 : 24, top: ph ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <span style={{ fontWeight: 900, fontSize: ph ? 19 : 24, lineHeight: 1.1, letterSpacing: '-.03em', whiteSpace: ph ? 'normal' : 'nowrap' }}>Build your own</span>
-        <span style={{ fontSize: ph ? 13 : 14, color: 'rgba(255,255,255,.7)' }}>Any 4 toppings</span>
+        <span style={{ fontSize: ph ? 13 : 14, color: 'rgba(255,255,255,.7)' }}>4 toppings · meat counts as 2</span>
         {ph ? null : <span style={{ fontSize: 13, fontWeight: 700, color: '#fff', opacity: 0.92, marginTop: 6, minHeight: 18 }}>{BYO_SETS[byoSi].map((x) => x[0]).join(' · ')}</span>}
       </span>
       <span style={ph ? ARROW_DOT_SM : ARROW_DOT}><IconArrow /></span>

@@ -176,7 +176,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
                   <br />
                   toppings.
                 </span>
-                <span style={{ fontSize: 14, lineHeight: 1.45, color: '#EDEDF0' }}>Any 4 toppings, from {money(SIZE_PRICES.S)}.</span>
+                <span style={{ fontSize: 14, lineHeight: 1.45, color: '#EDEDF0' }}>4 toppings included (meat counts as 2), from {money(SIZE_PRICES.S)}.</span>
               </div>
               <Hov
                 as="button"

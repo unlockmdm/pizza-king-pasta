@@ -236,7 +236,7 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
   const title = deal.name + ' combo';
   const subtitle = [
     sp.pizzas + ' ' + SIZE_NAMES[sp.size].toLowerCase() + (sp.pizzas > 1 ? ' pizzas' : ' pizza'),
-    tw(sp.tops) + (sp.pizzas > 1 ? ' each' : ''),
+    tw(sp.tops) + (sp.pizzas > 1 ? ' each' : '') + ' (meat counts as 2)',
     sp.dips ? sp.dips + ' dips' : '',
     sp.pops ? sp.pops + ' pops' : '',
     'Pickup only',

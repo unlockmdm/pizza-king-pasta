@@ -77,20 +77,39 @@ export interface PizzaQuote {
   /** Charge above the size price (extra toppings). */
   extra: number;
   included: number;
+  /** Included-topping units used (meat and paneer count as 2). */
   used: number;
+  /** How many toppings are charged as extras. */
   extraCount: number;
+  /** Which toppings are the charged extras (the fewest possible: heaviest first, latest added first). */
+  extraIds: string[];
   topCost: number;
   cheeseCost: number;
 }
-/** Price of a pizza: the size price plus TOP_PRICE for each topping over the included count. */
+/** Weight of a topping: how many of the included toppings it uses. */
+export const topWeight = (id: string) => TOPPINGS[id]?.wt || 1;
+/**
+ * Price of a pizza: the size price plus TOP_PRICE for each extra topping.
+ * Toppings use the included allowance by weight; when they don't fit, the fewest toppings are charged
+ * (each extra costs the same, meat or veggie), always the cheapest way for the customer.
+ */
 export function pizzaQuote(id: string, size: SizeKey, topIds: string[], cheese: string, included = includedFor(id), P: SizePrices = pricesFor(id)): PizzaQuote {
-  const used = topIds.reduce((a, k) => a + (TOPPINGS[k]?.wt || 1), 0);
-  const extraCount = Math.max(0, used - included);
+  const used = topIds.reduce((a, k) => a + topWeight(k), 0);
+  // Drop the heaviest toppings (latest added first on ties) until the rest fit in the allowance.
+  const order = topIds.map((k, i) => ({ k, i, w: topWeight(k) })).sort((x, y) => y.w - x.w || y.i - x.i);
+  const extraIds: string[] = [];
+  let rest = used;
+  for (const t of order) {
+    if (rest <= included) break;
+    extraIds.push(t.k);
+    rest -= t.w;
+  }
+  const extraCount = extraIds.length;
   const topCost = extraCount * TOP_PRICE[size];
   const cheeseCost = cheese === 'Extra' ? EXTRA_CHEESE : 0;
   const unit = round2(P[size] + topCost + cheeseCost);
   const extra = round2(unit - P[size]);
-  return { base: P[size], unit, extra, included, used, extraCount, topCost, cheeseCost };
+  return { base: P[size], unit, extra, included, used, extraCount, extraIds, topCost, cheeseCost };
 }
 
 const topName = (id: string) => TOPPINGS[id]?.name || id;
