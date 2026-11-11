@@ -16,6 +16,11 @@ export default {
       const out = await handlePay(body, env);
       return new Response(JSON.stringify(out.json), { status: out.status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
     }
+    // Apple Pay domain verification (Square). Served from a plain asset so dot-folders don't matter.
+    if (url.pathname === '/.well-known/apple-developer-merchantid-domain-association') {
+      const r = await env.ASSETS.fetch(new Request(new URL('/apple-pay-domain-association.txt', url), request));
+      return new Response(r.body, { status: r.status, headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' } });
+    }
     return env.ASSETS.fetch(request);
   },
 };
