@@ -60,7 +60,11 @@ function friendly(errors: { code?: string; detail?: string }[] = []): string {
 export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
   const token = env.SQUARE_ACCESS_TOKEN;
   const locationId = env.VITE_SQUARE_LOCATION_ID;
-  if (!token || !locationId) return fail(500, 'Online payments aren’t set up yet.');
+  if (!token || !locationId) {
+    // Names only (never values), so a misconfigured host is easy to diagnose.
+    const missing = [!token && 'SQUARE_ACCESS_TOKEN', !locationId && 'VITE_SQUARE_LOCATION_ID'].filter(Boolean);
+    return fail(500, 'Online payments aren’t set up yet.', { missing });
+  }
   const base = env.SQUARE_ENV === 'production' ? 'https://connect.squareup.com' : 'https://connect.squareupsandbox.com';
 
   // ---- validate input ----
