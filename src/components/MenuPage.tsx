@@ -382,14 +382,10 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
         <h1 style={{ margin: 0, padding: 'clamp(36px,5vw,64px) 0 0', fontWeight: 900, fontSize: 'clamp(44px,6vw,72px)', lineHeight: 1, letterSpacing: '-.045em' }}>Menu</h1>
 
         <section id="walkin" style={{ paddingTop: 32, scrollMarginTop: 124 }}>
-          <div style={{ background: 'radial-gradient(120% 70% at 100% 0%, rgba(215,25,45,.38) 0%, rgba(215,25,45,0) 55%), #1A1414', color: '#fff', borderRadius: ph ? 24 : 28, padding: ph ? '20px 12px 12px' : 'clamp(24px,4vw,40px)', display: 'flex', flexDirection: 'column', gap: ph ? 16 : 24 }}>
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: ph ? 6 : 8, padding: ph ? '2px 8px 0' : 0 }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: '#FFB547', fontWeight: 800, fontSize: 12, letterSpacing: '.12em', textTransform: 'uppercase' }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /></svg>
-                Pickup only · Best value
-              </span>
+          <div style={{ background: '#1A1414', color: '#fff', borderRadius: ph ? 24 : 28, padding: ph ? '20px 12px 12px' : 'clamp(24px,4vw,40px)', display: 'flex', flexDirection: 'column', gap: ph ? 16 : 24 }}>
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: ph ? 4 : 6, padding: ph ? '2px 8px 0' : 0 }}>
               <h2 style={{ margin: 0, fontWeight: 900, fontSize: ph ? 28 : 'clamp(32px,3.4vw,42px)', lineHeight: 1.05, letterSpacing: '-.04em' }}>Pickup combos</h2>
-              <p style={{ margin: 0, color: '#BDB3AD', fontSize: ph ? 14 : 16, lineHeight: 1.45, maxWidth: 520 }}>Our best deals. Order ahead and grab them hot from the counter.</p>
+              <p style={{ margin: 0, color: '#BDB3AD', fontSize: ph ? 14 : 16, lineHeight: 1.45, maxWidth: 520 }}>Order ahead and grab them hot from the counter.</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: walkCols, gap: ph ? 8 : 12 }}>
               {WALKINS.map(([key, name, price, desc, deal], i) => (
