@@ -1,7 +1,7 @@
 // Terms of Service and Privacy Policy (views `?view=terms` and `?view=privacy`).
 // Every statement here must match how the site actually works: pickup-only ordering,
 // payments through Square (server/square.ts), hosting on Cloudflare (worker/index.ts),
-// cart + pickup choice in localStorage (App.tsx), no analytics and no cookies of our own.
+// cart + pickup choice in localStorage (App.tsx), Cloudflare Web Analytics (cookieless), no cookies of our own.
 // If any of that changes, update the text and the effective date.
 import type { CSSProperties, MouseEvent, ReactNode } from 'react';
 import { SHOP } from '../lib/catalog';
@@ -467,7 +467,7 @@ const privacy = (goOther: (e?: MouseEvent) => void): Section[] => [
       <UL>
         <li>We collect what we need to make your pickup order and get it to you: your name, phone number, email, order and any kitchen note.</li>
         <li>Your card details go straight to Square, our payment processor. We never see or store your full card number.</li>
-        <li>We do not use analytics, advertising trackers or tracking cookies, and we do not sell or rent your personal information.</li>
+        <li>We use privacy-friendly visitor statistics that do not use cookies or identify you. We do not use advertising trackers or tracking cookies, and we do not sell or rent your personal information.</li>
         <li>We only email you about your order. We do not send marketing emails unless you have agreed to receive them.</li>
         <li>You can ask to see or correct your information at any time by calling <Tel /> or writing to us.</li>
       </UL>
@@ -516,11 +516,18 @@ const privacy = (goOther: (e?: MouseEvent) => void): Section[] => [
           request and the time of the request. Our hosting provider, Cloudflare, processes this to deliver the website and protect it
           against abuse. We do not use it to identify you or build a profile about you.
         </P>
+        <H3>Visitor statistics</H3>
+        <P>
+          We use Cloudflare Web Analytics to understand how the website is used, for example how many people visit, which pages they view,
+          which website or app they came from, the type of device and browser, the approximate country or region, and how quickly pages
+          load. It does not use cookies or local storage, does not track you across other websites, and does not build a profile about
+          you. We only see totals, not information about individual visitors.
+        </P>
         <H3>When you contact us</H3>
         <P>If you call or write to us, we collect what you choose to tell us so that we can respond.</P>
         <H3>What we do not collect</H3>
         <P>
-          We do not use analytics tools, advertising pixels or social media trackers. We do not ask for delivery addresses, because delivery
+          We do not use advertising pixels, social media trackers or analytics that follow you across websites. We do not ask for delivery addresses, because delivery
           is handled by DoorDash and Uber Eats, and the website does not have user accounts or passwords.
         </P>
       </>
@@ -583,7 +590,8 @@ const privacy = (goOther: (e?: MouseEvent) => void): Section[] => [
             <Ext href="https://squareup.com/ca/en/legal/general/privacy">Square’s privacy notice</Ext>.
           </li>
           <li>
-            <strong>Cloudflare</strong> hosts the website and runs the server that sends your order and payment to Square. See{' '}
+            <strong>Cloudflare</strong> hosts the website, runs the server that sends your order and payment to Square, and provides our
+            cookieless visitor statistics (Cloudflare Web Analytics). See{' '}
             <Ext href="https://www.cloudflare.com/privacypolicy/">Cloudflare’s privacy policy</Ext>.
           </li>
           <li>
@@ -674,7 +682,8 @@ const privacy = (goOther: (e?: MouseEvent) => void): Section[] => [
     body: (
       <>
         <P>
-          Our website does not set its own cookies and does not use analytics or advertising cookies. It uses your browser’s local storage
+          Our website does not set its own cookies and does not use analytics or advertising cookies. Our visitor statistics (Cloudflare
+          Web Analytics) work without cookies. The website uses your browser’s local storage
           only to remember your cart and pickup choice, as described above.
         </P>
         <P>Some third-party services we use may set their own cookies or similar technologies:</P>
