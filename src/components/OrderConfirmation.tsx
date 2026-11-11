@@ -1,4 +1,5 @@
 // Order confirmation ("Order placed") — the approved design from CartCheckout.dc.html (handoff v2).
+import LineThumb from './LineThumb';
 import { useEffect, useState, type CSSProperties } from 'react';
 import { SHOP } from '../lib/catalog';
 import { orderTotals } from '../lib/pricing';
@@ -75,11 +76,10 @@ const steam = (left: string, bottom: string, w: number, h: number, anim: string)
 });
 
 export default function OrderConfirmation({
-  done, onClose, thumbFor, stage = 'oven',
+  done, onClose, stage = 'oven',
 }: {
   done: Confirmation;
   onClose: () => void;
-  thumbFor: (l: CartLine) => [string, string, string];
   stage?: Stage;
 }) {
   useLockBody(true);
@@ -252,11 +252,10 @@ export default function OrderConfirmation({
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', padding: '0 24px' }}>
             {items.map((l) => {
-              const [thumb, thumbW, fit] = thumbFor(l);
               return (
                 <div key={l.key} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 0', borderTop: '1px solid #F0F0F2' }}>
                   <span style={{ width: 52, height: 52, flex: 'none', borderRadius: 16, background: '#F2F2F5', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                    <span style={{ display: 'block', backgroundImage: "url('" + thumb + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', width: thumbW, height: thumbW, backgroundSize: fit }} />
+                    <LineThumb line={l} />
                   </span>
                   <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <span style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.25 }}>{l.name}</span>

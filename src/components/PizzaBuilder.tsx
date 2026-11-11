@@ -278,6 +278,14 @@ function PizzaLayers({ pieces, label, sauce, doneness, slices }: { pieces: Piece
   );
 }
 
+/** A finished pizza drawn from its options (cart and receipt thumbnails): same art as the live builder pizza. */
+export function PizzaArt({ sauce, tops, doneness = 'Regular', slices = 8 }: { sauce: string; tops: [string, Half][]; doneness?: string; slices?: number }) {
+  const key = tops.map((t) => t.join(':')).join(',');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const pieces = useMemo(() => buildPieces(Object.fromEntries(tops)), [key]);
+  return <PizzaLayers pieces={pieces} sauce={sauce} doneness={doneness} slices={slices} />;
+}
+
 // ---------------------------------------------------------------------------
 // Small shared pieces
 // ---------------------------------------------------------------------------

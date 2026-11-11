@@ -11,22 +11,9 @@ import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
 import './CartCheckout.css';
 import OrderConfirmation, { type Confirmation } from './OrderConfirmation';
+import LineThumb from './LineThumb';
 
 // ---------- Data (from the prototype) ----------
-
-/** [img, size, background-size] thumbnail guessed from the item name. */
-type Thumb = [string, string, string];
-const thumbOf = (name: string): Thumb => {
-  const n = (name || '').toLowerCase();
-  if (/juice|lassi|coconut|sugarcane/.test(n)) return ['assets/menu/juice-mix.png', '100%', 'cover'];
-  if (/gelato|shake|scoop|cone/.test(n)) return ['assets/menu/gelato.jpg', '100%', 'cover'];
-  if (/pasta|penne|spaghetti|momo/.test(n)) return ['assets/menu/pasta.jpg', '100%', 'cover'];
-  if (/wing|tandoori chicken|leg|fish/.test(n)) return ['assets/ingredients/tandoori-chicken.png', '82%', 'contain'];
-  return ['assets/pizza-base.webp', '86%', 'contain'];
-};
-/** A line's own `img` wins over the name guess (cut-out PNGs are contained, photos cover). */
-const thumbFor = (l: CartLine): Thumb =>
-  l.img ? (/\.png($|\?)/i.test(l.img) ? [l.img, '86%', 'contain'] : [l.img, '100%', 'cover']) : thumbOf(l.name);
 
 interface Upsell {
   key: string;
@@ -402,10 +389,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const showCart = !!p.open && step === 'cart';
   const showCheckout = !!p.open && step === 'checkout';
 
-  const rows = lines.map((l) => {
-    const [thumb, thumbW, thumbFit] = thumbFor(l);
-    return { ...l, thumb, thumbW, thumbFit, totalText: money(l.unit * l.qty), isOne: l.qty === 1 };
-  });
+  const rows = lines.map((l) => ({ ...l, totalText: money(l.unit * l.qty), isOne: l.qty === 1 }));
   const upsells = UPSELLS.filter((u) => !lines.some((l) => l.key.startsWith(u.key)));
   const pickU = upsells.find((u) => u.key === upPick);
 
@@ -420,21 +404,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const lblW = w >= 560 ? 76 : 64;
   const twoCols = w >= 560 ? '1fr 1fr' : '1fr';
 
-  const thumbBox = (r: (typeof rows)[number]) => (
-    <span
-      aria-hidden="true"
-      style={{
-        display: 'block',
-        flex: 'none',
-        backgroundImage: "url('" + r.thumb + "')",
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        width: r.thumbW,
-        height: r.thumbW,
-        backgroundSize: r.thumbFit,
-      }}
-    />
-  );
+  const thumbBox = (r: (typeof rows)[number]) => <LineThumb line={r} />;
 
   return (
     <>
@@ -1133,7 +1103,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
       ) : null}
 
       {/* ---------- Order placed (approved confirmation design) ---------- */}
-      {done ? <OrderConfirmation done={done} thumbFor={thumbFor} onClose={() => setDone(null)} /> : null}
+      {done ? <OrderConfirmation done={done} onClose={() => setDone(null)} /> : null}
     </>
   );
 }
