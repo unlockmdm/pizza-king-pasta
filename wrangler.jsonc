@@ -18,6 +18,10 @@
     "SQUARE_ENV": "sandbox",
     "VITE_SQUARE_LOCATION_ID": "LGN3E2XQ2FP3G"
   },
+  // Payment attempts per visitor (IP) per minute, to slow down card-testing bots.
+  "ratelimits": [
+    { "name": "PAY_LIMITER", "namespace_id": "1001", "simple": { "limit": 8, "period": 60 } }
+  ],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
