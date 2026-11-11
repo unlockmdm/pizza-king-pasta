@@ -451,7 +451,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
     const n = Math.min(used, included), full = used >= included;
     tp = {
       done: full,
-      text: extraCount ? n + ' of ' + included + ' + ' + extraCount + ' extra' : full ? 'All set' : n + ' of ' + included + ' included',
+      text: extraCount ? included + ' included + ' + extraCount + ' extra' : full ? 'All set' : n + ' of ' + included + ' included',
       aria: n + ' of ' + included + ' included toppings chosen' + (extraCount ? ', ' + extraCount + ' extra' : ''),
       bg: full ? '#E8F5EC' : '#F2F2F5',
       fg: full ? '#1E7A3C' : '#1A1414',

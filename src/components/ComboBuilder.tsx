@@ -3,7 +3,7 @@
 import { useState, type CSSProperties } from 'react';
 import type { ComboBuilderProps, ComboContext, NewLine, PizzaConfig } from '../lib/types';
 import { COMBOS, COMBO_DIPS, COMBO_POPS, COMBO_SIDES, EXTRA_DIP, SIZE_NAMES, comboPizzaBits, mustPrice, SLICES, pizzaOptsOf, type LineSpec, type PizzaOpts } from '../lib/pricing';
-import { money } from '../lib/format';
+import { chooseLabel, money } from '../lib/format';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody } from '../lib/hooks';
 import PizzaBuilder, { PizzaArt } from './PizzaBuilder';
@@ -204,8 +204,8 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
   if (missing != null) {
     primaryLabel = 'Customize pizza ' + (missing + 1);
     primary = editAt(missing);
-  } else if (!dipsOk) primaryLabel = 'Choose ' + (sp.dips - nd) + ' more dip' + (sp.dips - nd > 1 ? 's' : '');
-  else if (!popsOk) primaryLabel = 'Choose ' + (sp.pops - np) + ' more pop' + (sp.pops - np > 1 ? 's' : '');
+  } else if (!dipsOk) primaryLabel = chooseLabel('dip', sp.dips, nd);
+  else if (!popsOk) primaryLabel = chooseLabel('pop', sp.pops, np);
   else if (!sideOk) primaryLabel = 'Choose juice or corn';
   if (ready)
     primary = () => {
