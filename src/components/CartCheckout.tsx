@@ -848,7 +848,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
                       {payErr ? <span role="alert" style={{ fontSize: 14, fontWeight: 700, color: '#C11425', background: '#FDECEE', borderRadius: 12, padding: '10px 12px' }}>{payErr}</span> : null}
                       <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#818184' }}>
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
-                        Encrypted and processed by Square. We never see or store your card.
+                        <span>Encrypted and processed by <a href="https://squareup.com/ca/en/legal/general/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2 }}>Square</a>. We never see or store your card.</span>
                       </span>
                     </>
                   ) : (
@@ -988,7 +988,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
                           <rect x="5" y="11" width="14" height="10" rx="2" />
                           <path d="M8 11V8a4 4 0 0 1 8 0v3" />
                         </svg>
-                        Encrypted and processed by Square. We never store your card.
+                        <span>Encrypted and processed by <a href="https://squareup.com/ca/en/legal/general/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2 }}>Square</a>. We never store your card.</span>
                       </span>
                     </div>
                   ) : null}
