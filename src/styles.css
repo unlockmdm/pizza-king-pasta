@@ -8,7 +8,12 @@ body {
   font-family: 'Figtree', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  /* clip (not hidden): hidden turns body into a scroll container, which breaks
+     position: sticky on iOS Safari (header + menu section bar would scroll away). */
+  overflow-x: clip;
+}
+@supports not (overflow-x: clip) {
+  body { overflow-x: hidden; }
 }
 *, *::before, *::after { box-sizing: border-box; }
 a { color: #D7192D; }
