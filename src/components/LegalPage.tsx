@@ -30,14 +30,14 @@ const Ext = ({ href, children }: { href: string; children: ReactNode }) => (
   <a href={href} target="_blank" rel="noreferrer" style={S.a}>{children}</a>
 );
 const Tel = () => <a href={SHOP.phoneHref} style={S.a}>{SHOP.phoneText}</a>;
-const ADDRESS = 'Pizza King & Pasta, 10-511 Ray Lawson Blvd, Brampton, ON L6Y 0N2, Canada';
+const ADDRESS = 'Pizza King & Pasta, 511 Ray Lawson Blvd, Unit 10, Brampton, ON L6Y 0N2, Canada';
 
 /* ---------- Terms of Service ---------- */
 const TERMS_INTRO = (
   <>
     <P>
       These Terms of Service (the “Terms”) apply when you use this website or place an online pickup order with Pizza King &amp; Pasta
-      (“Pizza King &amp; Pasta”, “we”, “us” or “our”), 10-511 Ray Lawson Blvd, Brampton, Ontario. By using the website or placing an
+      (“Pizza King &amp; Pasta”, “we”, “us” or “our”), 511 Ray Lawson Blvd, Unit 10, Brampton, Ontario. By using the website or placing an
       order, you agree to these Terms and to our Privacy Policy. If you do not agree, please do not use the website. You can still order
       by phone or at the counter.
     </P>
@@ -52,7 +52,7 @@ const terms = (goOther: (e?: MouseEvent) => void): Section[] => [
     body: (
       <>
         <P>
-          This website is operated by Pizza King &amp; Pasta, a restaurant located at 10-511 Ray Lawson Blvd, Brampton, ON L6Y 0N2, Canada.
+          This website is operated by Pizza King &amp; Pasta, a restaurant located at 511 Ray Lawson Blvd, Unit 10, Brampton, ON L6Y 0N2, Canada.
           You can reach us by phone at <Tel /> during our opening hours (daily, 4 PM to 2 AM, subject to holiday changes), or by mail at
           the address above.
         </P>
@@ -488,7 +488,7 @@ const privacy = (goOther: (e?: MouseEvent) => void): Section[] => [
     title: 'Who is responsible',
     body: (
       <P>
-        Pizza King &amp; Pasta, 10-511 Ray Lawson Blvd, Brampton, ON L6Y 0N2, is responsible for personal information under its control. Our
+        Pizza King &amp; Pasta, 511 Ray Lawson Blvd, Unit 10, Brampton, ON L6Y 0N2, is responsible for personal information under its control. Our
         owner or manager acts as our privacy contact and is accountable for our compliance with this policy. You can reach them by phone at{' '}
         <Tel /> or by mail at the address above, marked “Attention: Privacy”.
       </P>

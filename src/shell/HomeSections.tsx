@@ -83,7 +83,7 @@ const FAQ: [string, string][] = [
   ['What is Indian-style (desi) pizza?', 'Pizza with Indian flavours: butter chicken or shahi paneer sauce, tandoori chicken or paneer, green chilli, ginger and coriander. Pick a desi pizza from the menu, or build your own with these toppings.'],
   ['What are your hours?', 'Every day, 4 PM to 2 AM. You can also order ahead online and pick a later pickup time.'],
   ['Do you deliver?', 'Delivery is through DoorDash. For pickup, order on this website and pay online, then collect your order at the counter.'],
-  ['Where are you located?', '10-511 Ray Lawson Blvd, Brampton, ON L6Y 0N2. Call us at 905-460-9494.'],
+  ['Where are you located?', '511 Ray Lawson Blvd, Unit 10, Brampton, ON L6Y 0N2. Call us at 905-460-9494.'],
   ['Can I choose the oven?', 'Yes. Every pizza can be baked in our wood-fired oven or a conventional oven, at the same price.'],
   ['How many slices are in each size?', 'Small 6, medium 8, large 10 and X-large 12. Every pizza is cut into triangles.'],
 ];

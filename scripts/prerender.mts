@@ -30,7 +30,7 @@ const restaurant = {
   priceRange: '$$',
   servesCuisine: ['Pizza', 'Indian', 'Italian', 'Pasta'],
   description: PAGES.home.description,
-  address: { '@type': 'PostalAddress', streetAddress: '10-511 Ray Lawson Blvd', addressLocality: 'Brampton', addressRegion: 'ON', postalCode: 'L6Y 0N2', addressCountry: 'CA' },
+  address: { '@type': 'PostalAddress', streetAddress: '511 Ray Lawson Blvd, Unit 10', addressLocality: 'Brampton', addressRegion: 'ON', postalCode: 'L6Y 0N2', addressCountry: 'CA' },
   areaServed: { '@type': 'City', name: 'Brampton' },
   openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], opens: '16:00', closes: '02:00' }],
   hasMenu: SITE_URL + '/menu',

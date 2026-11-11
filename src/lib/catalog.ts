@@ -3,7 +3,7 @@
 
 export const SHOP = {
   name: 'Pizza King & Pasta',
-  street: '10-511 Ray Lawson Blvd',
+  street: '511 Ray Lawson Blvd, Unit 10',
   cityLine: 'Brampton, ON L6Y 0N2',
   phoneText: '905-460-9494',
   phoneHref: 'tel:+19054609494',
