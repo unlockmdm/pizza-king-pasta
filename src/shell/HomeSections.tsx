@@ -30,7 +30,7 @@ function ByoToppings({ si }: { si: number }) {
           style={{
             position: 'absolute', left: 180 + Math.cos(a) * rr + 'px', top: 180 + Math.sin(a) * rr + 'px',
             width: w * (0.9 + ((i * 37) % 20) / 100) + 'px', '--r': rot, transform: 'translate(-50%,-50%) rotate(' + rot + ')',
-            opacity: 0, filter: 'drop-shadow(0 3px 3px rgba(0,0,0,.35))',
+            opacity: 0,
             animation: 'pkDrop .5s cubic-bezier(.2,.8,.2,1) ' + (i * 0.025).toFixed(3) + 's forwards',
           } as CSSProperties}
         />,
@@ -38,6 +38,32 @@ function ByoToppings({ si }: { si: number }) {
     });
   }
   return <>{out}</>;
+}
+
+
+function ByoTile({ ph, onClick }: { ph: boolean; onClick: () => void }) {
+  const [byoSi, setByoSi] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const t = setInterval(() => setByoSi((x) => (x + 1) % BYO_SETS.length), 2600);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <Hov as="button" onClick={onClick} aria-label="Build your own pizza, any 4 toppings" style={{ gridArea: 'byo', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: ph ? 24 : 36, overflow: 'hidden', background: '#1A1414', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
+      <span style={{ position: 'absolute', left: '50%', top: ph ? 78 : 120, width: 360, height: 360, marginLeft: -180, transform: ph ? 'scale(.62)' : undefined, transformOrigin: '50% 0' }}>
+        <span style={{ position: 'absolute', inset: 0, animation: 'pkSpin 60s linear infinite' }}>
+          <img src="assets/pizza-base.webp" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} />
+          <ByoToppings si={byoSi} />
+        </span>
+      </span>
+      <span style={{ position: 'absolute', left: ph ? 16 : 24, right: ph ? 16 : 24, top: ph ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{ fontWeight: 900, fontSize: ph ? 19 : 24, lineHeight: 1.1, letterSpacing: '-.03em', whiteSpace: ph ? 'normal' : 'nowrap' }}>Build your own</span>
+        <span style={{ fontSize: ph ? 13 : 14, color: 'rgba(255,255,255,.7)' }}>Any 4 toppings</span>
+        {ph ? null : <span style={{ fontSize: 13, fontWeight: 700, color: '#fff', opacity: 0.92, marginTop: 6, minHeight: 18 }}>{BYO_SETS[byoSi].map((x) => x[0]).join(' · ')}</span>}
+      </span>
+      <span style={ph ? ARROW_DOT_SM : ARROW_DOT}><IconArrow /></span>
+    </Hov>
+  );
 }
 
 export interface HomeHandlers {
@@ -52,13 +78,6 @@ export interface HomeHandlers {
 }
 
 export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
-  // Cycle the Build Your Own toppings.
-  const [byoSi, setByoSi] = useState(0);
-  useEffect(() => {
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    const t = setInterval(() => setByoSi((s) => (s + 1) % BYO_SETS.length), 2600);
-    return () => clearInterval(t);
-  }, []);
 
   const desk = w >= 1000, tab = w >= 600, ph = !tab;
   const clamp2 = { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as const;
@@ -111,11 +130,13 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
 
           {/* Pickup combo tile */}
           <Hov style={{ gridArea: 'deal', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, background: '#D7192D', color: '#fff', overflow: 'hidden', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
-            <div style={{ position: 'absolute', right: ph ? -46 : -60, top: ph ? -40 : -90, width: ph ? 200 : 330, height: ph ? 200 : 330, filter: 'drop-shadow(0 24px 40px rgba(0,0,0,.35))' }}>
-              <img src="assets/pizza-base.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 40s linear infinite' }} />
+            <div style={{ position: 'absolute', right: ph ? -46 : -60, top: ph ? -40 : -90, width: ph ? 200 : 330, height: ph ? 200 : 330 }}>
+              <span aria-hidden="true" style={{ position: 'absolute', left: '8%', right: '8%', bottom: '-6%', height: '22%', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(40,0,6,.45),rgba(40,0,6,0))' }} />
+              <img src="assets/pizza-base.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 40s linear infinite', willChange: 'transform' }} />
             </div>
-            <div style={{ position: 'absolute', right: ph ? 54 : 170, top: ph ? 104 : 110, width: ph ? 176 : 300, height: ph ? 176 : 300, filter: 'drop-shadow(0 24px 40px rgba(0,0,0,.35))' }}>
-              <img src="assets/pizza-base.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 50s linear reverse infinite' }} />
+            <div style={{ position: 'absolute', right: ph ? 54 : 170, top: ph ? 104 : 110, width: ph ? 176 : 300, height: ph ? 176 : 300 }}>
+              <span aria-hidden="true" style={{ position: 'absolute', left: '8%', right: '8%', bottom: '-6%', height: '22%', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(40,0,6,.45),rgba(40,0,6,0))' }} />
+              <img src="assets/pizza-base.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 50s linear reverse infinite', willChange: 'transform' }} />
             </div>
             <div aria-hidden="true" style={{ position: 'absolute', right: ph ? 8 : 18, bottom: ph ? 10 : 14, width: 236, height: 128, display: 'flex', pointerEvents: 'none', transform: ph ? (w < 380 ? 'scale(.5)' : 'scale(.64)') : undefined, transformOrigin: 'right bottom' }}>
               <span style={{ position: 'absolute', left: 14, right: 8, bottom: -4, height: 20, borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(60,0,8,.5),rgba(60,0,8,0))' }} />
@@ -146,21 +167,8 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
             </div>
           </Hov>
 
-          {/* Build your own tile */}
-          <Hov as="button" onClick={h.onByo} aria-label="Build your own pizza, any 4 toppings" style={{ gridArea: 'byo', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: ph ? 24 : 36, overflow: 'hidden', background: '#1A1414', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
-            <span style={{ position: 'absolute', left: '50%', top: ph ? 78 : 120, width: 360, height: 360, marginLeft: -180, transform: ph ? 'scale(.62)' : undefined, transformOrigin: '50% 0' }}>
-              <span style={{ position: 'absolute', inset: 0, animation: 'pkSpin 60s linear infinite' }}>
-                <img src="assets/pizza-base.png" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} />
-                <ByoToppings si={byoSi} />
-              </span>
-            </span>
-            <span style={{ position: 'absolute', left: ph ? 16 : 24, right: ph ? 16 : 24, top: ph ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span style={{ fontWeight: 900, fontSize: ph ? 19 : 24, lineHeight: 1.1, letterSpacing: '-.03em', whiteSpace: ph ? 'normal' : 'nowrap' }}>Build your own</span>
-              <span style={{ fontSize: ph ? 13 : 14, color: 'rgba(255,255,255,.7)' }}>Any 4 toppings</span>
-              {ph ? null : <span style={{ fontSize: 13, fontWeight: 700, color: '#fff', opacity: 0.92, marginTop: 6, minHeight: 18 }}>{BYO_SETS[byoSi].map((x) => x[0]).join(' · ')}</span>}
-            </span>
-            <span style={ph ? ARROW_DOT_SM : ARROW_DOT}><IconArrow /></span>
-          </Hov>
+          {/* Build your own tile (own component so its 2.6s topping cycle doesn't re-render the page) */}
+          <ByoTile ph={ph} onClick={h.onByo} />
 
           {/* Fresh pasta tile */}
           <Hov as="button" onClick={h.onPasta} aria-label="Fresh pasta: rosé, Alfredo, tomato" style={{ gridArea: 'pasta', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: ph ? 24 : 36, overflow: 'hidden', background: '#F2F2F5', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>

@@ -24,6 +24,9 @@ export interface Confirmation {
 
 type Stage = 'oven' | 'ready';
 
+/** Progress shown only while the order is in the oven. */
+const STEPS: [string, 'done' | 'now' | 'next'][] = [['Received', 'done'], ['In the oven', 'now'], ['Ready for pickup', 'next']];
+
 const BRAND: Record<string, [name: string, w: string, h: string, bg: string]> = {
   visa: ['Visa', '38px', '14px', '#fff'],
   mc: ['Mastercard', '36px', '24px', '#fff'],
@@ -142,7 +145,23 @@ export default function OrderConfirmation({
                 {orderPill}
               </div>
             </div>
-          ) : (
+          ) : null}
+          {!ready ? (
+            <div role="list" aria-label="Order progress" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 10 }}>
+              {STEPS.map(([label, k]) => (
+                <div key={label} role="listitem" aria-current={k === 'now' ? 'step' : undefined} style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
+                  <span style={{ position: 'relative', display: 'block', height: 6, borderRadius: 999, background: '#EEEEF0', overflow: 'hidden' }}>
+                    <span style={{ position: 'absolute', inset: 0, borderRadius: 999, background: k === 'next' ? 'transparent' : k === 'done' ? '#1E8A4C' : '#D7192D', transformOrigin: 'left center', animation: k === 'now' ? 'ccGrow 2.4s ease-in-out infinite' : 'none' }} />
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 800, color: k === 'next' ? '#9A9AA0' : '#1A1414', minWidth: 0 }}>
+                    <span style={{ width: 8, height: 8, flex: 'none', borderRadius: '50%', background: k === 'done' ? '#1E8A4C' : k === 'now' ? '#D7192D' : '#D9D9DE', boxShadow: k === 'now' ? '0 0 0 4px rgba(215,25,45,.16)' : 'none' }} />
+                    <span style={{ overflowWrap: 'anywhere' }}>{label}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {ready ? (
             <div aria-label="Order status" style={{ ...statusCard, background: '#120B08' }}>
               <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: w >= 760 ? '64%' : '100%', overflow: 'hidden' }}>
                 <img src="assets/ready.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '60% 62%' }} />
@@ -159,7 +178,7 @@ export default function OrderConfirmation({
                 {orderPill}
               </div>
             </div>
-          )}
+          ) : null}
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 12 }}>
             <div style={infoCard}>

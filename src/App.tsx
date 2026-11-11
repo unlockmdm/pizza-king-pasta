@@ -7,7 +7,7 @@ import ComboBuilder from './components/ComboBuilder';
 import MeatFavourites from './components/MeatFavourites';
 import MenuPage from './components/MenuPage';
 import PastaPage from './components/PastaPage';
-import PizzaBuilder from './components/PizzaBuilder';
+import PizzaBuilder, { preloadPizzaImages } from './components/PizzaBuilder';
 import { creditOf, isShopOpen, pricesFor, SIZE_PRICES } from './lib/catalog';
 import { money } from './lib/format';
 import { useWidth } from './lib/hooks';
@@ -50,7 +50,7 @@ function guessImg(t: string) {
   if (/juice|lassi|sugarcane|coconut/.test(t)) return 'assets/menu/juice-mix.png';
   if (/gelato|shake|scoop|cone/.test(t)) return 'assets/menu/gelato.jpg';
   if (/pasta|penne|spaghetti|alfredo|ros[eé]|momo/.test(t)) return 'assets/menu/pasta.jpg';
-  if (/pizza|combo|crust|small|medium|large|paneer|pepperoni|meat|veg/.test(t)) return 'assets/pizza-base.png';
+  if (/pizza|combo|crust|small|medium|large|paneer|pepperoni|meat|veg/.test(t)) return 'assets/pizza-base.webp';
   return '';
 }
 
@@ -95,6 +95,14 @@ export default function App() {
     return () => document.removeEventListener('pointerdown', onPt, true);
   }, []);
 
+  // Warm the pizza builder's images once the page has settled, so opening it is instant.
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      const ric = (window as unknown as { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback;
+      if (ric) ric(preloadPizzaImages); else preloadPizzaImages();
+    }, 2500);
+    return () => clearTimeout(t);
+  }, []);
   useEffect(() => writeJSON(CART_KEY, cart), [cart]);
   useEffect(() => { if (mode) writeJSON(MODE_KEY, { mode: 'pickup', addr: '', when }); }, [mode, when]);
 

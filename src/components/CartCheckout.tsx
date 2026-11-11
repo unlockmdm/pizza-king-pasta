@@ -20,7 +20,7 @@ const thumbOf = (name: string): Thumb => {
   if (/gelato|shake|scoop|cone/.test(n)) return ['assets/menu/gelato.jpg', '100%', 'cover'];
   if (/pasta|penne|spaghetti|momo/.test(n)) return ['assets/menu/pasta.jpg', '100%', 'cover'];
   if (/wing|tandoori chicken|leg|fish/.test(n)) return ['assets/ingredients/tandoori-chicken.png', '82%', 'contain'];
-  return ['assets/pizza-base.png', '86%', 'contain'];
+  return ['assets/pizza-base.webp', '86%', 'contain'];
 };
 /** A line's own `img` wins over the name guess (cut-out PNGs are contained, photos cover). */
 const thumbFor = (l: CartLine): Thumb =>
@@ -466,7 +466,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
 
             {count === 0 ? (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 40, textAlign: 'center' }}>
-                <img src="assets/pizza-base.png" alt="" style={{ width: 120, height: 120, opacity: 0.9 }} />
+                <img src="assets/pizza-base.webp" alt="" style={{ width: 120, height: 120, opacity: 0.9 }} />
                 <span style={{ fontWeight: 900, fontSize: 22, letterSpacing: '-.03em' }}>Your order is empty</span>
                 <span style={{ fontSize: 15, color: '#636366' }}>Add a pizza to get started.</span>
                 <button

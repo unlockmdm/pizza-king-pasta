@@ -1,5 +1,5 @@
 // Live pizza builder. Port of design_handoff_pizza_king_website 2/prototype/PizzaBuilder.dc.html.
-import { Fragment, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import type { Half, NewLine, PizzaBuilderProps, PizzaConfig, SizeKey, SizePrices } from '../lib/types';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
@@ -12,7 +12,7 @@ import './PizzaBuilder.css';
 // ---------------------------------------------------------------------------
 
 const IMG = 'assets/ingredients/';
-const BASE_IMG = 'assets/pizza-base.png';
+const BASE_IMG = 'assets/pizza-base.webp';
 
 /** Per-topping scale factor applied to the cut-out sprite sizes. Default 0.8. */
 const TSCALE: Record<string, number> = { pineapple: 0.62, tomatoes: 0.7, broccoli: 0.68, zucchini: 0.68, eggplant: 0.68, mushrooms: 0.75, 'hot-peppers': 0.7, 'sun-dried': 0.72, corn: 1, olives: 0.9, 'green-olives': 0.9, pepperoni: 0.62, 'veg-pepperoni': 0.62, 'hot-salami': 0.62, anchovies: 0.55, bacon: 0.5, ham: 0.5, sausage: 0.6, 'tandoori-chicken': 0.55, 'butter-chicken': 0.75, 'grilled-chicken': 0.5, 'shawarma-chicken': 0.6, shrimp: 0.7, 'seafood-mix': 0.6, 'chicken-kabab': 0.5 };
@@ -75,7 +75,7 @@ const FREE_IMG: Record<string, string> = { Ginger: 'ginger.png', Garlic: 'sauce-
 const SAUCES: [string, string, string][] = [['Regular', 'Marinara', 'tomato'], ['Butter chicken', 'Butter chicken', 'butter-chicken'], ['Shahi paneer', 'Shahi paneer', 'shahi-paneer'], ['Garlic', 'Garlic', 'garlic'], ['Hot', 'Hot sauce', 'hot'], ['BBQ', 'BBQ', 'bbq'], ['Pesto', 'Pesto', 'pesto'], ['Honey garlic', 'Honey garlic', 'honey-garlic']];
 const sauceImg = (f: string) => 'assets/sauces/' + f + '.png';
 /** Live pizza base image per sauce. Regular (marinara) keeps the plain base photo. */
-const SAUCE_BASE: Record<string, string> = { 'Butter chicken': 'assets/sauce-base/butter-chicken.png', 'Shahi paneer': 'assets/sauce-base/shahi-paneer.png', Garlic: 'assets/sauce-base/garlic.png', Hot: 'assets/sauce-base/hot.png', BBQ: 'assets/sauce-base/bbq.png', Pesto: 'assets/sauce-base/pesto.png', 'Honey garlic': 'assets/sauce-base/honey-garlic.png' };
+const SAUCE_BASE: Record<string, string> = { 'Butter chicken': 'assets/sauce-base/butter-chicken.webp', 'Shahi paneer': 'assets/sauce-base/shahi-paneer.webp', Garlic: 'assets/sauce-base/garlic.webp', Hot: 'assets/sauce-base/hot.webp', BBQ: 'assets/sauce-base/bbq.webp', Pesto: 'assets/sauce-base/pesto.webp', 'Honey garlic': 'assets/sauce-base/honey-garlic.webp' };
 
 /** Crust cards: [value, subtitle, stacked-disc layer count]. */
 const CRUSTS: [string, string, number][] = [['Regular', 'Classic hand-tossed', 9], ['Thin', 'Light and crispy', 3], ['Thick', 'Soft and bready', 13]];
@@ -188,23 +188,55 @@ function buildPieces(tops: Record<string, Half>): Piece[] {
 }
 
 /** Layers of the live pizza: base photo (swapped per sauce), topping cut-outs, knife lines. */
+/** Every image the live pizza can need: the 8 bases and all topping cut-outs. */
+const PRELOAD = [BASE_IMG, ...Object.values(SAUCE_BASE), ...Object.values(SPR).flat().map(([p]) => 'assets/toppings/' + p + '.png')];
+let preloaded = false;
+export function preloadPizzaImages() {
+  if (preloaded) return;
+  preloaded = true;
+  for (const src of PRELOAD) {
+    const im = new Image();
+    im.decoding = 'async';
+    im.src = src;
+  }
+}
+
+/** Show `src` only once it has downloaded and decoded; until then keep the previous image (no half-drawn pizza). */
+function useReadySrc(src: string) {
+  const [shown, setShown] = useState(src);
+  useEffect(() => {
+    if (src === shown) return;
+    let live = true;
+    const im = new Image();
+    im.src = src;
+    const done = () => { if (live) setShown(src); };
+    (im.decode ? im.decode() : Promise.resolve()).then(done, done);
+    return () => { live = false; };
+  }, [src, shown]);
+  return shown;
+}
+
 function PizzaLayers({ pieces, label, sauce, doneness, cut }: { pieces: Piece[]; label?: string; sauce: string; doneness: string; cut: string }) {
   const tone = DONENESS_FILTER[doneness] || 'none';
-  const base = SAUCE_BASE[sauce] || BASE_IMG;
+  const base = useReadySrc(SAUCE_BASE[sauce] || BASE_IMG);
   const cuts = CUT_PATH[cut] || '';
   return (
     <>
-      <span
-        role={label ? 'img' : undefined}
-        aria-label={label}
+      {/* Cheap static shadow instead of a CSS drop-shadow filter (filters repaint on every change). */}
+      <span aria-hidden="true" style={{ position: 'absolute', left: '6%', right: '6%', bottom: '-4%', height: '16%', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(26,20,20,.24),rgba(26,20,20,0))', pointerEvents: 'none' }} />
+      <img
+        src={base}
+        alt={label || ''}
         aria-hidden={label ? undefined : true}
-        style={{ display: 'block', flex: 'none', backgroundImage: "url('" + base + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', width: '100%', height: '100%', backgroundSize: 'cover', transform: 'scale(1)', filter: (tone === 'none' ? '' : tone + ' ') + 'drop-shadow(0 22px 28px rgba(26,20,20,.22))', transition: 'filter .2s' }}
+        decoding="async"
+        draggable={false}
+        style={{ position: 'relative', display: 'block', width: '100%', height: '100%', objectFit: 'cover', filter: tone === 'none' ? undefined : tone, transition: 'filter .2s' }}
       />
       {pieces.map((pc) => (
         <span
           key={pc.key}
           aria-hidden="true"
-          style={{ display: 'block', flex: 'none', backgroundImage: "url('" + pc.src + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'absolute', left: pc.x, top: pc.y, width: pc.w, aspectRatio: '1/1', backgroundSize: 'contain', transform: pc.tf, filter: (tone === 'none' ? '' : tone + ' ') + 'drop-shadow(0 1px 1.2px rgba(60,20,0,.35))', pointerEvents: 'none' }}
+          style={{ display: 'block', flex: 'none', backgroundImage: "url('" + pc.src + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'absolute', left: pc.x, top: pc.y, width: pc.w, aspectRatio: '1/1', backgroundSize: 'contain', transform: pc.tf, filter: tone === 'none' ? undefined : tone, pointerEvents: 'none' }}
         />
       ))}
       {cuts ? (
@@ -277,6 +309,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   const wide = w >= 960;
   useLockBody(true);
   useEscape(true, onClose);
+  useEffect(preloadPizzaImages, []);
 
   const baseTops = () => {
     const t: Record<string, Half> = {};

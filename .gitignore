@@ -11,3 +11,4 @@ research/
 .env.*
 !.env.example
 *.tsbuildinfo
+/*.dc.html

@@ -159,7 +159,7 @@ const scatter = (recipe: Recipe, seed: number): Piece[] => {
 const SH = 'drop-shadow(0 14px 18px rgba(0,0,0,.5))';
 const SH2 = 'drop-shadow(0 8px 10px rgba(0,0,0,.45))';
 const pizza = (cx: number, cy: number, w: number, recipe: string, seed: number, z?: number): Layer => ({
-  src: 'assets/pizza-base.png', ar: '1/1', l: cx + '%', t: cy + '%', w: w + '%', z: z || 1,
+  src: 'assets/pizza-base.webp', ar: '1/1', l: cx + '%', t: cy + '%', w: w + '%', z: z || 1,
   r: ((seed * 37) % 40) + 'deg', f: SH, tops: scatter(RECIPES[recipe], seed),
 });
 const prop = (src: string, cx: number, cy: number, w: number, r?: number, z?: number): Layer => ({

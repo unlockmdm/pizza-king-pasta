@@ -245,7 +245,7 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
 
   const dipImgs = DIPS.flatMap(([id]) => Array<string>(dips[id] || 0).fill('assets/dips/top-' + id + '.png'));
   const popImgs = POPS.flatMap((n) => Array<string>(pops[n] || 0).fill('assets/pops/' + POP_IMG[n]));
-  const pzImgs = pz.filter((i) => pizzas[i]).map(() => 'assets/pizza-base.png');
+  const pzImgs = pz.filter((i) => pizzas[i]).map(() => 'assets/pizza-base.webp');
   const sideImgs = side ? [SIDES.find((x) => x[0] === side)![2]] : [];
   const pzT = track(pzImgs, sp.pizzas, '118%', 'ready');
   const dipT = track(dipImgs, sp.dips || 0, '84%');
@@ -404,7 +404,7 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
                       justifyContent: 'center',
                     }}
                   >
-                    <img src="assets/pizza-base.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 10px 14px rgba(60,30,10,.22))' }} />
+                    <img src="assets/pizza-base.webp" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 10px 14px rgba(60,30,10,.22))' }} />
                     {p.done ? (
                       <span style={{ position: 'absolute', right: 2, top: 2, width: 30, height: 30, borderRadius: '50%', background: '#1E8A4C', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 3px #fff' }}>
                         <CheckSvg stroke={3.4} />
