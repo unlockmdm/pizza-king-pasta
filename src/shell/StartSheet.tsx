@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { SHOP } from '../lib/catalog';
 import { useEffect } from 'react';
 import { useLockBody } from '../lib/hooks';
-import { canOrderAsap, timeSlots } from '../lib/hours';
+import { canOrderAsap, OPENS_AT, timeSlots } from '../lib/hours';
 import { Hov, IconArrow, IconCheck, IconClose, Photo } from '../lib/ui';
 import type { Mode } from '../lib/types';
 
@@ -119,9 +119,9 @@ export default function StartSheet({
               {asapOk ? (
                 <WhenRow bg={later ? '#fff' : '#F8F8FB'} on={!later} title="As soon as possible" sub="" onClick={() => setWhen('asap')} />
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '14px 16px', background: '#FFF8E6' }}>
-                  <span style={{ fontWeight: 800, fontSize: 15, color: '#1A1414' }}>We{'’'}re closed right now</span>
-                  <span style={{ fontSize: 13, color: '#636366' }}>Open every day, {SHOP.hoursText}. Choose a pickup time below.</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '14px 16px 10px', background: '#F8F8FB' }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1414' }}>Schedule for later</span>
+                  <span style={{ fontSize: 13, color: '#636366' }}>Closed now · Opens at {OPENS_AT}</span>
                 </div>
               )}
               {asapOk && slots.length ? (
