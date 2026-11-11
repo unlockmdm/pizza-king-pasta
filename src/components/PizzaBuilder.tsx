@@ -1,5 +1,5 @@
 // Live pizza builder. Port of design_handoff_pizza_king_website 2/prototype/PizzaBuilder.dc.html.
-import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { Fragment, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import type { Half, NewLine, PizzaBuilderProps, PizzaConfig, SizeKey, SizePrices } from '../lib/types';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
@@ -104,7 +104,25 @@ const HV: [Half, string, string][] = [['left', 'Left half', 'M12 3.5a8.5 8.5 0 0
 /** Bake level treatment (same filter on the option tile and on the live pizza). */
 const DONENESS_FILTER: Record<string, string> = { Light: 'brightness(1.1) saturate(.7) contrast(.95)', Regular: 'none', 'Well done': 'brightness(.78) saturate(1.25) contrast(1.12) sepia(.12)' };
 /** Knife lines, in the 76x76 box of the pizza photo. */
-const CUT_PATH: Record<string, string> = { Triangles: 'M38 9V67M9 38H67M17.5 17.5L58.5 58.5M58.5 17.5L17.5 58.5', Squares: 'M27 10V66M49 10V66M10 27H66M10 49H66', Uncut: '' };
+/**
+ * Knife cuts for the live pizza, like a real sliced pie: straight, crisp cuts that meet in the centre and run
+ * right through the crust to the edge (viewBox 0 0 76 76; the pizza photo's edge is a circle of radius ~37.6).
+ * Each cut is a thin dark gap with a light cheese edge on one side and a soft shadow on the other.
+ */
+const PIE_C = 37.96, PIE_R = 37.6;
+function naturalCuts(slices: number): { gap: string; hi: string; sh: string } {
+  const cuts = slices / 2, f = (n: number) => n.toFixed(2);
+  let gap = '', hi = '', sh = '';
+  for (let i = 0; i < cuts; i++) {
+    const a = (Math.PI * i) / cuts - Math.PI / 2;
+    const dx = Math.cos(a) * PIE_R, dy = Math.sin(a) * PIE_R, nx = -Math.sin(a), ny = Math.cos(a);
+    const seg = (o: number) => 'M' + f(PIE_C + dx + nx * o) + ' ' + f(PIE_C + dy + ny * o) + 'L' + f(PIE_C - dx + nx * o) + ' ' + f(PIE_C - dy + ny * o);
+    gap += seg(0);
+    hi += seg(0.42);
+    sh += seg(-0.4);
+  }
+  return { gap, hi, sh };
+}
 // Cut is not a customer choice: every pizza is cut into triangles.
 const CHIP_GROUPS: ['doneness', string, string[]][] = [['doneness', 'Bake', ['Regular', 'Light', 'Well done']]];
 /** Size picker icon: a pizza with one knife line per pair of slices (S 6, M 8, L 10, XL 12). */
@@ -215,10 +233,11 @@ function useReadySrc(src: string) {
   return shown;
 }
 
-function PizzaLayers({ pieces, label, sauce, doneness, cut }: { pieces: Piece[]; label?: string; sauce: string; doneness: string; cut: string }) {
+function PizzaLayers({ pieces, label, sauce, doneness, slices }: { pieces: Piece[]; label?: string; sauce: string; doneness: string; slices: number }) {
   const tone = DONENESS_FILTER[doneness] || 'none';
   const base = useReadySrc(SAUCE_BASE[sauce] || BASE_IMG);
-  const cuts = CUT_PATH[cut] || '';
+  const cuts = useMemo(() => naturalCuts(slices), [slices]);
+  const uid = useId().replace(/:/g, '');
   return (
     <>
       {/* Cheap static shadow instead of a CSS drop-shadow filter (filters repaint on every change). */}
@@ -238,12 +257,17 @@ function PizzaLayers({ pieces, label, sauce, doneness, cut }: { pieces: Piece[];
           style={{ display: 'block', flex: 'none', backgroundImage: "url('" + pc.src + "')", backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'absolute', left: pc.x, top: pc.y, width: pc.w, aspectRatio: '1/1', backgroundSize: 'contain', transform: pc.tf, filter: tone === 'none' ? undefined : tone, pointerEvents: 'none' }}
         />
       ))}
-      {cuts ? (
-        <svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 76 76" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', animation: 'pbIn .25s ease both' }}>
-          <path d={cuts} stroke="rgba(70,35,10,.55)" strokeWidth={2} vectorEffect="non-scaling-stroke" fill="none" strokeLinecap="round" />
-          <path d={cuts} stroke="rgba(255,240,215,.55)" strokeWidth={1} vectorEffect="non-scaling-stroke" fill="none" strokeLinecap="round" transform="translate(.25,.25)" />
-        </svg>
-      ) : null}
+      {/* Knife cuts: straight, crisp, edge to edge (see naturalCuts). */}
+      <svg key={slices} aria-hidden="true" width="100%" height="100%" viewBox="0 0 76 76" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', animation: 'pbIn .25s ease both' }}>
+        <defs>
+          <clipPath id={'c' + uid}><circle cx={PIE_C} cy={PIE_C} r={PIE_R - 0.7} /></clipPath>
+        </defs>
+        <g clipPath={'url(#c' + uid + ')'} fill="none" strokeLinecap="butt">
+          <path d={cuts.sh} stroke="rgba(60,22,6,.28)" strokeWidth={0.7} />
+          <path d={cuts.hi} stroke="rgba(255,244,222,.75)" strokeWidth={0.32} />
+          <path d={cuts.gap} stroke="rgba(52,20,6,.82)" strokeWidth={0.4} />
+        </g>
+      </svg>
     </>
   );
 }
@@ -486,7 +510,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   const pickedText = keys.length + ' topping' + (keys.length === 1 ? '' : 's') + (keys.length > 8 ? ' (+' + (keys.length - 8) + ')' : '');
 
   const pizzaBox: CSSProperties = { transform: 'scale(' + SCALE[s.size] + ')', transition: 'transform .5s cubic-bezier(.3,.8,.3,1)', borderRadius: '50%', overflow: 'visible', boxShadow: 'none' };
-  const layers = (label?: string) => <PizzaLayers pieces={pieces} label={label} sauce={s.sauce} doneness={s.doneness} cut={s.cut} />;
+  const layers = (label?: string) => <PizzaLayers pieces={pieces} label={label} sauce={s.sauce} doneness={s.doneness} slices={SLICES[s.size]} />;
 
   const stepper = (label: string, fn: () => void, ch: ReactNode) => (
     <Hov as="button" onClick={fn} aria-label={label} style={{ width: 40, height: 40, border: 0, borderRadius: '50%', background: 'transparent', fontSize: 20, fontWeight: 600, cursor: 'pointer', color: '#1A1414' }} hover={{ background: '#F0F0F3' }}>
