@@ -4,7 +4,7 @@
   "name": "pizza-king-pasta",
   "main": "worker/index.ts",
   "compatibility_date": "2025-06-01",
-  "workers_dev": true,
+  "workers_dev": false,
   // Keep variables added in the dashboard (wrangler deploy would otherwise remove them).
   "keep_vars": true,
   // Custom domain (zone lives in this Cloudflare account). Cloudflare creates the DNS records and SSL cert.

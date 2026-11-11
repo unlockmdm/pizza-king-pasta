@@ -50,7 +50,7 @@ export async function handleStatus(id: string | null, t: string | null, env: Pay
   const token = env.SQUARE_ACCESS_TOKEN;
   if (!token) return fail(500, 'Order status is unavailable right now.');
   if (!id || !t || !/^[A-Za-z0-9_-]{8,64}$/.test(id) || !/^[0-9a-f]{32}$/.test(t)) return fail(400, 'Unknown order.');
-  if ((await statusToken(id, token)) !== t) return fail(403, 'Unknown order.');
+  if (!sameText(await statusToken(id, token), t)) return fail(403, 'Unknown order.');
   const base = env.SQUARE_ENV === 'production' ? 'https://connect.squareup.com' : 'https://connect.squareupsandbox.com';
   const r = await fetch(base + '/v2/orders/' + id, { headers: { Authorization: 'Bearer ' + token, 'Square-Version': API_VERSION } });
   if (!r.ok) return fail(502, 'Order status is unavailable right now.');
@@ -67,6 +67,15 @@ export async function handleStatus(id: string | null, t: string | null, env: Pay
 }
 
 const API_VERSION = '2024-10-17';
+/** Constant-time string compare (no early exit), for the status token. */
+function sameText(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let d = 0;
+  for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return d === 0;
+}
+/** Customer text for the kitchen ticket: no control characters or line breaks (so nobody can fake extra ticket lines). */
+const ticketText = (v: unknown, n: number) => (typeof v === 'string' ? v : '').replace(/[\u0000-\u001F\u007F-\u009F\u2028\u2029]+/g, ' ').replace(/\s{2,}/g, ' ').trim().slice(0, n);
 const cents = (n: number) => Math.round(n * 100);
 const clip = (s: unknown, n: number) => String(s ?? '').slice(0, n);
 const fail = (status: number, message: string, extra?: Record<string, unknown>): PayResult => ({ status, json: { ok: false, message, ...extra } });
@@ -99,19 +108,30 @@ function friendly(errors: { code?: string; detail?: string }[] = []): string {
 }
 
 export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
+  try {
+    return await pay(raw, env);
+  } catch (e) {
+    // Network trouble talking to Square, or malformed input we didn't anticipate: never a raw 500.
+    // 503 tells the browser it's safe to retry with the same idempotency key (no double charge).
+    console.error('[pay] unexpected error', e instanceof Error ? e.message : String(e));
+    return fail(503, 'We couldn’t finish your payment. Please try again, or call 905-460-9494.');
+  }
+}
+
+async function pay(raw: unknown, env: PayEnv): Promise<PayResult> {
   const token = env.SQUARE_ACCESS_TOKEN;
   const locationId = env.VITE_SQUARE_LOCATION_ID;
   if (!token || !locationId) {
-    // Names only (never values), so a misconfigured host is easy to diagnose.
-    const missing = [!token && 'SQUARE_ACCESS_TOKEN', !locationId && 'VITE_SQUARE_LOCATION_ID'].filter(Boolean);
-    return fail(500, 'Online payment is unavailable right now. Please call 905-460-9494 to order.', { missing });
+    console.error('[pay] missing config:', [!token && 'SQUARE_ACCESS_TOKEN', !locationId && 'VITE_SQUARE_LOCATION_ID'].filter(Boolean).join(', '));
+    return fail(500, 'Online payment is unavailable right now. Please call 905-460-9494 to order.');
   }
   const base = env.SQUARE_ENV === 'production' ? 'https://connect.squareup.com' : 'https://connect.squareupsandbox.com';
 
   // ---- validate input ----
   const b = (raw || {}) as Partial<PayBody>;
   if (!b.sourceId || typeof b.sourceId !== 'string') return fail(400, 'We didn’t receive your payment details. Please enter them again.');
-  if (!b.idempotencyKey || typeof b.idempotencyKey !== 'string') return fail(400, 'Something went wrong on our end. Please refresh the page and try again.');
+  if (b.sourceId.length > 2000) return fail(400, 'We didn’t receive your payment details. Please enter them again.');
+  if (typeof b.idempotencyKey !== 'string' || !/^[A-Za-z0-9-]{16,40}$/.test(b.idempotencyKey)) return fail(400, 'Something went wrong on our end. Please refresh the page and try again.');
   const inLines = Array.isArray(b.lines) ? (b.lines as Partial<InLine>[]) : [];
   if (!inLines.length) return fail(400, 'Your order is empty. Add an item to continue.');
   if (inLines.length > MAX_LINES) return fail(400, 'Your order has too many different items. Please call 905-460-9494 for large orders.');
@@ -131,14 +151,16 @@ export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
   // The customer must have seen exactly this total (the browser uses the same pricing code, so any
   // difference means prices changed since the page loaded, or the request was edited).
   if (typeof b.expectedTotal !== 'number' || serverTotal !== b.expectedTotal) {
-    return fail(409, 'Some prices changed while you were ordering. Please refresh and try again.', { code: 'PRICE_CHANGED', total: serverTotal });
+    return fail(409, 'Some prices changed while you were ordering. Please refresh and try again.', { code: 'PRICE_CHANGED' });
   }
   // ---- opening hours (shop time): no ASAP orders while closed, no pickup times outside hours ----
   const pickupAt = typeof b.pickupAt === 'string' && b.pickupAt ? b.pickupAt : undefined;
   const timing = pickupProblem(pickupAt);
   if (timing) return fail(409, timing, { code: 'CLOSED' });
-  const c = b.customer || ({} as PayBody['customer']);
-  if (!c.name?.trim() || (c.phone || '').replace(/\D/g, '').length < 10 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email || '')) {
+  const rc = (b.customer && typeof b.customer === 'object' ? b.customer : {}) as Partial<Record<keyof PayBody['customer'], unknown>>;
+  const c = { name: ticketText(rc.name, 255), phone: typeof rc.phone === 'string' ? rc.phone.slice(0, 40) : '', email: typeof rc.email === 'string' ? rc.email.trim().slice(0, 255) : '' };
+  const verificationToken = typeof b.verificationToken === 'string' && b.verificationToken.length <= 4000 ? b.verificationToken : undefined;
+  if (!c.name || c.phone.replace(/\D/g, '').length < 10 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email)) {
     return fail(400, 'Enter your name, a 10-digit phone number and a valid email.');
   }
   const sq = async (path: string, body: unknown) => {
@@ -153,8 +175,8 @@ export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
 
   // ---- 1. create the order (shows in Square Order Manager once paid) ----
   const pickupDetails: Record<string, unknown> = {
-    recipient: { display_name: clip(c.name.trim(), 255), email_address: clip(c.email.trim(), 255), phone_number: phoneE164(c.phone) },
-    note: clip(b.note, 500) || undefined,
+    recipient: { display_name: c.name, email_address: c.email, phone_number: phoneE164(c.phone) },
+    note: ticketText(b.note, 500) || undefined,
     schedule_type: pickupAt ? 'SCHEDULED' : 'ASAP',
   };
   if (pickupAt) pickupDetails.pickup_at = new Date(pickupAt).toISOString();
@@ -181,6 +203,15 @@ export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
     return fail(502, friendly(order.j.errors), { step: 'order' });
   }
   const o = order.j.order;
+  const headersGet = { Authorization: 'Bearer ' + token, 'Square-Version': API_VERSION };
+  // A retry of an order that was already paid (the customer's connection dropped after the charge):
+  // Square hands back the same order for the same idempotency key, so report that payment instead of charging again.
+  const current = ((await (await fetch(base + '/v2/orders/' + o.id, { headers: headersGet })).json().catch(() => ({}))) as Record<string, any>).order;
+  const paidId = current?.tenders?.[0]?.payment_id || current?.tenders?.[0]?.id;
+  if (paidId) {
+    const prev = ((await (await fetch(base + '/v2/payments/' + paidId, { headers: headersGet })).json().catch(() => ({}))) as Record<string, any>).payment;
+    if (prev && (prev.status === 'COMPLETED' || prev.status === 'APPROVED')) return paidResult(o.id, prev, token, Number(prev.amount_money?.amount ?? 0));
+  }
   // Cancel an unpaid order so it never clutters the shop's order list (best effort).
   // The order version may have moved on, and the pickup fulfillment must be cancelled with it.
   const cancelOrder = async () => {
@@ -208,18 +239,18 @@ export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
   if (total > (b.expectedTotal as number) || total < (b.expectedTotal as number) - 1) {
     console.error('[square] order total differs from the shown total', total, b.expectedTotal);
     await cancelOrder();
-    return fail(409, 'Some prices changed while you were ordering. Please refresh and try again.', { code: 'PRICE_CHANGED', total });
+    return fail(409, 'Some prices changed while you were ordering. Please refresh and try again.', { code: 'PRICE_CHANGED' });
   }
 
   // ---- 2. charge the card against the order ----
   const payment = await sq('/v2/payments', {
     idempotency_key: b.idempotencyKey + '-p',
     source_id: b.sourceId,
-    verification_token: b.verificationToken || undefined,
+    verification_token: verificationToken,
     amount_money: { amount: total, currency: 'CAD' },
     order_id: o.id,
     location_id: locationId,
-    buyer_email_address: c.email.trim(),
+    buyer_email_address: c.email,
     note: 'Website pickup order',
     autocomplete: true,
   });
@@ -228,7 +259,11 @@ export async function handlePay(raw: unknown, env: PayEnv): Promise<PayResult> {
     await cancelOrder();
     return fail(402, friendly(payment.j.errors), { step: 'payment' });
   }
-  const p = payment.j.payment;
+  return paidResult(o.id, payment.j.payment, token, total);
+}
+
+async function paidResult(orderId: string, p: Record<string, any> | undefined, token: string, total: number): Promise<PayResult> {
+  const o = { id: orderId };
   return {
     status: 200,
     json: {

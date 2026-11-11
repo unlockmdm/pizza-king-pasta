@@ -147,6 +147,9 @@ export default function CartCheckout(p: CartCheckoutProps) {
   useEscape(!!p.open, p.onClose);
 
   const lines = p.lines || [];
+  // A different cart or pickup time is a different order: start a fresh payment key.
+  const cartSig = lines.map((l) => l.key + 'x' + l.qty).join(',') + '|' + (p.when || '');
+  useEffect(() => { payKey.current = newKey(); }, [cartSig]);
   const mode: Mode = p.mode === 'delivery' ? 'delivery' : 'pickup';
   const pickup = mode === 'pickup';
   const count = lines.reduce((a, l) => a + l.qty, 0);
@@ -328,7 +331,9 @@ export default function CartCheckout(p: CartCheckoutProps) {
         pickupAt: slotToIso(p.when),
         expectedTotal: totals.totalCents,
       });
-      payKey.current = newKey();
+      // Keep the same key when the outcome is unknown (dropped connection, server hiccup), so tapping Pay again
+      // can never charge twice: the server finds the first payment instead. Any definite answer gets a fresh key.
+      if (!r.retry) payKey.current = newKey();
       if (!r.ok) {
         setPayErr(r.message || 'Payment didn\u2019t go through. Please try again.');
         setBusy(false);

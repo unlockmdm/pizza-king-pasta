@@ -14,7 +14,6 @@ interface Env extends PayEnv {
 const ALLOWED_ORIGINS = new Set([
   'https://pizzakingandpasta.ca',
   'https://www.pizzakingandpasta.ca',
-  'https://pizza-king-pasta.rajvirsingh928.workers.dev',
 ]);
 const MAX_BODY = 32 * 1024; // a big cart is a few KB
 

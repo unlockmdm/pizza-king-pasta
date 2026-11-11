@@ -77,16 +77,17 @@ export interface PayRequest {
   pickupAt?: string;
   expectedTotal: number;
 }
-export interface PayResponse { ok: boolean; message?: string; orderId?: string; statusToken?: string; orderNumber?: string; receiptUrl?: string | null; total?: number; cardBrand?: string | null; cardLast4?: string | null }
+export interface PayResponse { ok: boolean; retry?: boolean; message?: string; orderId?: string; statusToken?: string; orderNumber?: string; receiptUrl?: string | null; total?: number; cardBrand?: string | null; cardLast4?: string | null }
 
 export async function submitPayment(body: PayRequest): Promise<PayResponse> {
   try {
     const r = await fetch('api/pay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const j = (await r.json().catch(() => ({}))) as PayResponse;
-    if (!r.ok || !j.ok) return { ok: false, message: j.message || 'Your payment didn’t go through. Please try again.' };
+    // 5xx: the server or Square hiccuped, and the card may or may not have been charged: retry with the same key.
+    if (!r.ok || !j.ok) return { ok: false, retry: r.status >= 500, message: j.message || 'Your payment didn’t go through. Please try again.' };
     return j;
   } catch {
-    return { ok: false, message: 'We couldn’t reach the payment server. Check your connection and try again.' };
+    return { ok: false, retry: true, message: 'We couldn’t reach the payment server. Check your connection and try again.' };
   }
 }
 
