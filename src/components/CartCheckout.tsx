@@ -8,7 +8,7 @@ import { UPSELLS as UPSELL_DATA, mustPrice, orderTotals, type LineSpec } from '.
 import { CARD_STYLE, isSafari, loadSquare, newKey, SQUARE_ENABLED, SQUARE_SANDBOX, submitPayment, type SqCard, type SqCardEvent, type SqCardState, type SqPaymentRequest, type SqWallet } from '../lib/square';
 import { money } from '../lib/format';
 import { Hov } from '../lib/ui';
-import { useEscape, useLockBody, useWidth } from '../lib/hooks';
+import { useEscape, useKeyboardOpen, useLockBody, useWidth } from '../lib/hooks';
 import './CartCheckout.css';
 import OrderConfirmation, { type Confirmation } from './OrderConfirmation';
 import LineThumb from './LineThumb';
@@ -388,6 +388,8 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const showBar = count > 0 && !p.open && !done;
   const showCart = !!p.open && step === 'cart';
   const showCheckout = !!p.open && step === 'checkout';
+  // While typing on a phone the Place order bar would float above the keyboard over the form: hide it until the keyboard closes.
+  const kbOpen = useKeyboardOpen();
 
   const rows = lines.map((l) => ({ ...l, totalText: money(l.unit * l.qty), isOne: l.qty === 1 }));
   const upsells = UPSELLS.filter((u) => !lines.some((l) => l.key.startsWith(u.key)));
@@ -672,7 +674,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Checkout"
-          style={{ position: 'fixed', inset: 0, zIndex: 90, background: pageBg, overflow: 'auto', animation: 'ccFade .2s ease both', fontFamily: FONT, color: '#1A1414' }}
+          style={{ position: 'fixed', inset: 0, zIndex: 90, background: pageBg, overflow: 'auto', overscrollBehavior: 'contain', animation: 'ccFade .2s ease both', fontFamily: FONT, color: '#1A1414', boxShadow: '0 100vh 0 0 ' + pageBg }}
         >
           <header style={{ position: 'sticky', top: 0, zIndex: 10, background: pageBgA, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
             <div style={{ maxWidth: 1080, margin: '0 auto', height: 68, padding: '0 clamp(16px,3vw,32px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
@@ -1080,7 +1082,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
             </aside>
           </div>
 
-          {!wide && pickup ? (
+          {!wide && pickup && !kbOpen ? (
             <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 10, display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 16px calc(12px + env(safe-area-inset-bottom))', background: pageBgA, backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', boxShadow: '0 -1px 0 rgba(26,20,20,.06)' }}>
               {tried && (!timeOk || missing.length || cardErr) ? (
                 <span role="status" style={{ ...fieldErr, justifyContent: 'center' }}>

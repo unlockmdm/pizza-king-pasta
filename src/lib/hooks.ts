@@ -19,13 +19,37 @@ export function useLockBody(active: boolean) {
   useEffect(() => {
     if (!active) return;
     locks++;
-    const prev = document.documentElement.style.overflow;
+    if (locks > 1) return () => { locks--; };
+    // iPhone Safari ignores overflow:hidden and scrolls the page underneath when the keyboard opens,
+    // so pin the body in place instead and put the scroll position back afterwards.
+    const y = window.scrollY;
+    const b = document.body.style;
+    const prev = { position: b.position, top: b.top, left: b.left, right: b.right, width: b.width };
+    const prevHtml = document.documentElement.style.overflow;
     document.documentElement.style.overflow = 'hidden';
+    Object.assign(b, { position: 'fixed', top: -y + 'px', left: '0', right: '0', width: '100%' });
     return () => {
       locks--;
-      if (locks === 0) document.documentElement.style.overflow = prev === 'hidden' ? '' : prev;
+      if (locks > 0) return;
+      Object.assign(b, prev);
+      document.documentElement.style.overflow = prevHtml;
+      window.scrollTo(0, y);
     };
   }, [active]);
+}
+
+/** True while the on-screen keyboard is up (phones): the visible area is much shorter than the window. */
+export function useKeyboardOpen(): boolean {
+  return useSyncExternalStore(
+    (cb) => {
+      const vv = window.visualViewport;
+      vv?.addEventListener('resize', cb);
+      window.addEventListener('resize', cb);
+      return () => { vv?.removeEventListener('resize', cb); window.removeEventListener('resize', cb); };
+    },
+    () => !!window.visualViewport && window.innerHeight - window.visualViewport.height > 140,
+    () => false,
+  );
 }
 
 /** Run `fn` on Escape while active. */
