@@ -50,7 +50,7 @@ export default function Footer({
             <Hov as="a" href="#top" onClick={onPickup} style={link} hover={linkHover}>Pickup</Hov>
             <Hov as="a" href="#top" onClick={onDelivery} style={link} hover={linkHover}>Delivery</Hov>
             <Hov as="a" href="#deals" onClick={onDeals} style={link} hover={linkHover}>Pickup combos</Hov>
-            <Hov as="a" href="#oven" onClick={onOven} style={link} hover={linkHover}>Our wood oven</Hov>
+            <Hov as="a" href="#oven" onClick={onOven} style={link} hover={linkHover}>Our ovens</Hov>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 15, lineHeight: 1.5 }}>
             <span style={colHead}>Visit</span>
@@ -70,8 +70,8 @@ export default function Footer({
             </span>
           </span>
           <nav aria-label="Legal" style={{ display: 'flex', gap: 24 }}>
-            <Hov as="a" href="#terms" style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Terms of Service</Hov>
-            <Hov as="a" href="#privacy" style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Privacy Policy</Hov>
+            <Hov as="a" href="#terms" style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Terms of service</Hov>
+            <Hov as="a" href="#privacy" style={{ color: '#C9C9CE', textDecoration: 'none' }} hover={{ color: '#fff' }}>Privacy policy</Hov>
           </nav>
         </div>
       </div>

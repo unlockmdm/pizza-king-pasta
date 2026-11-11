@@ -214,13 +214,12 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <h2 style={H2}>House specials</h2>
-            <span style={LEAD}>Our most-ordered pizzas. Choose size, crust and oven when you add one.</span>
+            <span style={LEAD}>Signature pizzas, Indian-fusion and classic. Choose size, crust and oven when you add one.</span>
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: specialCols, gap: ph ? 10 : 16 }}>
           {SPECIALS.map((p) => {
             const c = creditOf(p);
-            const meta = [p.veg ? 'Vegetarian' : null, p.tag || null].filter(Boolean).join(' · ');
             return (
               <Hov
                 key={p.id}
@@ -234,7 +233,6 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
                 </div>
                 <div style={{ padding: ph ? '10px 4px 2px 6px' : '16px 8px 6px', display: 'flex', flexDirection: 'column', gap: ph ? 8 : 14, flex: 1 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: ph ? 3 : 6, flex: 1 }}>
-                    {meta && <span style={{ fontSize: ph ? 10.5 : 12, fontWeight: 800, letterSpacing: '.07em', textTransform: 'uppercase', color: p.veg ? '#12663A' : '#C11425' }}>{meta}</span>}
                     <span style={{ fontWeight: 900, fontSize: ph ? 16 : 21, lineHeight: ph ? 1.15 : undefined, letterSpacing: '-.025em' }}>{p.name}</span>
                     <span style={{ fontSize: ph ? 12.5 : 15, lineHeight: ph ? 1.4 : 1.45, color: '#636366', ...(ph ? clamp2 : {}) }}>{p.desc}</span>
                   </div>
@@ -255,7 +253,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
       <section id="deals" style={SECTION}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <h2 style={H2}>Pickup combos</h2>
-          <span style={LEAD}>Walk-in combo prices, available on online pickup orders.</span>
+          <span style={LEAD}>Combo prices for online pickup orders.</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: dealCols, gap: ph ? 10 : 16 }}>
           {DEALS.map((d) => {
@@ -311,11 +309,11 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
             <div style={{ display: 'grid', gridTemplateColumns: ph ? 'repeat(2,minmax(0,1fr))' : 'repeat(auto-fit,minmax(200px,1fr))', gap: ph ? 8 : 12 }}>
               <div style={{ background: '#D7192D', borderRadius: ph ? 18 : 22, padding: ph ? 14 : 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <span style={{ fontWeight: 900, fontSize: 20, letterSpacing: '-.02em' }}>Wood-fired</span>
-                <span style={{ fontSize: 15, lineHeight: 1.45, color: '#fff' }}>Smoky, blistered, charred crust. Our default.</span>
+                <span style={{ fontSize: 15, lineHeight: 1.45, color: '#fff' }}>Smoky, blistered crust. Our default.</span>
               </div>
               <div style={{ background: '#2C2424', borderRadius: ph ? 18 : 22, padding: ph ? 14 : 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <span style={{ fontWeight: 900, fontSize: 20, letterSpacing: '-.02em' }}>Conventional</span>
-                <span style={{ fontSize: 15, lineHeight: 1.45, color: '#CFC6C0' }}>Even bake, softer crust. The classic.</span>
+                <span style={{ fontSize: 15, lineHeight: 1.45, color: '#CFC6C0' }}>Even bake, softer crust.</span>
               </div>
             </div>
           </div>

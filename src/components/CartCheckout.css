@@ -10,3 +10,7 @@
 @keyframes ccSteamA { 0% { transform: translate(0, 0) scale(.6, .7); opacity: 0 } 25% { opacity: .5 } 65% { opacity: .25 } 100% { transform: translate(14px, -150px) scale(1.5, 1.9); opacity: 0 } }
 @keyframes ccSteamB { 0% { transform: translate(0, 0) scale(.6, .7); opacity: 0 } 25% { opacity: .45 } 65% { opacity: .22 } 100% { transform: translate(-16px, -170px) scale(1.6, 2); opacity: 0 } }
 @keyframes ccGrow { 0% { transform: scaleX(.08) } 60% { transform: scaleX(1) } 100% { transform: scaleX(1); opacity: 0 } }
+
+/* Square reserves ~38px under the card fields for an error line even when empty. Collapse it until there's a message. */
+#sq-card .sq-card-message:empty { display: none; }
+#sq-card .sq-card-message { margin: 8px 0 0; }

@@ -78,7 +78,7 @@ const sauceImg = (f: string) => 'assets/sauces/' + f + '.png';
 const SAUCE_BASE: Record<string, string> = { 'Butter chicken': 'assets/sauce-base/butter-chicken.webp', 'Shahi paneer': 'assets/sauce-base/shahi-paneer.webp', Garlic: 'assets/sauce-base/garlic.webp', Hot: 'assets/sauce-base/hot.webp', BBQ: 'assets/sauce-base/bbq.webp', Pesto: 'assets/sauce-base/pesto.webp', 'Honey garlic': 'assets/sauce-base/honey-garlic.webp' };
 
 /** Crust cards: [value, subtitle, stacked-disc layer count]. */
-const CRUSTS: [string, string, number][] = [['Regular', 'Classic hand-tossed', 9], ['Thin', 'Light and crispy', 3], ['Thick', 'Soft and bready', 13]];
+const CRUSTS: [string, string, number][] = [['Regular', 'Our standard crust', 9], ['Thin', 'Light and crispy', 3], ['Thick', 'Soft and bready', 13]];
 /** Brown gradient discs stacked under the top photo (darkest at the bottom). */
 const crustLayers = (t: number) => Array.from({ length: t }, (_, j) => {
   const k = j / Math.max(1, t - 1);
@@ -392,7 +392,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   if (whole.length) ingredientLine += ', ' + whole.join(', ');
   if (lh.length) ingredientLine += '. Left half: ' + lh.join(', ');
   if (rh.length) ingredientLine += '. Right half: ' + rh.join(', ');
-  if (freeOn.length) ingredientLine += '. Free: ' + freeOn.join(', ').toLowerCase();
+  if (freeOn.length) ingredientLine += '. Seasonings: ' + freeOn.join(', ').toLowerCase();
   ingredientLine = ingredientLine.charAt(0).toUpperCase() + ingredientLine.slice(1) + '.';
 
   const pieces = useMemo(() => buildPieces(s.tops), [s.tops]);
@@ -479,7 +479,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
   const totalText = combo ? (hasExtra ? '+' + money(extra) : 'Included') : money(unit * s.qty);
   const mobileTotal = combo && !hasExtra ? '' : combo ? '+' + money(extra) : money(unit * s.qty);
   const hasExtras = !!(extraCount || cheeseCost);
-  const extrasLine = [extraCount ? extraCount + ' extra topping' + (extraCount > 1 ? 's' : '') + ' ' + money(topCost) : '', cheeseCost ? 'extra cheese ' + money(cheeseCost) : ''].filter(Boolean).join(' · ') + ' included in price';
+  const extrasLine = 'Price includes ' + [extraCount ? extraCount + ' extra topping' + (extraCount > 1 ? 's' : '') + ' (' + money(topCost) + ')' : '', cheeseCost ? 'extra cheese (' + money(cheeseCost) + ')' : ''].filter(Boolean).join(' and ');
   const picked = keys.filter((k) => TOPMAP[k] && TOPMAP[k].img).slice(0, 8).map((k) => { const t = topOf(k); return { id: k, name: t.name, img: t.img as string, fit: t.fit, iw: t.iw === '100%' ? '100%' : '86%' }; });
   const pickedText = keys.length + ' topping' + (keys.length === 1 ? '' : 's') + (keys.length > 8 ? ' (+' + (keys.length - 8) + ')' : '');
 
@@ -505,7 +505,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
             {combo ? 'Combo' : 'Menu'}
           </Hov>
           <span style={{ fontWeight: 900, fontSize: 18, whiteSpace: 'nowrap', letterSpacing: '-.03em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
-          <Hov as="button" onClick={reset} aria-label="Reset pizza to default" title="Start over" style={{ justifySelf: 'end', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 0, background: '#F2F2F5', height: 44, minWidth: 44, padding: w < 420 ? 0 : '0 18px 0 14px', borderRadius: 999, fontFamily: 'inherit', fontWeight: 800, fontSize: 15, color: '#1A1414', whiteSpace: 'nowrap', cursor: 'pointer', transition: 'background .2s,color .2s' }} hover={{ background: '#1A1414', color: '#fff' }}>
+          <Hov as="button" onClick={reset} aria-label="Start over with the default pizza" title="Start over" style={{ justifySelf: 'end', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 0, background: '#F2F2F5', height: 44, minWidth: 44, padding: w < 420 ? 0 : '0 18px 0 14px', borderRadius: 999, fontFamily: 'inherit', fontWeight: 800, fontSize: 15, color: '#1A1414', whiteSpace: 'nowrap', cursor: 'pointer', transition: 'background .2s,color .2s' }} hover={{ background: '#1A1414', color: '#fff' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /></svg>
             {w < 420 ? null : 'Start over'}
           </Hov>
@@ -718,7 +718,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 10 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-                <span style={{ fontSize: 15, fontWeight: 700 }}>Free add-ons</span>
+                <span style={{ fontSize: 15, fontWeight: 700 }}>Seasonings</span>
                 <span style={{ fontSize: 13, fontWeight: 600, color: '#12663A' }}>No charge</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(104px,1fr))', gap: 10 }}>

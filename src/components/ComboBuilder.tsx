@@ -35,7 +35,7 @@ const POP_IMG: Record<PopName, string> = {
 type SideId = 'sugarcane' | 'corn';
 /** [id, name, img, worth, desc] */
 const SIDES: [SideId, string, string, string, string][] = [
-  ['sugarcane', 'Sugarcane juice', 'assets/menu/juice-mix.png', '$6.81', 'Fresh pressed, ice cold'],
+  ['sugarcane', 'Sugarcane juice', 'assets/menu/juice-mix.png', '$6.81', 'Served cold'],
   ['corn', 'Wood-oven corn', 'assets/ingredients/corn.jpg', '$5.00', 'Sweet corn from the wood oven'],
 ];
 
@@ -281,7 +281,7 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
 
   // Pick up to the included number of dips; extras are added separately from the menu (README "4. Combo builder").
   const dipItems = step(dips, setDips, sp.dips, DIPS.map(([id, n]) => [id, n, 'assets/dips/top-' + id + '.png']));
-  const dipNote = 'Want more? Add extra dips from the menu.';
+  const dipNote = 'Extra dips can be added from the menu.';
   const popItems = step(pops, setPops, sp.pops, POPS.map((n) => [n, n, 'assets/pops/' + POP_IMG[n]]));
 
   const sides = SIDES.map(([id, name, img, worth, desc]) => {
@@ -511,8 +511,8 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
             <section style={sectionStyle}>
               <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: '#D7192D' }}>On the house</span>
-                  <h2 style={h2Style}>Pick your free extra</h2>
+                  <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: '#D7192D' }}>Included</span>
+                  <h2 style={h2Style}>Choose one extra</h2>
                 </div>
                 <Tracker t={sideT} />
               </div>

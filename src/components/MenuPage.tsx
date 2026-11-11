@@ -186,28 +186,28 @@ const SCENE_ALT = ['One large pepperoni pizza', 'Two large pizzas with two dips 
 
 /** [key, name, price, description, combo-builder deal id] */
 const WALKINS: [string, string, number, string, string][] = [
-  ['walkin-1l', '1 Large, 1 topping', 11.99, 'Wood-fired or conventional oven', 'one-large'],
-  ['walkin-2l', '2 Large combo', 36.0, '4 toppings each, 2 dips, 2 drinks or sweet corn', 'two-large'],
-  ['walkin-2m', '2 Medium combo', 32.0, '4 toppings each, 2 dips, 2 drinks or sweet corn', 'two-medium'],
-  ['walkin-2s', '2 Small combo', 25.99, '4 toppings each, 2 dips', 'two-small'],
+  ['walkin-1l', 'One Large', 11.99, '1 large pizza with 1 topping, wood-fired or conventional oven', 'one-large'],
+  ['walkin-2l', 'Two Large', 36.0, '2 large pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-large'],
+  ['walkin-2m', 'Two Medium', 32.0, '2 medium pizzas with 4 toppings each, 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-medium'],
+  ['walkin-2s', 'Two Small', 25.99, '2 small pizzas with 4 toppings each and 2 dips', 'two-small'],
 ];
 
 /** [id, name, description, builder topping ids, vegetarian] */
 const PIZZAS: [string, string, string, string[], boolean?][] = [
   ['napoli', 'Napoli', 'Anchovies, capers, green olives, oregano', ['anchovies', 'green-olives']],
   ['four-seasons', 'Four Seasons', 'Ham, mushrooms, artichokes, black olives', ['ham', 'mushrooms', 'olives']],
-  ['italian-veg', 'Italian Vegetarian', 'Grilled zucchini, red pepper, eggplant, onion', ['zucchini', 'red-pepper', 'eggplant', 'red-onions'], true],
+  ['italian-veg', 'Italian Vegetarian', 'Grilled zucchini, red peppers, eggplant, red onions', ['zucchini', 'red-pepper', 'eggplant', 'red-onions'], true],
   ['non-veg', 'Non-Vegetarian', 'Grilled chicken, sausage, hot salami, ham', ['grilled-chicken', 'sausage', 'hot-salami', 'ham']],
-  ['bismark', 'Bismark', 'Sun dried tomatoes, grilled chicken, sausage', ['sun-dried', 'grilled-chicken', 'sausage']],
+  ['bismark', 'Bismark', 'Sun-dried tomatoes, grilled chicken, sausage', ['sun-dried', 'grilled-chicken', 'sausage']],
   ['sea-food', 'Sea Food', 'Shrimp, gambari, calamari, salmon', ['shrimp', 'seafood-mix']],
-  ['chicken-shawarma', 'Shawarma Chicken', 'Garlic base, shawarma chicken, hot peppers, onions', ['shawarma-chicken', 'hot-peppers', 'red-onions']],
-  ['butter-chicken', 'Butter Chicken', 'Tandoori chicken, green pepper, onion', ['tandoori-chicken', 'green-peppers', 'red-onions']],
-  ['shahi-paneer', 'Shahi Paneer', 'Tandoori paneer, green pepper, onion, jalapeño', ['paneer', 'green-peppers', 'red-onions', 'jalapenos'], true],
-  ['greek', 'Greek', 'Feta cheese, black olive, tomato', ['feta', 'olives', 'tomatoes'], true],
+  ['chicken-shawarma', 'Shawarma Chicken', 'Garlic base, shawarma chicken, hot peppers, red onions', ['shawarma-chicken', 'hot-peppers', 'red-onions']],
+  ['butter-chicken', 'Butter Chicken', 'Tandoori chicken, green peppers, red onions', ['tandoori-chicken', 'green-peppers', 'red-onions']],
+  ['shahi-paneer', 'Shahi Paneer', 'Tandoori paneer, green peppers, red onions, jalapeños', ['paneer', 'green-peppers', 'red-onions', 'jalapenos'], true],
+  ['greek', 'Greek', 'Feta, black olives, tomatoes', ['feta', 'olives', 'tomatoes'], true],
   ['hawaiian', 'Hawaiian', 'Pineapple, bacon, ham', ['pineapple', 'bacon', 'ham']],
-  ['meat-lover', 'Meat Lover', 'Pepperoni, ham, bacon, sausages', ['pepperoni', 'ham', 'bacon', 'sausage']],
-  ['canadian', 'Canadian', 'Pepperoni, mushroom, bacon', ['pepperoni', 'mushrooms', 'bacon']],
-  ['tandoori-fish', 'Tandoori Fish', 'Tandoori fish, mushroom, onion, green pepper', ['mushrooms', 'red-onions', 'green-peppers']],
+  ['meat-lover', 'Meat Lover', 'Pepperoni, ham, bacon, sausage', ['pepperoni', 'ham', 'bacon', 'sausage']],
+  ['canadian', 'Canadian', 'Pepperoni, mushrooms, bacon', ['pepperoni', 'mushrooms', 'bacon']],
+  ['tandoori-fish', 'Tandoori Fish', 'Tandoori fish, mushrooms, red onions, green peppers', ['mushrooms', 'red-onions', 'green-peppers']],
   ['pepperoni', 'Pepperoni', 'Pepperoni and mozzarella', ['pepperoni']],
 ];
 
@@ -230,26 +230,26 @@ const SECTIONS: Section[] = [
   { id: 'sides', title: 'Sides & salads', rows: [
     ['wedges', 'Potato wedges', '', [['Medium', 8], ['Large', 10]]],
     ['garlic-bread', 'Garlic bread', 'With or without cheese', [['With cheese', 8.01], ['Without cheese', 6.99]]],
-    ['sub', 'Sub', 'One foot, veggie or non-veggie', [['Veggie', 10.18], ['Non-veggie', 11.06]], true],
+    ['sub', 'Sub', 'Foot-long, veggie or non-veggie', [['Veggie', 10.18], ['Non-veggie', 11.06]], true],
     ['nv-salad', 'Non-veg salad', '', [['', 8.99]]],
     ['v-salad', 'Veg salad', '', [['', 7.99]]],
-    ['corn', 'Sweet corn', 'Cooked in the wood oven', [['', 5]]],
-    ['chaat', 'Fruit chaat', 'With sweet potatoes', [['', 8.01]]],
+    ['corn', 'Sweet corn', 'Roasted in the wood oven', [['', 5]]],
+    ['chaat', 'Fruit chaat', 'With sweet potato', [['', 8.01]]],
   ] },
   { id: 'pasta', title: 'Pasta & momos', rows: [
-    ['pasta-rose', 'Rosé sauce pasta', 'Tomato sauce, cream, parmesan, ginger, parsley', [['', 12.5]], true],
+    ['pasta-rose', 'Rosé sauce pasta', 'Tomato, cream, parmesan, ginger, parsley', [['', 12.5]], true],
     ['pasta-alfredo', 'Alfredo sauce pasta', 'Cream, parmesan, ginger, parsley', [['', 13]], true],
-    ['veg-pasta-rose', 'Veggie pasta, rosé', 'Green pepper, onion, broccoli, mushroom', [['', 13.27]], true],
-    ['veg-pasta-tomato', 'Veggie pasta, tomato', 'Green pepper, onion, broccoli, mushroom', [['', 12.5]], true],
-    ['veg-pasta-alfredo', 'Veggie pasta, Alfredo', 'Green pepper, onion, broccoli, mushroom', [['', 13.72]], true],
-    ['ch-pasta-rose', 'Chicken pasta, rosé', 'Green pepper, onion, chicken', [['', 14.6]], true],
-    ['ch-pasta-tomato', 'Chicken pasta, tomato', 'Green pepper, onion, chicken', [['', 14]], true],
-    ['ch-pasta-alfredo', 'Chicken pasta, Alfredo', 'Green pepper, onion, chicken', [['', 15.04]], true],
+    ['veg-pasta-rose', 'Veggie pasta, rosé', 'Green peppers, onions, broccoli, mushrooms', [['', 13.27]], true],
+    ['veg-pasta-tomato', 'Veggie pasta, tomato', 'Green peppers, onions, broccoli, mushrooms', [['', 12.5]], true],
+    ['veg-pasta-alfredo', 'Veggie pasta, Alfredo', 'Green peppers, onions, broccoli, mushrooms', [['', 13.72]], true],
+    ['ch-pasta-rose', 'Chicken pasta, rosé', 'Chicken, green peppers, onions', [['', 14.6]], true],
+    ['ch-pasta-tomato', 'Chicken pasta, tomato', 'Chicken, green peppers, onions', [['', 14]], true],
+    ['ch-pasta-alfredo', 'Chicken pasta, Alfredo', 'Chicken, green peppers, onions', [['', 15.04]], true],
     ['momos', 'Momos', 'Veggie or non-veggie', [['Veggie', 9], ['Non-veggie', 11]]],
   ] },
   { id: 'gelato', title: 'Gelato & shakes', rows: [
     ['cone', 'Gelato cone', 'Vanilla, mango, pistachio, chocolate and more', [['', 6]]],
-    ['cup', 'Gelato cup', 'Medium cup, any flavour', [['', 6]]],
+    ['cup', 'Gelato cup', 'Medium cup, choice of flavour', [['', 6]]],
     ['shake', 'Shake', 'Mango, strawberry, banana, badam, papaya, vanilla, pistachio, black cherry', SIZES3([8.41, 9.29, 11.11])],
   ] },
   { id: 'drinks', title: 'Drinks', rows: [
@@ -277,7 +277,7 @@ const SECTIONS: Section[] = [
     ['dip-chutney', 'Green chutney', '', [['', 1.33]]],
   ] },
 ];
-const NAV: [string, string][] = [['walkin', 'Walk-in specials'], ['pizzas', 'Pizzas'], ...SECTIONS.map((s): [string, string] => [s.id, s.title])];
+const NAV: [string, string][] = [['walkin', 'Pickup combos'], ['pizzas', 'Pizzas'], ...SECTIONS.map((s): [string, string] => [s.id, s.title])];
 
 /** Scroll-spy: a section becomes active once its top reaches 140px from the viewport top. */
 const SPY_LINE = 140;
@@ -431,7 +431,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
         <section id="walkin" style={{ paddingTop: 32, scrollMarginTop: 124 }}>
           <div style={{ background: '#1A1414', color: '#fff', borderRadius: ph ? 24 : 28, padding: ph ? '20px 12px 12px' : 'clamp(24px,4vw,40px)', display: 'flex', flexDirection: 'column', gap: ph ? 16 : 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: ph ? 10 : 14, flexWrap: 'wrap', padding: ph ? '0 8px' : 0 }}>
-              <h2 style={{ margin: 0, fontWeight: 900, fontSize: ph ? 24 : 'clamp(28px,3vw,36px)', letterSpacing: '-.035em' }}>Walk-in specials</h2>
+              <h2 style={{ margin: 0, fontWeight: 900, fontSize: ph ? 24 : 'clamp(28px,3vw,36px)', letterSpacing: '-.035em' }}>Pickup combos</h2>
               <span style={{ height: 26, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 999, background: '#D7192D', fontWeight: 800, fontSize: 12, letterSpacing: '.06em', whiteSpace: 'nowrap', textTransform: 'uppercase' }}>Pickup only</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: walkCols, gap: ph ? 8 : 12 }}>
@@ -529,7 +529,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, paddingBottom: 10 }}>
               <span style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <span style={{ fontWeight: 900, fontSize: 22, letterSpacing: '-.03em' }}>{picker.name}</span>
-                <span style={{ fontSize: 14, color: '#636366' }}>{picker.spicy ? 'Choose a spice level, then add' : 'Choose an option'}</span>
+                <span style={{ fontSize: 14, color: '#636366' }}>{picker.spicy ? 'Choose a spice level and option' : 'Choose an option'}</span>
               </span>
               <button type="button" onClick={closePicker} aria-label="Close" style={{ width: 42, height: 42, border: 0, borderRadius: '50%', background: '#F2F2F5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1A1414', flex: 'none' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>

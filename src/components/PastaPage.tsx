@@ -34,8 +34,8 @@ interface Base {
 }
 const BASES: readonly Base[] = [
   { id: 'classic', name: 'Classic', tint: '#F6F0E4', ings: [['ginger', 34, 44, 46, -12], ['coriander', 68, 58, 44, 18]], desc: 'Ginger and parsley', p: { rose: 12.5, alfredo: 13 } },
-  { id: 'veggie', name: 'Veggie', veg: true, tint: '#EAF3E6', ings: [['broccoli', 30, 36, 36, -10], ['mushrooms', 70, 34, 34, 14], ['green-peppers', 34, 70, 36, 8], ['red-onions', 70, 70, 34, -16]], desc: 'Green pepper, onion, broccoli, mushroom', p: { rose: 13.27, tomato: 12.5, alfredo: 13.72 } },
-  { id: 'chicken', name: 'Chicken', tint: '#F7ECE4', ings: [['tandoori-chicken', 46, 48, 52, -6], ['green-peppers', 78, 30, 30, 20], ['red-onions', 78, 72, 30, -12]], desc: 'Green pepper, onion, chicken', p: { rose: 14.6, tomato: 14, alfredo: 15.04 } },
+  { id: 'veggie', name: 'Veggie', veg: true, tint: '#EAF3E6', ings: [['broccoli', 30, 36, 36, -10], ['mushrooms', 70, 34, 34, 14], ['green-peppers', 34, 70, 36, 8], ['red-onions', 70, 70, 34, -16]], desc: 'Green peppers, onions, broccoli, mushrooms', p: { rose: 13.27, tomato: 12.5, alfredo: 13.72 } },
+  { id: 'chicken', name: 'Chicken', tint: '#F7ECE4', ings: [['tandoori-chicken', 46, 48, 52, -6], ['green-peppers', 78, 30, 30, 20], ['red-onions', 78, 72, 30, -12]], desc: 'Chicken, green peppers, onions', p: { rose: 14.6, tomato: 14, alfredo: 15.04 } },
 ];
 
 /** Bowl photo per `${base}-${sauce}`; falls back to the sauce photo. */
@@ -205,13 +205,13 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
               Back
             </Hov>
             <div style={S.heroText}>
-              <span style={S.eyebrow}>The Pasta Bar</span>
+              <span style={S.eyebrow}>Pasta & momos</span>
               <h1 style={S.h1}>
-                Pick a sauce.
+                Fresh pasta,
                 <br />
-                <span style={{ color: '#F2B53A' }}>We do the rest.</span>
+                <span style={{ color: '#F2B53A' }}>cooked to order.</span>
               </h1>
-              <p style={S.heroP}>Rosé, Alfredo or tomato. Classic, veggie or chicken. Cooked to order, with parmesan, ginger and parsley.</p>
+              <p style={S.heroP}>Choose rosé, Alfredo or tomato sauce, then classic, veggie or chicken. Finished with parmesan, ginger and parsley.</p>
             </div>
           </div>
           {wide ? (
@@ -361,7 +361,7 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
         <div style={{ maxWidth: 'none' }}>
           <div style={S.momoWrap}>
             <div style={S.momoHead}>
-              <span style={S.momoEyebrow}>Also at the bar</span>
+              <span style={S.momoEyebrow}>Also on the menu</span>
               <h2 style={S.h2}>Momos</h2>
             </div>
             <div style={{ ...S.momoCard, gridTemplateColumns: wide ? 'minmax(0,1.1fr) minmax(0,1fr)' : 'minmax(0,1fr)' }}>
@@ -370,8 +370,8 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
               </div>
               <div style={S.momoBody}>
                 <div style={S.momoText}>
-                  <span style={S.momoTitle}>Steamed momos</span>
-                  <span style={S.momoDesc}>Dumplings, steamed to order.</span>
+                  <span style={S.momoTitle}>Steamed dumplings</span>
+                  <span style={S.momoDesc}>Veggie or non-veggie, made to order.</span>
                 </div>
                 <div role="radiogroup" aria-label="Momos" style={S.momoSeg}>
                   {MOMOS.map(([id, name, pr]) => {

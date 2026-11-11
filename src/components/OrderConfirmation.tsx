@@ -25,7 +25,7 @@ export interface Confirmation {
 type Stage = 'oven' | 'ready';
 
 /** Progress shown only while the order is in the oven. */
-const STEPS: [string, 'done' | 'now' | 'next'][] = [['Received', 'done'], ['In the oven', 'now'], ['Ready for pickup', 'next']];
+const STEPS: [string, 'done' | 'now' | 'next'][] = [['Order placed', 'done'], ['Preparing', 'now'], ['Ready for pickup', 'next']];
 
 const BRAND: Record<string, [name: string, w: string, h: string, bg: string]> = {
   visa: ['Visa', '38px', '14px', '#fff'],
@@ -82,7 +82,7 @@ export default function OrderConfirmation({
   const whenLine = ready ? 'Ready now' : /soon/i.test(done.when) ? 'Ready as soon as possible' : 'Ready at ' + done.when;
   const line = ready
     ? 'Your order is waiting at ' + SHOP.street + '. Your receipt was sent to ' + (done.email || 'your email') + '.'
-    : 'Your order is in the kitchen. We’ll text ' + (done.phone ? done.phone.trim() : 'you') + ' when it’s ready' + (done.email ? ', and your receipt is on its way to ' + done.email.trim() + '.' : '.');
+    : 'Your order has been sent to the kitchen.' + (done.email ? ' Your receipt is on its way to ' + done.email.trim() + '.' : '');
 
   const bk = brandKey(done);
   const L = BRAND[bk];
@@ -119,9 +119,9 @@ export default function OrderConfirmation({
           <span style={{ fontSize: 15, fontWeight: 700, color: '#818184', letterSpacing: '.01em' }}>{done.no}</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             <h1 style={{ margin: 0, fontWeight: 900, fontSize: 'clamp(46px,7vw,92px)', lineHeight: 0.92, letterSpacing: '-.055em' }}>
-              {'Thanks, ' + (done.name || 'friend') + '.'}
+              {done.name ? 'Thank you, ' + done.name + '.' : 'Thank you.'}
               <br />
-              <span style={{ color: ready ? '#1E8A4C' : '#D7192D' }}>{ready ? 'It’s ready.' : 'We’re on it.'}</span>
+              <span style={{ color: ready ? '#1E8A4C' : '#D7192D' }}>{ready ? 'It’s ready.' : 'Order confirmed.'}</span>
             </h1>
             <p style={{ margin: 0, maxWidth: 520, fontSize: 'clamp(16px,1.4vw,18px)', lineHeight: 1.55, color: '#636366', textWrap: 'pretty' } as CSSProperties}>{line}</p>
           </div>
@@ -140,8 +140,8 @@ export default function OrderConfirmation({
               <span style={ember('22%', '44%', 2, 'ocEmberA 5.4s linear 2.8s infinite')} />
               <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg,rgba(18,10,8,.94) 0%,rgba(18,10,8,.78) 36%,rgba(18,10,8,.15) 72%,rgba(18,10,8,0) 100%)' }} />
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, position: 'relative', zIndex: 1 }}>
-                <span style={{ fontWeight: 900, fontSize: 'clamp(38px,5vw,52px)', letterSpacing: '-.05em', lineHeight: 0.95 }}>In the oven</span>
-                <span style={{ maxWidth: 340, fontSize: 16, lineHeight: 1.5, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>Wood-fired and made to order. We{'’'}ll text you the moment it{'’'}s ready.</span>
+                <span style={{ fontWeight: 900, fontSize: 'clamp(38px,5vw,52px)', letterSpacing: '-.05em', lineHeight: 0.95 }}>Order placed</span>
+                <span style={{ maxWidth: 340, fontSize: 16, lineHeight: 1.5, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>When you arrive, give your name or order number at the counter.</span>
                 {orderPill}
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function OrderConfirmation({
               <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg,rgba(18,11,8,1) 0%,rgba(18,11,8,.88) 34%,rgba(18,11,8,.25) 62%,rgba(18,11,8,0) 80%)' }} />
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, position: 'relative', zIndex: 1 }}>
                 <span style={{ fontWeight: 900, fontSize: 'clamp(38px,5vw,52px)', letterSpacing: '-.05em', lineHeight: 0.95 }}>Ready for pickup</span>
-                <span style={{ maxWidth: 360, fontSize: 16, lineHeight: 1.5, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>Hot out of the oven. Give your name or order number at the counter.</span>
+                <span style={{ maxWidth: 360, fontSize: 16, lineHeight: 1.5, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>Give your name or order number at the counter.</span>
                 {orderPill}
               </div>
             </div>
@@ -190,7 +190,7 @@ export default function OrderConfirmation({
             <div style={infoCard}>
               <span style={{ fontSize: 13, fontWeight: 800, color: '#818184' }}>Questions?</span>
               <span style={{ fontWeight: 900, fontSize: 19, letterSpacing: '-.02em' }}>{SHOP.phoneText}</span>
-              <span style={{ fontSize: 14, color: '#818184' }}>Call the shop about this order</span>
+              <span style={{ fontSize: 14, color: '#818184' }}>Call us about this order</span>
               <a href={SHOP.phoneHref} style={infoLink}>Call now →</a>
             </div>
           </div>

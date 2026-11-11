@@ -61,11 +61,11 @@ const GELATO: Opt[] = ['Vanilla', 'Mango', 'Strawberry', 'Banana', 'Pistachio', 
 
 const CATS: Record<CategoryId, Category> = {
   wings: {
-    hero: { img: '1608039755401-742074f0548d', eyebrow: 'Wings & sides', t1: 'Tandoori', t2: 'Wings.', p: 'Baked in the wood oven in hot, honey garlic or BBQ. Plus tandoori chicken, fish and sides.' },
+    hero: { img: '1608039755401-742074f0548d', eyebrow: 'Wings & sides', t1: 'Tandoori', t2: 'wings.', p: 'Wings from the wood oven in hot, honey garlic or BBQ. Also tandoori chicken and fish, salads and sides.' },
     filters: [['all', 'All'], ['tandoor', 'Wings & tandoori'], ['sides', 'Sides & salads']],
     items: [
       {
-        id: 'wings', f: 'tandoor', name: 'Tandoori wings', desc: 'Wood oven. Extra dip $1.33.', tag: 'Wood oven', img: '1608039755401-742074f0548d', def: { n: '12' },
+        id: 'wings', f: 'tandoor', name: 'Tandoori wings', desc: 'Hot, honey garlic or BBQ. Extra dip $1.33.', tag: 'Wood oven', img: '1608039755401-742074f0548d', def: { n: '12' },
         groups: [
           { id: 'flav', label: 'Flavour', opts: [o('hot', 'Hot', { img: '1608039755401-742074f0548d' }), o('honey', 'Honey garlic', { img: '1567620832903-9fc6debc209f' }), o('bbq', 'BBQ', { img: '1527477396000-e27163b481c2' })] },
           { id: 'n', label: 'Wings', opts: ([[8, 10], [12, 12], [16, 14], [24, 22], [34, 31], [48, 42]] as const).map(([n, p]) => o(String(n), String(n), { price: p, long: n + ' wings' })) },
@@ -89,17 +89,17 @@ const CATS: Record<CategoryId, Category> = {
         groups: [{ id: 'c', opts: [o('cheese', 'With cheese', { price: 8.01 }), o('plain', 'Without cheese', { price: 6.99 })] }],
       },
       {
-        id: 'sub', f: 'sides', name: 'Sub', desc: 'One foot, veggie or non-veggie', img: '1509722747041-616f39b57569',
+        id: 'sub', f: 'sides', name: 'Sub', desc: 'Foot-long, veggie or non-veggie', img: '1509722747041-616f39b57569',
         groups: [{ id: 'kind', opts: [o('veg', 'Veggie', { price: 10.18 }), o('nonveg', 'Non-veggie', { price: 11.06 })] }, SPICE],
       },
       { id: 'nv-salad', f: 'sides', name: 'Non-veg salad', price: 8.99, img: '1546069901-ba9599a7e63c' },
       { id: 'v-salad', f: 'sides', name: 'Veg salad', price: 7.99, veg: true, img: '1512621776951-a57141f2eefd' },
-      { id: 'corn', f: 'sides', name: 'Sweet corn', desc: 'Cooked in the wood oven', price: 5, veg: true, img: 'assets/ingredients/corn.jpg' },
-      { id: 'chaat', f: 'sides', name: 'Fruit chaat', desc: 'With sweet potatoes', price: 8.01, veg: true, img: '1490474418585-ba9bad8fd0ea' },
+      { id: 'corn', f: 'sides', name: 'Sweet corn', desc: 'Roasted in the wood oven', price: 5, veg: true, img: 'assets/ingredients/corn.jpg' },
+      { id: 'chaat', f: 'sides', name: 'Fruit chaat', desc: 'With sweet potato', price: 8.01, veg: true, img: '1490474418585-ba9bad8fd0ea' },
     ],
   },
   juice: {
-    hero: { img: '1622597467836-f3285f2131b8', eyebrow: 'The Drinks Bar', t1: 'Fresh juice.', t2: 'Hot chai. Cold beer.', p: 'Juice, lassi, coffee and chai, and cold beer by the bottle or can.' },
+    hero: { img: '1622597467836-f3285f2131b8', eyebrow: 'Drinks', t1: 'Fresh juice.', t2: 'Lassi and chai.', p: 'Fruit and sugarcane juice, lassi, coffee, masala tea, pop, and beer by the bottle or can.' },
     filters: [['all', 'All'], ['juice', 'Juice'], ['lassi', 'Lassi'], ['hot', 'Coffee & chai'], ['soft', 'Pop & water'], ['beer', 'Beer']],
     noun: 'drinks',
     items: [
@@ -131,7 +131,7 @@ const CATS: Record<CategoryId, Category> = {
       },
       { id: 'water', f: 'soft', name: 'Water', desc: '500 mL bottle', price: 1.99, img: '' },
       {
-        id: 'beer', f: 'beer', name: 'Beer', desc: 'Prices before tax', img: '1600788886242-5c96aabe3757',
+        id: 'beer', f: 'beer', name: 'Beer', desc: 'Bottle or can', img: '1600788886242-5c96aabe3757',
         groups: [
           { id: 'kind', label: 'Bottle or can', opts: [o('bottle', 'Bottle', { price: 5.7 }), o('can', 'Can', { price: 7.5 })] },
           { id: 'brand', label: 'Brand', chips: true, opts: ['Canadian', 'Molson', 'Moosehead Blue', 'Miller', 'Corona', 'Heineken', 'Stella'].map((b) => o(b.toLowerCase().replace(/\s+/g, '-'), b)) },
@@ -140,8 +140,8 @@ const CATS: Record<CategoryId, Category> = {
     ],
   },
   gelato: {
-    hero: { img: '1501443762994-82bd5dace89a', eyebrow: 'Gelato & shakes', t1: 'Gelato &', t2: 'Shakes.', p: 'Cones, cups and thick shakes. Ten gelato flavours.' },
-    noun: 'treats',
+    hero: { img: '1501443762994-82bd5dace89a', eyebrow: 'Gelato & shakes', t1: 'Gelato &', t2: 'shakes.', p: 'Gelato in a cone or cup, in ten flavours, and thick shakes.' },
+    noun: 'items',
     items: [
       { id: 'cone', name: 'Gelato cone', price: 6, img: '1497034825429-c343d7c6a68f', groups: [{ id: 'flav', label: 'Flavour', chips: true, opts: GELATO }] },
       // Square calls gelato "Ice Cream": Cone $6.00, Medium Bowl $6.00 (Large Bowl has no price set yet).
@@ -332,7 +332,7 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
       <section style={S.listSection}>
         <div style={ph ? { ...S.bar, padding: '24px 0 18px', gap: 12 } : S.bar}>
           {filters ? (
-            <div role="tablist" aria-label="Filter" className="pk-noscroll" style={ph ? { display: 'flex', gap: 8, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', margin: '0 -16px', padding: '2px 16px', width: 'calc(100% + 32px)', WebkitOverflowScrolling: 'touch' } : S.tabs}>
+            <div role="tablist" aria-label="Filter items" className="pk-noscroll" style={ph ? { display: 'flex', gap: 8, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', margin: '0 -16px', padding: '2px 16px', width: 'calc(100% + 32px)', WebkitOverflowScrolling: 'touch' } : S.tabs}>
               {filters.map(([id, label]) => {
                 const on = filter === id;
                 const count = id === 'all' ? cat.items.length : cat.items.filter((i) => i.f === id).length;
@@ -348,7 +348,7 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
             <span style={S.count}>{cat.items.length + ' ' + (cat.noun || 'items')}</span>
           )}
           <Hov as="a" href="#menu" onClick={ev(onMenu)} style={S.fullMenu} hover={S.fullMenuHover}>
-            Full menu
+            View full menu
             <IconArrow size={14} stroke={2.8} />
           </Hov>
         </div>
@@ -366,7 +366,7 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
                     {it.veg ? (
                       <span style={S.veg}>
                         <span style={S.vegDot} />
-                        Veg
+                        Vegetarian
                       </span>
                     ) : null}
                   </div>
@@ -379,7 +379,7 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
                   <div style={S.cardFoot}>
                     <div style={S.priceCol}>
                       <span style={ph ? { ...S.price, fontSize: 16, letterSpacing: '-.02em' } : S.price}>{b.priceText}</span>
-                      {ph ? null : <span style={S.sub}>{b.hasOpts ? 'Tap to customize' : ''}</span>}
+                      {ph ? null : <span style={S.sub}>{b.hasOpts ? 'Choose options' : ''}</span>}
                     </div>
                     <Hov
                       as="button"

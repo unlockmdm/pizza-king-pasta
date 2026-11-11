@@ -7,6 +7,13 @@ const LOCATION_ID = (import.meta.env.VITE_SQUARE_LOCATION_ID as string | undefin
 export const SQUARE_ENABLED = !!(APP_ID && LOCATION_ID);
 export const SQUARE_SANDBOX = APP_ID.startsWith('sandbox-');
 
+/** True in Safari (macOS and every iOS browser that isn't Chrome/Firefox/Edge/Opera). Google Pay is hidden there; Apple Pay covers it. */
+export function isSafari(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  return /Safari\//.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|EdgA?\/|OPR\/|OPiOS|Android|SamsungBrowser/.test(ua);
+}
+
 const SDK_URL = SQUARE_SANDBOX ? 'https://sandbox.web.squarecdn.com/v1/square.js' : 'https://web.squarecdn.com/v1/square.js';
 
 /* Minimal typings for the parts of the Web Payments SDK we use. */
@@ -35,7 +42,7 @@ export function loadSquare(): Promise<SqPayments> {
       s.src = SDK_URL;
       s.async = true;
       s.onload = ready;
-      s.onerror = () => { sdk = null; reject(new Error('Could not load Square. Check your connection.')); };
+      s.onerror = () => { sdk = null; reject(new Error('The payment form couldn’t load. Check your connection and try again.')); };
       document.head.appendChild(s);
     });
   }
@@ -72,7 +79,7 @@ export async function submitPayment(body: PayRequest): Promise<PayResponse> {
   try {
     const r = await fetch('api/pay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const j = (await r.json().catch(() => ({}))) as PayResponse;
-    if (!r.ok || !j.ok) return { ok: false, message: j.message || 'Payment didn’t go through. Please try again.' };
+    if (!r.ok || !j.ok) return { ok: false, message: j.message || 'Your payment didn’t go through. Please try again.' };
     return j;
   } catch {
     return { ok: false, message: 'We couldn’t reach the payment server. Check your connection and try again.' };

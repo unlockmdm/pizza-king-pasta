@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 import type { CartCheckoutProps, CartLine, Mode } from '../lib/types';
 import { HST, SHOP } from '../lib/catalog';
-import { CARD_STYLE, loadSquare, newKey, slotToIso, SQUARE_ENABLED, SQUARE_SANDBOX, submitPayment, type SqCard, type SqPaymentRequest, type SqWallet } from '../lib/square';
+import { CARD_STYLE, isSafari, loadSquare, newKey, slotToIso, SQUARE_ENABLED, SQUARE_SANDBOX, submitPayment, type SqCard, type SqPaymentRequest, type SqWallet } from '../lib/square';
 import { money } from '../lib/format';
 import { Hov } from '../lib/ui';
 import { useEscape, useLockBody, useWidth } from '../lib/hooks';
@@ -34,7 +34,7 @@ interface Upsell {
   summary: string;
 }
 const UPSELLS: Upsell[] = [
-  { key: 'fruit-juice', name: 'Fresh juice', unit: 6.81, img: 'assets/menu/juice-mix.png', summary: 'Large' },
+  { key: 'fruit-juice', name: 'Fresh fruit juice', unit: 6.81, img: 'assets/menu/juice-mix.png', summary: 'Medium' },
   { key: 'gelato-cone', name: 'Gelato cone', unit: 6, img: 'assets/menu/gelato.jpg', summary: 'Vanilla' },
 ];
 
@@ -188,7 +188,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
         setSqReady(true);
         const req = payments.paymentRequest({ countryCode: 'CA', currencyCode: 'CAD', total: { amount: totalRef.current, label: SHOP.name } });
         st.req = req;
-        try {
+        if (!isSafari()) try {
           const g = await payments.googlePay(req);
           if (cancelled) { void g.destroy(); return; }
           await g.attach?.('#sq-gpay', { buttonColor: 'white', buttonSizeMode: 'fill', buttonType: 'long' });
@@ -202,7 +202,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
           setWallets((x) => ({ ...x, apple: true }));
         } catch { /* Apple Pay needs Safari + a verified domain */ }
       } catch (e) {
-        if (!cancelled) setSqLoadErr((e as Error).message || 'Card payments are unavailable right now.');
+        if (!cancelled) setSqLoadErr((e as Error).message || 'Card payments are unavailable right now. Please call 905-460-9494 to order.');
       }
     })();
     return () => {
@@ -318,7 +318,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
   ];
   const pays: { id: Pay; short: string }[] = [
     { id: 'card', short: 'Card' },
-    { id: 'store', short: pickup ? 'Pay at pickup' : 'Pay on delivery' },
+    { id: 'store', short: pickup ? 'Pay at pickup' : 'Pay in the app' },
   ];
   const lblW = w >= 560 ? 76 : 64;
   const twoCols = w >= 560 ? '1fr 1fr' : '1fr';
@@ -468,7 +468,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 40, textAlign: 'center' }}>
                 <img src="assets/pizza-base.webp" alt="" style={{ width: 120, height: 120, opacity: 0.9 }} />
                 <span style={{ fontWeight: 900, fontSize: 22, letterSpacing: '-.03em' }}>Your order is empty</span>
-                <span style={{ fontSize: 15, color: '#636366' }}>Add a pizza to get started.</span>
+                <span style={{ fontSize: 15, color: '#636366' }}>Add items from the menu to start your order.</span>
                 <button
                   onClick={p.onBrowse}
                   style={{ height: 48, padding: '0 24px', border: 0, borderRadius: 999, background: '#1A1414', color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 15, cursor: 'pointer' }}
@@ -558,7 +558,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
 
                 <footer style={{ padding: '16px 22px 22px', background: '#fff', boxShadow: '0 -1px 0 #EAEAED', display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <span style={{ fontSize: 14, color: '#818184' }}>Subtotal · taxes at checkout</span>
+                    <span style={{ fontSize: 14, color: '#818184' }}>Subtotal before HST</span>
                     <span style={{ fontWeight: 900, fontSize: 20, letterSpacing: '-.03em' }}>{money(sub)}</span>
                   </div>
                   <Hov
@@ -633,7 +633,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
                     </div>
                   ) : null}
                 </div>
-                {err.street ? <span style={errText}>Enter a delivery address.</span> : null}
+                {err.street ? <span style={errText}>Enter an address.</span> : null}
               </section>
 
               {pickup ? (<>
@@ -666,7 +666,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
                     rows={4}
                     maxLength={240}
                     aria-label="Note for the kitchen"
-                    placeholder="Allergies, extra crispy, cut in squares, buzzer code…"
+                    placeholder="Allergies, well done, cut in squares…"
                     style={{ width: '100%', minHeight: 120, padding: '14px 16px', border: 0, borderRadius: 16, background: fieldBg, fontFamily: 'inherit', fontSize: 16, lineHeight: 1.5, color: '#1A1414', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
                   />
                   <span style={{ alignSelf: 'flex-end', fontSize: 12, color: '#818184' }}>{f.note.length}/240</span>
@@ -855,7 +855,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
                   )}
                   {!pickup ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 4 }}>
-                      <span style={{ fontSize: 15, fontWeight: 700 }}>Tip your driver</span>
+                      <span style={{ fontSize: 15, fontWeight: 700 }}>Tip</span>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,minmax(0,1fr))', gap: 4, padding: 4, borderRadius: 16, background: '#F0F0F3' }}>
                         {TIP_PRESETS.map((t) => {
                           const on = tip === t;
