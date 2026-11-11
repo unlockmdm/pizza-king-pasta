@@ -172,6 +172,16 @@ for (const id of PAGE_IDS) {
   fs.writeFileSync(path.join(DIST, id === 'home' ? 'index.html' : m.slug + '.html'), html);
 }
 
+// 404 page: served with a 404 status for unknown addresses (wrangler.jsonc not_found_handling "404-page").
+// The app shows the homepage, so visitors aren't stranded; search engines see "not found" and don't index it.
+{
+  let html = template.replace(/<title>[^<]*<\/title>/, '<title>Page not found | Pizza King &amp; Pasta</title>');
+  html = html.replace('content="index, follow, max-image-preview:large"', 'content="noindex"');
+  html = html.replace(/\s*<link rel="canonical" href="[^"]*" \/>/, '');
+  html = html.replace('<!--SEO-JSONLD-->', '').replace('<!--SEO-BODY-->', '<p style="font-family:system-ui;padding:24px">Page not found. <a href="/">Go to the homepage</a>.</p>');
+  fs.writeFileSync(path.join(DIST, '404.html'), html);
+}
+
 const today = new Date().toISOString().slice(0, 10);
 fs.writeFileSync(
   path.join(DIST, 'sitemap.xml'),
