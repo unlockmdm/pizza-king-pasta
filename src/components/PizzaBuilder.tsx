@@ -87,7 +87,7 @@ const crustLayers = (t: number) => Array.from({ length: t }, (_, j) => {
 });
 interface OvenCard { v: string; desc: string; img: string; bg: string; r: string; b: string; w: string; h: string; fit: string; pos: string; ar: string }
 const OVENS: OvenCard[] = [
-  { v: 'Wood-fired', desc: 'Smoky, blistered crust. Our default.', img: 'assets/oven-wood-fired.png', bg: '#120B08', r: '0', b: '0', w: '100%', h: '100%', fit: 'cover', pos: '40% 45%', ar: 'auto' },
+  { v: 'Wood-fired', desc: 'Smoky, blistered crust. Our default.', img: 'assets/oven-wood-fired.webp', bg: '#120B08', r: '0', b: '0', w: '100%', h: '100%', fit: 'cover', pos: '35% 50%', ar: 'auto' },
   { v: 'Conventional', desc: 'Even bake, softer crust. Same price.', img: 'assets/oven-conventional.webp', bg: '#120B08', r: '0', b: '0', w: '100%', h: '100%', fit: 'cover', pos: '50% 60%', ar: 'auto' },
 ];
 /** Cheese level: [meter bars, photo width]. */
@@ -587,7 +587,7 @@ export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }
                   return (
                     <button key={o.v} role="radio" aria-checked={on} onClick={() => set({ bake: o.v })} style={{ position: 'relative', width: '100%', aspectRatio: '16/9', minHeight: 150, minWidth: 0, border: 0, padding: 0, borderRadius: 24, overflow: 'hidden', cursor: 'pointer', background: o.bg, outline: on ? '3px solid #D7192D' : '3px solid transparent', outlineOffset: 3, transition: 'outline-color .15s', fontFamily: 'inherit', color: '#fff', textAlign: 'left' }}>
                       <span aria-hidden="true" style={{ position: 'absolute', right: o.r, bottom: o.b, width: o.w, height: o.h, aspectRatio: o.ar, backgroundImage: "url('" + o.img + "')", backgroundSize: o.fit, backgroundPosition: o.pos, backgroundRepeat: 'no-repeat', transform: 'scale(' + (on ? 1.05 : 1) + ')', transition: 'transform .6s cubic-bezier(.3,.8,.3,1)' }} />
-                      <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(18,11,8,0) 35%,rgba(18,11,8,.85) 100%)' }} />
+                      <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(18,11,8,.05) 20%,rgba(18,11,8,.55) 55%,rgba(18,11,8,.92) 100%)' }} />
                       <span style={{ position: 'absolute', left: 18, right: 18, bottom: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
                         <span style={{ fontWeight: 900, fontSize: w < 400 ? 18 : 'clamp(20px,2.2vw,26px)', lineHeight: 1, letterSpacing: '-.03em' }}>{o.v}</span>
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#E2D7D1', textWrap: 'pretty' } as CSSProperties}>{o.desc}</span>
