@@ -40,3 +40,29 @@ export const creditOf = (o: { by?: string; h?: string; creditText?: string; cred
 
 /** Is the shop open for ASAP orders right now (shared hours module, Toronto time). */
 export { canOrderAsap as isShopOpen } from './hours';
+
+/**
+ * The one photo for each pizza (Unsplash id or local `assets/...` path). Home specials, the
+ * Meat favourites page and the full menu all read from here, so a pizza looks the same everywhere.
+ * Every photo must show that pizza's actual toppings.
+ */
+export const PIZZA_PHOTOS: Record<string, string> = {
+  byo: '1593560708920-61dd98c46a4e',
+  napoli: 'assets/pizzas/napoli.webp',
+  'four-seasons': '1559978137-8c560d91e9e1',
+  'italian-veg': '1617470702892-e01504297e84',
+  'non-veg': '1600628421055-4d30de868b8f',
+  bismark: 'assets/pizzas/bismark.webp',
+  'sea-food': 'assets/pizzas/sea-food.webp',
+  'chicken-shawarma': 'assets/pizzas/shawarma-chicken.webp',
+  'butter-chicken': 'assets/pizzas/butter-chicken.png',
+  'shahi-paneer': 'assets/pizzas/shahi-paneer.png',
+  greek: '1573821663912-6df460f9c684',
+  hawaiian: 'assets/pizzas/hawaiian.webp',
+  'meat-lover': '1628840042765-356cda07504e',
+  canadian: 'assets/pizzas/canadian-photo.webp',
+  'tandoori-fish': 'assets/pizzas/tandoori-fish.webp',
+  pepperoni: '1692737580547-b45bb4a02356',
+};
+/** Photo URL for a pizza id at width `w` (local assets pass through). */
+export const pizzaPhoto = (id: string, w = 900) => (PIZZA_PHOTOS[id] ? U(PIZZA_PHOTOS[id], w) : '');

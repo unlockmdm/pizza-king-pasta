@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Mous
 import type { BuilderItem, CategoryId, MenuPageProps, NewLine } from '../lib/types';
 import { Hov, Photo } from '../lib/ui';
 import { useEscape, useWidth } from '../lib/hooks';
-import { pricesFor, SIZE_PRICES, U } from '../lib/catalog';
+import { PIZZA_PHOTOS, pricesFor, SIZE_PRICES, U } from '../lib/catalog';
 import { CAT_MENU, COMBOS, MENU_SECTIONS, PIZZAS as PIZZA_DATA, SPICES, mustPrice, type LineSpec, type PastaBaseId, type PastaSauceId, type MenuOpt, type MenuRow, type MenuSection } from '../lib/pricing';
 import { money } from '../lib/format';
 import PizzaBuilder from './PizzaBuilder';
@@ -14,31 +14,11 @@ import './MenuPage.css';
 
 // ---------- Data (the prototype's const arrays are the spec) ----------
 
-const PIZZA_IMG = U('1593560708920-61dd98c46a4e', 1000);
+const PIZZA_IMG = U(PIZZA_PHOTOS.byo, 1000);
 /** Menu tile photo (prototype uses q=70, w=600 here, unlike the shared U()). */
 const UI = (id: string) => 'https://images.unsplash.com/photo-' + id + '?fm=jpg&q=70&w=600&auto=format&fit=crop';
-const PIZZA_PICS: string[] = [
-  '1593560708920-61dd98c46a4e', '1655673654158-9f7285b7d1ea', '1604382354936-07c5d9983bd3', '1590947132387-155cc02f3212',
-  '1692737580547-b45bb4a02356', '1565299624946-b28f40a0ae38', '1611915365928-565c527a0590', '1594007654729-407eedc4be65',
-].map(UI);
-/** Unsplash id, or a local asset path. */
-const PIZZA_PHOTO: Record<string, string> = {
-  napoli: 'assets/pizzas/napoli.webp',
-  'four-seasons': '1559978137-8c560d91e9e1',
-  'italian-veg': '1617470702892-e01504297e84',
-  'non-veg': '1600628421055-4d30de868b8f',
-  bismark: 'assets/pizzas/bismark.webp',
-  'sea-food': 'assets/pizzas/sea-food.webp',
-  'chicken-shawarma': 'assets/pizzas/shawarma-chicken.webp',
-  'butter-chicken': 'assets/pizzas/butter-chicken.png',
-  'shahi-paneer': 'assets/pizzas/shahi-paneer.png',
-  greek: '1573821663912-6df460f9c684',
-  hawaiian: 'assets/pizzas/hawaiian.webp',
-  'meat-lover': '1628840042765-356cda07504e',
-  canadian: 'assets/pizzas/canadian-photo.webp',
-  'tandoori-fish': 'assets/pizzas/tandoori-fish.webp',
-  pepperoni: '1692737580547-b45bb4a02356',
-};
+/** Pizza photos come from the shared PIZZA_PHOTOS list (same photo on every page). */
+const PIZZA_PHOTO = PIZZA_PHOTOS;
 /**
  * Row photos. The prototype also maps `lassi` to assets/menu/juice.jpg (the mixed-juice photo);
  * that is dropped here because the README lists lassi as an item with no real photo
@@ -330,12 +310,12 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
 
   const byo: BuilderItem = { id: 'byo', name: 'Build Your Own', tops: [], included: 4, img: PIZZA_IMG };
   const pizzaRows: Tile[] = [
-    { key: 'byo', img: PIZZA_PICS[0], name: 'Build Your Own', desc: '4 toppings included (meat counts as 2)', veg: false, priceText: 'From ' + money(SIZE_PRICES.S), cta: 'Customize', act: () => setBuilder(byo) },
+    { key: 'byo', img: UI(PIZZA_PHOTOS.byo), name: 'Build Your Own', desc: '4 toppings included (meat counts as 2)', veg: false, priceText: 'From ' + money(SIZE_PRICES.S), cta: 'Customize', act: () => setBuilder(byo) },
     ...PIZZAS.map(([id, name, desc, tops, veg], i): Tile => {
       const photo = PIZZA_PHOTO[id];
       return {
         key: id,
-        img: photo ? (photo.indexOf('assets/') === 0 ? photo : UI(photo)) : PIZZA_PICS[(i + 1) % PIZZA_PICS.length],
+        img: photo ? (photo.indexOf('assets/') === 0 ? photo : UI(photo)) : '',
         name,
         desc,
         veg: !!veg,

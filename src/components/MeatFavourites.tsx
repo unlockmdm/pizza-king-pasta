@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import type { BuilderItem, MeatFavouritesProps, NewLine, SizeKey } from '../lib/types';
 import { Hov, Photo } from '../lib/ui';
-import { SIZE_NAMES, SIZE_PRICES, U, creditOf, pricesFor } from '../lib/catalog';
+import { PIZZA_PHOTOS, SIZE_NAMES, SIZE_PRICES, U, creditOf, pricesFor } from '../lib/catalog';
 import { money } from '../lib/format';
 import { PIZZAS as PIZZA_DATA, mustPrice, type LineSpec } from '../lib/pricing';
 import { useWidth } from '../lib/hooks';
@@ -29,15 +29,15 @@ interface MeatPizza {
 }
 
 const PIZZA_LIST: Omit<MeatPizza, 'tops'>[] = [
-  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', pic: '1628840042765-356cda07504e', by: '', h: '', cured: true },
-  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', pic: 'assets/pizzas/butter-chicken.png', by: '', h: '', chicken: true },
-  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', pic: 'assets/pizzas/shawarma-chicken.webp', by: '', h: '', chicken: true, tag: 'Spicy' },
-  { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', pic: '1600628421055-4d30de868b8f', by: '', h: '', chicken: true, cured: true },
-  { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', pic: '1692737580547-b45bb4a02356', by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
-  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', pic: 'assets/pizzas/canadian-photo.webp', by: '', h: '', cured: true },
-  { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', pic: 'assets/pizzas/hawaiian.webp', by: '', h: '', creditText: 'Photo: Elsie Hui, Wikimedia Commons, CC BY 2.0', cured: true },
-  { id: 'bismark', name: 'Bismark', desc: 'Sun-dried tomatoes, grilled chicken, sausage', pic: 'assets/pizzas/bismark.webp', by: '', h: '', chicken: true, cured: true },
-  { id: 'four-seasons', name: 'Four Seasons', desc: 'Ham, mushrooms, artichokes, black olives', pic: '1559978137-8c560d91e9e1', by: '', h: '', cured: true },
+  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', pic: PIZZA_PHOTOS['meat-lover'], by: '', h: '', cured: true },
+  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', pic: PIZZA_PHOTOS['butter-chicken'], by: '', h: '', chicken: true },
+  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', pic: PIZZA_PHOTOS['chicken-shawarma'], by: '', h: '', chicken: true, tag: 'Spicy' },
+  { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', pic: PIZZA_PHOTOS['non-veg'], by: '', h: '', chicken: true, cured: true },
+  { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', pic: PIZZA_PHOTOS['pepperoni'], by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
+  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', pic: PIZZA_PHOTOS['canadian'], by: '', h: '', cured: true },
+  { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', pic: PIZZA_PHOTOS['hawaiian'], by: '', h: '', creditText: 'Photo: Elsie Hui, Wikimedia Commons, CC BY 2.0', cured: true },
+  { id: 'bismark', name: 'Bismark', desc: 'Sun-dried tomatoes, grilled chicken, sausage', pic: PIZZA_PHOTOS['bismark'], by: '', h: '', chicken: true, cured: true },
+  { id: 'four-seasons', name: 'Four Seasons', desc: 'Ham, mushrooms, artichokes, black olives', pic: PIZZA_PHOTOS['four-seasons'], by: '', h: '', cured: true },
 ];
 
 /** House toppings come from the shared pricing data (they set the included topping count). */
@@ -56,7 +56,7 @@ const DEFAULT_SIZE: SizeKey = 'L';
 const ADDED_MS = 1400;
 
 const HERO_IMG = U('1611915365928-565c527a0590', 2000);
-const BYO_IMG = U('1513104890138-7c749659a591', 800);
+const BYO_IMG = U(PIZZA_PHOTOS.byo, 800);
 
 const tagStyle = { position: 'absolute', left: 14, top: 14, height: 30, padding: '0 12px', borderRadius: 999, background: '#fff', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', boxShadow: '0 4px 14px rgba(0,0,0,.12)' } as const;
 
@@ -167,7 +167,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
             hover={{ transform: 'translateY(-4px)', boxShadow: '0 22px 44px rgba(215,25,45,.28)' }}
           >
             <div style={{ position: 'relative', aspectRatio: ph ? undefined : '4/3', width: ph ? '40%' : undefined, flex: ph ? 'none' : undefined, minHeight: ph ? 180 : undefined, background: '#B51424' }}>
-              <Photo src={BYO_IMG} alt="" credit="Photo by Ivan Torres on Unsplash" creditHref="https://unsplash.com/@iavnt" />
+              <Photo src={BYO_IMG} alt="" credit="Photo by Saundarya Srinivasan on Unsplash" creditHref="https://unsplash.com/@saundiii" />
               {ph ? null : <span style={{ ...tagStyle, color: '#D7192D' }}>Build your own</span>}
             </div>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: ph ? 14 : 20, padding: ph ? 16 : 22 }}>

@@ -1,5 +1,5 @@
 // Homepage data, ported verbatim from `Pizza King Home v2.dc.html`. These arrays are the spec.
-import { U } from '../lib/catalog';
+import { U, pizzaPhoto } from '../lib/catalog';
 import { money } from '../lib/format';
 import { COMBOS } from '../lib/pricing';
 import type { BuilderItem, Deal } from '../lib/types';
@@ -16,10 +16,10 @@ export interface Special {
 }
 
 export const SPECIALS: Special[] = [
-  { id: 'shahi-paneer', name: 'Shahi Paneer', desc: 'Tandoori paneer, green peppers, red onions, jalapeños', veg: true, img: 'assets/pizzas/shahi-paneer.png', by: '', h: '' },
-  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', veg: false, img: 'assets/pizzas/butter-chicken.png', by: '', h: '' },
-  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', veg: false, tag: 'Spicy', img: 'assets/pizzas/shawarma-chicken.webp', by: '', h: '' },
-  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', veg: false, img: U('1628840042765-356cda07504e'), by: '', h: '' },
+  { id: 'shahi-paneer', name: 'Shahi Paneer', desc: 'Tandoori paneer, green peppers, red onions, jalapeños', veg: true, img: pizzaPhoto('shahi-paneer'), by: '', h: '' },
+  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', veg: false, img: pizzaPhoto('butter-chicken'), by: '', h: '' },
+  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', veg: false, tag: 'Spicy', img: pizzaPhoto('chicken-shawarma'), by: '', h: '' },
+  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', veg: false, img: pizzaPhoto('meat-lover'), by: '', h: '' },
 ];
 
 export const DEALS: (Deal & { by: string; h: string })[] = [
@@ -44,7 +44,7 @@ export interface Tile {
 }
 
 export const TILES: Tile[] = [
-  { id: 'byo', name: 'Build your own', sub: '4 toppings · meat counts as 2', bg: '#EDEDF0', fg: '#1A1414', img: U('1593560708920-61dd98c46a4e'), by: 'Saundarya Srinivasan', h: 'saundiii' },
+  { id: 'byo', name: 'Build your own', sub: '4 toppings · meat counts as 2', bg: '#EDEDF0', fg: '#1A1414', img: pizzaPhoto('byo'), by: 'Saundarya Srinivasan', h: 'saundiii' },
   { id: 'specials', name: 'House specials', sub: 'Indian-fusion and classic', bg: '#D7192D', fg: '#fff', img: U('1565299624946-b28f40a0ae38'), by: 'Chad Montano', h: 'briewilly', target: 'bestsellers' },
   { id: 'meat', name: 'Meat favourites', sub: 'Pepperoni, bacon, sausage', bg: '#C2511F', fg: '#fff', img: U('1611915365928-565c527a0590'), by: 'Tamas Pap', h: 'tamasp' },
   { id: 'combos', name: 'Pickup combos', sub: 'From ' + money(Math.min(...Object.values(COMBOS).map((c) => c.price))), bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
@@ -66,7 +66,7 @@ export const BASE_TOPS: Record<string, string[]> = {
 
 export const BYO: BuilderItem & { by: string; h: string } = {
   id: 'byo', name: 'Build Your Own', desc: '4 toppings included (meat counts as 2)', tops: [], included: 4,
-  img: U('1593560708920-61dd98c46a4e', 1000), by: 'Saundarya Srinivasan', h: 'saundiii',
+  img: pizzaPhoto('byo', 1000), by: 'Saundarya Srinivasan', h: 'saundiii',
 };
 
 /** Build Your Own tile animation: [label, cut-out ids, piece width px]. */
