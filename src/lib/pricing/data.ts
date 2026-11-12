@@ -104,8 +104,9 @@ export const includedFor = (id: string): number =>
 export interface ComboDef { name: string; price: number; size: SizeKey; pizzas: number; tops: number; dips: number; pops: number; side: boolean }
 /** Ontario: 19+, valid government photo ID (AGCO list of acceptable ID). */
 export const BEER_ID_NOTICE = {
-  title: '19+ only. Bring photo ID to pick up.',
-  body: "Beer is for customers 19 and older. Bring valid, unexpired photo ID: a driver's licence, Ontario Photo Card, Canadian passport, Canadian citizenship card, Permanent Resident Card or LCBO BYID card. We can't hand over beer without it.",
+  title: 'Beer is 19+',
+  body: 'Bring valid, unexpired photo ID when you pick up your order.',
+  ids: ["Driver's licence", 'Ontario Photo Card', 'Canadian passport', 'Citizenship card', 'PR card', 'LCBO BYID'],
 };
 export const COMBOS: Record<string, ComboDef> = {
   'one-large': { name: 'One Large', price: 11.99, size: 'L', pizzas: 1, tops: 1, dips: 1, pops: 0, side: false },
