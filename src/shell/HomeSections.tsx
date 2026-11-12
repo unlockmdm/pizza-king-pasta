@@ -67,6 +67,97 @@ function ByoTile({ ph, onClick }: { ph: boolean; onClick: () => void }) {
   );
 }
 
+/** Hero combo slides: Two Large, Two Medium, Two Small. Auto-advances every 5s (paused on hover / reduced motion). */
+const SLIDES = [
+  { id: 'two-large', title: 'Two Large', line: ['2 large pizzas, 4 toppings each,', '2 dips and 2 pops'], scale: 1, pops: 2 },
+  { id: 'two-medium', title: 'Two Medium', line: ['2 medium pizzas, 4 toppings each,', '2 dips and 2 pops'], scale: 0.88, pops: 2 },
+  { id: 'two-small', title: 'Two Small', line: ['2 small pizzas, 4 toppings each,', 'and 2 dips'], scale: 0.76, pops: 0 },
+] as const;
+
+function ComboSlides({ ph, w, onDeal }: { ph: boolean; w: number; onDeal: (id: string) => void }) {
+  const [i, setI] = useState(0);
+  const [hold, setHold] = useState(false);
+  useEffect(() => {
+    if (hold || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const t = setTimeout(() => setI((n) => (n + 1) % SLIDES.length), 5000);
+    return () => clearTimeout(t);
+  }, [i, hold]);
+  const shade = (k: number) => ({ position: 'absolute', left: '8%', right: '8%', bottom: '-6%', height: '22%', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(40,0,6,.45),rgba(40,0,6,0))', opacity: k } as CSSProperties);
+  const fade = (on: boolean): CSSProperties => ({ position: 'absolute', inset: 0, opacity: on ? 1 : 0, transition: 'opacity .7s ease', pointerEvents: on ? 'auto' : 'none' });
+  return (
+    <Hov
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Pickup combos"
+      onMouseEnter={() => setHold(true)}
+      onMouseLeave={() => setHold(false)}
+      onFocus={() => setHold(true)}
+      onBlur={() => setHold(false)}
+      style={{ gridArea: 'deal', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, background: '#D7192D', color: '#fff', overflow: 'hidden', transition: 'transform .3s' }}
+      hover={{ transform: 'translateY(-3px)' }}
+    >
+      {SLIDES.map((d, k) => {
+        const on = k === i;
+        const big = ph ? 200 : 330, small = ph ? 176 : 300;
+        return (
+          <div key={d.id} aria-hidden={!on} style={fade(on)}>
+            {/* Pizzas: smaller for smaller sizes, same spot so the switch feels like the same table. */}
+            <div style={{ position: 'absolute', right: ph ? -46 : -60, top: ph ? -40 : -90, width: big * d.scale, height: big * d.scale, transition: 'width .7s, height .7s' }}>
+              <span aria-hidden="true" style={shade(1)} />
+              <img src="assets/combo/pizza-meat.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 40s linear infinite', willChange: 'transform' }} />
+            </div>
+            <div style={{ position: 'absolute', right: ph ? 54 : 170, top: ph ? 104 : 110, width: small * d.scale, height: small * d.scale }}>
+              <span aria-hidden="true" style={shade(1)} />
+              <img src="assets/combo/pizza-veg.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 50s linear reverse infinite', willChange: 'transform' }} />
+            </div>
+            <div aria-hidden="true" style={{ position: 'absolute', right: ph ? 8 : 18, bottom: ph ? 10 : 14, width: 236, height: 128, display: 'flex', pointerEvents: 'none', transform: ph ? (w < 380 ? 'scale(.5)' : 'scale(.64)') : undefined, transformOrigin: 'right bottom' }}>
+              <span style={{ position: 'absolute', left: 14, right: 8, bottom: -4, height: 20, borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(60,0,8,.5),rgba(60,0,8,0))' }} />
+              {d.pops ? <img src="assets/combo/coke.png" alt="" style={{ position: 'absolute', left: 68, bottom: 10, height: 108, filter: PRODUCT_SHADOW }} /> : null}
+              {d.pops ? <img src="assets/combo/coke.png" alt="" style={{ position: 'absolute', left: 118, bottom: 4, height: 112, filter: PRODUCT_SHADOW }} /> : null}
+              <img src="assets/combo/garlic-cup.webp" alt="" style={{ position: 'absolute', left: d.pops ? 0 : 50, bottom: 8, width: 92, filter: PRODUCT_SHADOW }} />
+              <img src="assets/combo/garlic-cup.webp" alt="" style={{ position: 'absolute', right: 0, bottom: 6, width: 92, filter: PRODUCT_SHADOW }} />
+            </div>
+            <div style={{ position: 'absolute', inset: 0, padding: ph ? '22px 22px' : '26px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: ph ? 'linear-gradient(90deg,rgba(215,25,45,.96) 0%,rgba(215,25,45,.82) 42%,rgba(215,25,45,0) 72%)' : 'linear-gradient(90deg,rgba(215,25,45,.92) 0%,rgba(215,25,45,.6) 34%,rgba(215,25,45,0) 52%)' }}>
+              <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase' }}>Pickup combo</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: ph ? 12 : 16, maxWidth: 300 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <span style={{ fontWeight: 900, fontSize: ph ? 38 : 46, lineHeight: 0.9, letterSpacing: '-.05em' }}>{d.title}<br />{money(COMBOS[d.id].price)}</span>
+                  <span style={{ fontSize: ph ? 14 : 15, fontWeight: 600, lineHeight: 1.4 }}>{d.line[0]}<br />{d.line[1]}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <Hov
+                    as="button"
+                    tabIndex={on ? 0 : -1}
+                    onClick={() => onDeal(d.id)}
+                    aria-label={'Customize ' + d.title + ' combo, ' + money(COMBOS[d.id].price)}
+                    style={{ height: 44, padding: '0 20px', border: 0, borderRadius: 999, background: '#fff', color: '#D7192D', fontFamily: 'inherit', fontWeight: 900, fontSize: 15, display: 'flex', alignItems: 'center', flex: 'none', cursor: 'pointer', transition: 'transform .2s' }}
+                    hover={{ transform: 'scale(1.04)' }}
+                  >
+                    Customize
+                  </Hov>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      {/* Slide dots: under the price on the left, out of the way of the pizzas. */}
+      <div role="tablist" aria-label="Choose a combo" style={{ position: 'absolute', left: ph ? 22 : 30, top: ph ? 50 : 56, display: 'flex', gap: 6, zIndex: 2 }}>
+        {SLIDES.map((d, k) => (
+          <button
+            key={d.id}
+            role="tab"
+            aria-selected={k === i}
+            aria-label={d.title}
+            onClick={() => setI(k)}
+            style={{ width: k === i ? 22 : 8, height: 8, padding: 0, border: 0, borderRadius: 999, background: k === i ? '#fff' : 'rgba(255,255,255,.45)', cursor: 'pointer', transition: 'width .3s, background .3s' }}
+          />
+        ))}
+      </div>
+    </Hov>
+  );
+}
+
 export interface HomeHandlers {
   onStart: () => void;
   onMenu: (e?: MouseEvent) => void;
@@ -130,44 +221,8 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
             </div>
           </div>
 
-          {/* Pickup combo tile */}
-          <Hov style={{ gridArea: 'deal', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, background: '#D7192D', color: '#fff', overflow: 'hidden', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
-            <div style={{ position: 'absolute', right: ph ? -46 : -60, top: ph ? -40 : -90, width: ph ? 200 : 330, height: ph ? 200 : 330 }}>
-              <span aria-hidden="true" style={{ position: 'absolute', left: '8%', right: '8%', bottom: '-6%', height: '22%', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(40,0,6,.45),rgba(40,0,6,0))' }} />
-              <img src="assets/combo/pizza-meat.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 40s linear infinite', willChange: 'transform' }} />
-            </div>
-            <div style={{ position: 'absolute', right: ph ? 54 : 170, top: ph ? 104 : 110, width: ph ? 176 : 300, height: ph ? 176 : 300 }}>
-              <span aria-hidden="true" style={{ position: 'absolute', left: '8%', right: '8%', bottom: '-6%', height: '22%', borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(40,0,6,.45),rgba(40,0,6,0))' }} />
-              <img src="assets/combo/pizza-veg.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 50s linear reverse infinite', willChange: 'transform' }} />
-            </div>
-            <div aria-hidden="true" style={{ position: 'absolute', right: ph ? 8 : 18, bottom: ph ? 10 : 14, width: 236, height: 128, display: 'flex', pointerEvents: 'none', transform: ph ? (w < 380 ? 'scale(.5)' : 'scale(.64)') : undefined, transformOrigin: 'right bottom' }}>
-              <span style={{ position: 'absolute', left: 14, right: 8, bottom: -4, height: 20, borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(60,0,8,.5),rgba(60,0,8,0))' }} />
-              <img src="assets/combo/coke.png" alt="" style={{ position: 'absolute', left: 68, bottom: 10, height: 108, filter: PRODUCT_SHADOW }} />
-              <img src="assets/combo/coke.png" alt="" style={{ position: 'absolute', left: 118, bottom: 4, height: 112, filter: PRODUCT_SHADOW }} />
-              <img src="assets/combo/garlic-cup.webp" alt="" style={{ position: 'absolute', left: 0, bottom: 8, width: 92, filter: PRODUCT_SHADOW }} />
-              <img src="assets/combo/garlic-cup.webp" alt="" style={{ position: 'absolute', right: 0, bottom: 6, width: 92, filter: PRODUCT_SHADOW }} />
-            </div>
-            <div style={{ position: 'absolute', inset: 0, padding: ph ? '22px 22px' : '26px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: ph ? 'linear-gradient(90deg,rgba(215,25,45,.96) 0%,rgba(215,25,45,.82) 42%,rgba(215,25,45,0) 72%)' : 'linear-gradient(90deg,rgba(215,25,45,.92) 0%,rgba(215,25,45,.6) 34%,rgba(215,25,45,0) 52%)' }}>
-              <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase' }}>Pickup combo</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: ph ? 12 : 16, maxWidth: 300 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <span style={{ fontWeight: 900, fontSize: ph ? 38 : 46, lineHeight: 0.9, letterSpacing: '-.05em' }}>Two Large<br />{money(COMBOS['two-large'].price)}</span>
-                  <span style={{ fontSize: ph ? 14 : 15, fontWeight: 600, lineHeight: 1.4 }}>2 large pizzas, 4 toppings each,<br />2 dips and 2 pops</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <Hov
-                    as="button"
-                    onClick={h.onTwoLarge}
-                    aria-label={'Customize Two Large combo, ' + money(COMBOS['two-large'].price)}
-                    style={{ height: 44, padding: '0 20px', border: 0, borderRadius: 999, background: '#fff', color: '#D7192D', fontFamily: 'inherit', fontWeight: 900, fontSize: 15, display: 'flex', alignItems: 'center', flex: 'none', cursor: 'pointer', transition: 'transform .2s' }}
-                    hover={{ transform: 'scale(1.04)' }}
-                  >
-                    Customize
-                  </Hov>
-                </div>
-              </div>
-            </div>
-          </Hov>
+          {/* Pickup combo tile: slideshow of the combos (own component so its timer doesn't re-render the page) */}
+          <ComboSlides ph={ph} w={w} onDeal={h.onDeal} />
 
           {/* Build your own tile (own component so its 2.6s topping cycle doesn't re-render the page) */}
           <ByoTile ph={ph} onClick={h.onByo} />
@@ -362,7 +417,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
             </div>
           </div>
           <div style={{ position: 'relative', borderRadius: 32, overflow: 'hidden', minHeight: 380, background: '#2A1E1A', display: ph ? 'none' : undefined }}>
-            <Photo src={U('1555072956-7758afb20e8f', 1400)} alt="" credit="Photo by Pinar Kucuk on Unsplash" creditHref="https://unsplash.com/@pinarimsi" />
+            <Photo src="assets/visit-pizza.webp" alt="Wood-fired pizza in front of the oven" position="50% 30%" />
           </div>
         </div>
       </section>
