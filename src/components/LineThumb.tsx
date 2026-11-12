@@ -20,7 +20,7 @@ const JUICE: Record<string, Photo> = {
   orange: cut('assets/menu/juice-cup-orange.webp'),
   pineapple: cut('assets/menu/juice-cup-pineapple.webp'),
   mix: cut('assets/menu/juice-cup-clean.webp'),
-  guava: un('1497534446932-c925b458314e'),
+  guava: cover('assets/menu/guava-juice.webp'),
 };
 const DIP: Record<string, string> = { 'dip-garlic': 'garlic', 'dip-ranch': 'ranch', 'dip-chipotle': 'chipotle', 'dip-jalapeno': 'jalapeno-cheddar', 'dip-marinara': 'marinara' };
 const WINGS: Record<string, string> = { hot: '1608039755401-742074f0548d', honey: '1567620832903-9fc6debc209f', 'honey-garlic': '1567620832903-9fc6debc209f', garlic: '1567620832903-9fc6debc209f', bbq: '1527477396000-e27163b481c2' };
@@ -41,14 +41,14 @@ function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Ph
     sugarcane: cover('assets/menu/sugarcane.webp'),
     cone: un('1497034825429-c343d7c6a68f'),
     'gelato-cone': un('1497034825429-c343d7c6a68f'),
-    cup: un('1570197788417-0e82375c9371'),
-    corn: cover('assets/ingredients/corn.jpg'),
+    cup: cover('assets/menu/gelato-cup.webp'),
+    corn: cover('assets/menu/sweet-corn.webp'),
     leg: un('1617692855027-33b14f061079'),
     fish: cut('assets/ingredients/tandoori-chicken.png'),
     wedges: un('1623238913973-21e45cced554'),
     sub: un('1509722747041-616f39b57569'),
-    'nv-salad': un('1546069901-ba9599a7e63c'),
-    'v-salad': un('1512621776951-a57141f2eefd'),
+    'nv-salad': cover('assets/menu/chicken-salad.webp'),
+    'v-salad': cover('assets/menu/garden-salad.webp'),
     chaat: un('1490474418585-ba9bad8fd0ea'),
     espresso: un('1510591509098-f4fdc6d0ff04'),
     hot: un('1509042239860-f550ce710b93'),

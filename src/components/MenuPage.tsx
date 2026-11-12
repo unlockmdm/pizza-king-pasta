@@ -53,8 +53,8 @@ const ROW_PIC: Record<string, string> = {
   momos: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?fm=jpg&q=70&w=600&auto=format&fit=crop',
   chaat: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?fm=jpg&q=70&w=600&auto=format&fit=crop',
   sub: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  'nv-salad': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  'v-salad': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  'nv-salad': 'assets/menu/chicken-salad.webp',
+  'v-salad': 'assets/menu/garden-salad.webp',
   wedges: 'https://images.unsplash.com/photo-1623238913973-21e45cced554?fm=jpg&q=70&w=600&auto=format&fit=crop',
   leg: 'https://images.unsplash.com/photo-1617692855027-33b14f061079?fm=jpg&q=70&w=600&auto=format&fit=crop',
   'dip-garlic': 'assets/dips/menu-garlic.png',
@@ -71,10 +71,10 @@ const ROW_PIC: Record<string, string> = {
   'ch-pasta-alfredo': 'assets/menu/pasta-alfredo.png',
   'veg-pasta-tomato': 'assets/menu/pasta.jpg',
   'ch-pasta-tomato': 'assets/menu/pasta.jpg',
-  cone: 'assets/menu/gelato.jpg',
-  cup: 'assets/menu/gelato.jpg',
+  cone: 'https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  cup: 'assets/menu/gelato-cup.webp',
   lassi: 'assets/menu/juice.jpg',
-  corn: 'assets/ingredients/corn.jpg',
+  corn: 'assets/menu/sweet-corn.webp',
 };
 
 /** Per-section colours used by the photo-card grid (the prototype's unused list-row fields are omitted). */

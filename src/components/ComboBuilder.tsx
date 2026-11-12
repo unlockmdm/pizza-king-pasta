@@ -25,7 +25,7 @@ type SideId = string;
 /** Side visuals: [img, worth (the side's menu price), desc] by side id. */
 const SIDE_UI: Record<string, [string, string, string]> = {
   sugarcane: ['assets/menu/juice-mix.png', money(mustPrice({ k: 'menu', id: 'sugarcane', opt: 'Medium' }).unit), 'Served cold'],
-  corn: ['assets/ingredients/corn.jpg', money(mustPrice({ k: 'menu', id: 'corn', opt: '' }).unit), 'Sweet corn from the wood oven'],
+  corn: ['assets/menu/sweet-corn.webp', money(mustPrice({ k: 'menu', id: 'corn', opt: '' }).unit), 'Sweet corn from the wood oven'],
 };
 /** [id, name, img, worth, desc] */
 const SIDES: [SideId, string, string, string, string][] = COMBO_SIDES.map(([id, name]) => [id, name, ...SIDE_UI[id]]);

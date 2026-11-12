@@ -61,9 +61,9 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   wedges: { f: 'sides', veg: true, img: '1623238913973-21e45cced554' },
   'garlic-bread': { f: 'sides', veg: true, img: '' },
   sub: { f: 'sides', img: '1509722747041-616f39b57569' },
-  'nv-salad': { f: 'sides', img: '1546069901-ba9599a7e63c' },
-  'v-salad': { f: 'sides', veg: true, img: '1512621776951-a57141f2eefd' },
-  corn: { f: 'sides', veg: true, img: 'assets/ingredients/corn.jpg' },
+  'nv-salad': { f: 'sides', img: 'assets/menu/chicken-salad.webp' },
+  'v-salad': { f: 'sides', veg: true, img: 'assets/menu/garden-salad.webp' },
+  corn: { f: 'sides', veg: true, img: 'assets/menu/sweet-corn.webp' },
   chaat: { f: 'sides', veg: true, img: '1490474418585-ba9bad8fd0ea' },
   // drinks
   fresh: { f: 'juice', img: '1600271886742-f049cd451bba' },
@@ -78,7 +78,7 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   beer: { f: 'beer', img: '1600788886242-5c96aabe3757' },
   // gelato & shakes
   cone: { img: '1497034825429-c343d7c6a68f' },
-  cup: { img: '1570197788417-0e82375c9371' },
+  cup: { img: 'assets/menu/gelato-cup.webp' },
   shake: { img: '1505252585461-04db1eb84625' },
 };
 /** Option groups shown as wrapping chips instead of a segmented control ("item.group"; spice is always chips). */
@@ -88,12 +88,12 @@ const CHIP_GROUPS = new Set(['sugar', 'ice', 'salt', 'flav2']);
 /** Option photos ("item.option" → Unsplash id). */
 const OPT_IMG: Record<string, string> = {
   'wings.hot': '1608039755401-742074f0548d', 'wings.honey': '1567620832903-9fc6debc209f', 'wings.bbq': '1527477396000-e27163b481c2',
-  'fresh.orange': '1600271886742-f049cd451bba', 'fresh.pineapple': '1534353473418-4cfa6c56fd38', 'fresh.guava': '1497534446932-c925b458314e', 'fresh.mix': 'assets/menu/juice-mix-cup.webp',
+  'fresh.orange': '1600271886742-f049cd451bba', 'fresh.pineapple': '1534353473418-4cfa6c56fd38', 'fresh.guava': 'assets/menu/guava-juice.webp', 'fresh.mix': 'assets/menu/juice-mix-cup.webp',
   'lassi.strawberry': '1589733955941-5eeaf752f6dd',
   'shake.mango': 'assets/menu/mango-shake.webp', 'shake.strawberry': 'assets/menu/strawberry-shake.webp', 'shake.banana': 'assets/menu/banana-shake.webp',
   'shake.badam': 'assets/menu/badam-shake.webp', 'shake.papaya': 'assets/menu/papaya-shake.webp',
 };
-/** Fresh-juice pop-up: real cut-out cup photos on a soft tinted glow (Guava keeps its stock photo). */
+/** Fresh-juice pop-up: real cut-out cup photos on a soft tinted glow (Guava uses a regular photo). */
 const JUICE_CUPS: Record<string, { src: string; tint: string; alt: string }> = {
   mix: { src: 'assets/menu/juice-cup-clean.webp', tint: '#E2335A', alt: 'Mixed juice' },
   orange: { src: 'assets/menu/juice-cup-orange.webp', tint: '#F59A1F', alt: 'Orange juice' },
