@@ -34,7 +34,7 @@ const PIZZA_LIST: Omit<MeatPizza, 'tops'>[] = [
   { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', pic: 'assets/pizzas/shawarma-chicken.webp', by: '', h: '', chicken: true, tag: 'Spicy' },
   { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', pic: '1600628421055-4d30de868b8f', by: '', h: '', chicken: true, cured: true },
   { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', pic: '1692737580547-b45bb4a02356', by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
-  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', pic: 'assets/pizzas/canadian.webp', by: '', h: '', cured: true },
+  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', pic: 'assets/pizzas/canadian-photo.webp', by: '', h: '', cured: true },
   { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', pic: 'assets/pizzas/hawaiian.webp', by: '', h: '', creditText: 'Photo: Elsie Hui, Wikimedia Commons, CC BY 2.0', cured: true },
   { id: 'bismark', name: 'Bismark', desc: 'Sun-dried tomatoes, grilled chicken, sausage', pic: 'assets/pizzas/bismark.webp', by: '', h: '', chicken: true, cured: true },
   { id: 'four-seasons', name: 'Four Seasons', desc: 'Ham, mushrooms, artichokes, black olives', pic: '1559978137-8c560d91e9e1', by: '', h: '', cured: true },

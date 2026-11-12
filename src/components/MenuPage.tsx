@@ -35,7 +35,7 @@ const PIZZA_PHOTO: Record<string, string> = {
   greek: '1573821663912-6df460f9c684',
   hawaiian: 'assets/pizzas/hawaiian.webp',
   'meat-lover': '1628840042765-356cda07504e',
-  canadian: 'assets/pizzas/canadian.webp',
+  canadian: 'assets/pizzas/canadian-photo.webp',
   'tandoori-fish': 'assets/pizzas/tandoori-fish.webp',
   pepperoni: '1692737580547-b45bb4a02356',
 };
