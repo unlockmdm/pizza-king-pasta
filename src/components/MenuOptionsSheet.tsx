@@ -3,7 +3,7 @@
 // added from /menu reaches the kitchen exactly like one added from its own page.
 import { useState } from 'react';
 import type { CategoryId, NewLine } from '../lib/types';
-import { CAT_MENU, PASTA_EXTRAS, PASTA_REMOVE, SPICES, mustPrice, type LineSpec, type PastaBaseId, type PastaSauceId } from '../lib/pricing';
+import { CAT_MENU, PASTA_EXTRAS, PASTA_REMOVE, SPICES, mustPrice, visibleGroups, type LineSpec, type PastaBaseId, type PastaSauceId } from '../lib/pricing';
 import { money } from '../lib/format';
 import { Hov } from '../lib/ui';
 
@@ -17,8 +17,10 @@ const chip = (on: boolean) => ({ minHeight: 40, padding: '8px 14px', border: 0, 
 
 export default function MenuOptionsSheet({ target, onAdd, onClose }: { target: SheetTarget; onAdd: (line: NewLine, qty: number) => void; onClose: () => void }) {
   const item = target.kind === 'cat' ? CAT_MENU[target.cat].items.find((x) => x.id === target.id) : undefined;
-  const groups = item?.groups || [];
-  const [sel, setSel] = useState<Record<string, string>>(() => Object.fromEntries(groups.map((g) => [g.id, item?.def?.[g.id] || g.opts[0].id])));
+  const allGroups = item?.groups || [];
+  const [sel, setSel] = useState<Record<string, string>>(() => Object.fromEntries(allGroups.map((g) => [g.id, item?.def?.[g.id] || g.opts[0].id])));
+  // Groups hidden by the current choice (e.g. can size for water) are not shown or sent.
+  const groups = visibleGroups(allGroups, (id) => sel[id]);
   const [spice, setSpice] = useState(SPICES[0]);
   const [extras, setExtras] = useState<string[]>([]);
   const [remove, setRemove] = useState<string[]>([]);
@@ -28,7 +30,7 @@ export default function MenuOptionsSheet({ target, onAdd, onClose }: { target: S
   const removable = target.kind === 'pasta' ? PASTA_REMOVE.filter((x) => x[2].includes(target.base)) : [];
   const spec: LineSpec =
     target.kind === 'cat'
-      ? { k: 'cat', cat: target.cat, id: target.id, opts: sel }
+      ? { k: 'cat', cat: target.cat, id: target.id, opts: Object.fromEntries(groups.map((g) => [g.id, sel[g.id]])) }
       : { k: 'pasta', base: target.base, sauce: target.sauce, spice, ...(extras.length ? { extras } : {}), ...(remove.length ? { remove } : {}) };
   const q = mustPrice(spec);
   const title = target.kind === 'cat' ? item?.name || '' : target.name;

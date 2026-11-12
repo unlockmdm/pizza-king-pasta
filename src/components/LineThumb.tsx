@@ -27,7 +27,7 @@ const WINGS: Record<string, string> = { hot: '1608039755401-742074f0548d', honey
 /** Photo for a menu / category item id (both pages use the same ids for most things). */
 function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Photo | null {
   const flav = (opts.flav || '').toLowerCase();
-  if (id === 'pop') return popPhoto(opts.brand || brandIn(text) || 'coke');
+  if (id === 'pop') return opts.brand === 'water' || /\bwater\b/i.test(text) ? cover('assets/menu/water.webp') : popPhoto(opts.brand || brandIn(text) || 'coke');
   if (id === 'shake') { const f = flav || Object.keys(SHAKE).find((k) => text.toLowerCase().includes(k)) || 'mango'; return cover('assets/menu/' + (SHAKE[f] || 'mango') + '-shake.webp'); }
   if (id === 'fresh' || id === 'fruit-juice') { const f = flav || Object.keys(JUICE).find((k) => text.toLowerCase().includes(k)) || 'mix'; return JUICE[f] || JUICE.mix; }
   if (id === 'wings') return WINGS[flav] ? un(WINGS[flav]) : cut('assets/ingredients/tandoori-chicken.png');

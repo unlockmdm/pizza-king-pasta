@@ -237,8 +237,8 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
   const subtitle = [
     sp.pizzas + ' ' + SIZE_NAMES[sp.size].toLowerCase() + (sp.pizzas > 1 ? ' pizzas' : ' pizza'),
     tw(sp.tops) + (sp.pizzas > 1 ? ' each' : '') + ' (meat counts as 2)',
-    sp.dips ? sp.dips + ' dips' : '',
-    sp.pops ? sp.pops + ' pops' : '',
+    sp.dips ? sp.dips + (sp.dips > 1 ? ' dips' : ' dip') : '',
+    sp.pops ? sp.pops + (sp.pops > 1 ? ' pops' : ' pop') : '',
     'Pickup only',
   ]
     .filter(Boolean)
@@ -288,10 +288,10 @@ export default function ComboBuilder({ deal, sizePrices, onClose, onAdd }: Combo
   // ---------- Pizza Builder hand-off (field names match the prototype) ----------
   const editItem =
     edit != null
-      ? { id: 'byo', name: solo ? deal.name : 'Pizza ' + (edit + 1), desc: SIZE_NAMES[sp.size] + ' · ' + tw(sp.tops) + ' included', tops: [] as string[], included: sp.tops }
+      ? { id: 'byo', name: solo || sp.pizzas === 1 ? deal.name : 'Pizza ' + (edit + 1), desc: SIZE_NAMES[sp.size] + ' · ' + tw(sp.tops) + ' included', tops: [] as string[], included: sp.tops }
       : null;
   const editCombo: ComboContext | null =
-    edit != null ? { size: sp.size, btn: solo ? 'Add to order' : 'Save pizza ' + (edit + 1), init: pizzas[edit] ? pizzas[edit].cfg : null } : null;
+    edit != null ? { size: sp.size, btn: solo ? 'Add to order' : sp.pizzas === 1 ? 'Save pizza' : 'Save pizza ' + (edit + 1), init: pizzas[edit] ? pizzas[edit].cfg : null } : null;
   const closeEdit = () => (solo ? onClose() : setEdit(null));
   const saveEdit = (line: NewLine, _qty?: number, cfgArg?: ComboCfg) => {
     // The builder passes its config as the 3rd argument (prototype); fall back to line.meta.

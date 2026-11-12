@@ -146,7 +146,7 @@ const SCENE_ALT = ['One large pepperoni pizza', 'Two large pizzas with two dips 
 
 /** [key, name, price, description, combo-builder deal id] */
 const WALKINS: [string, string, number, string, string][] = ([
-  ['walkin-1l', '1 large pizza with 1 topping, wood-fired or conventional oven', 'one-large'],
+  ['walkin-1l', '1 large pizza with 1 topping and 1 dip, wood-fired or conventional oven', 'one-large'],
   ['walkin-2l', '2 large pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-large'],
   ['walkin-2m', '2 medium pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-medium'],
   ['walkin-2s', '2 small pizzas with 4 toppings each (meat counts as 2) and 2 dips', 'two-small'],
@@ -199,7 +199,7 @@ const CAT_TWIN: Record<string, [CategoryId, string]> = {
   wings: ['wings', 'wings'], leg: ['wings', 'leg'], fish: ['wings', 'fish'], wedges: ['wings', 'wedges'], 'garlic-bread': ['wings', 'garlic-bread'],
   sub: ['wings', 'sub'], 'nv-salad': ['wings', 'nv-salad'], 'v-salad': ['wings', 'v-salad'], corn: ['wings', 'corn'], chaat: ['wings', 'chaat'],
   'fruit-juice': ['juice', 'fresh'], sugarcane: ['juice', 'sugarcane'], lemonade: ['juice', 'lemonade'], coconut: ['juice', 'coconut'],
-  hot: ['juice', 'hot'], pop: ['juice', 'pop'], water: ['juice', 'water'], beer: ['juice', 'beer'],
+  hot: ['juice', 'hot'], pop: ['juice', 'pop'], beer: ['juice', 'beer'],
   cone: ['gelato', 'cone'], cup: ['gelato', 'cup'], shake: ['gelato', 'shake'],
 };
 /** Pasta rows → [base, sauce] for the pasta options (spice, extras, leave out). */

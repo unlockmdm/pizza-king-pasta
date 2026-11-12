@@ -239,6 +239,7 @@ export default function App() {
       summary: line.summary || '',
       price: money((line.unit || 0) * q),
       qty: q,
+      line: { ...line, qty: q } as CartLine,
     });
     addedT.current = window.setTimeout(() => setAdded(null), 3800);
     flyDot(q);

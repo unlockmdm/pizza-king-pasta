@@ -1,5 +1,7 @@
 import { useEffect, useRef, type CSSProperties } from 'react';
 import { IconCheck } from '../lib/ui';
+import type { CartLine } from '../lib/types';
+import LineThumb from '../components/LineThumb';
 
 export interface Added {
   n: number;
@@ -8,6 +10,8 @@ export interface Added {
   summary: string;
   price: string;
   qty: number;
+  /** The added line: drawn with the same thumbnail as the cart (real toppings, the chosen drink...). */
+  line?: CartLine;
 }
 
 /** "Added to your order" card (bottom right). Names wrap and are never truncated. */
@@ -27,7 +31,11 @@ export function AddedToast({ added, right, bottom }: { added: Added; right: stri
       style={{ position: 'fixed', right, bottom, zIndex: 60, width: 'min(380px,calc(100vw - 24px))', background: '#fff', color: '#1A1414', borderRadius: 24, boxShadow: '0 1px 2px rgba(26,20,20,.06),0 24px 56px -12px rgba(26,20,20,.3)', padding: '12px 18px 12px 12px', display: 'flex', alignItems: 'center', gap: 14 }}
     >
       <span style={{ position: 'relative', width: 72, height: 72, flex: 'none' }}>
-        {added.img ? (
+        {added.line?.spec ? (
+          <span role="img" aria-label={added.name} style={{ position: 'relative', width: 72, height: 72, borderRadius: 18, background: '#F2F2F5', display: 'block', overflow: 'hidden' }}>
+            <LineThumb line={added.line} />
+          </span>
+        ) : added.img ? (
           <span role="img" aria-label={added.name} style={{ width: 72, height: 72, borderRadius: 18, background: '#F2F2F5 url("' + added.img + '") center/cover no-repeat', display: 'block' }} />
         ) : (
           <span style={{ width: 72, height: 72, borderRadius: 18, background: '#F2F2F5', display: 'block' }} />

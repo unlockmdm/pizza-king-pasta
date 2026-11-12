@@ -6,7 +6,7 @@ import { Hov, Photo, IconArrow, IconBack, IconCheck, IconClose, IconMinus, IconP
 import { useLockBody, useWidth } from '../lib/hooks';
 import { ITEM_PHOTOS, U } from '../lib/catalog';
 import { money } from '../lib/format';
-import { CAT_MENU, mustPrice, type LineSpec } from '../lib/pricing';
+import { CAT_MENU, mustPrice, visibleGroups, type LineSpec } from '../lib/pricing';
 
 // ---------- Data (the prototype's `const` arrays are the spec) ----------
 
@@ -25,6 +25,7 @@ interface Group {
   /** Chips (wrap) instead of a segmented control. */
   chips?: boolean;
   opts: Opt[];
+  hideIf?: { group: string; opt: string };
 }
 interface Item {
   id: string;
@@ -72,7 +73,6 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   coconut: { f: 'juice', img: ITEM_PHOTOS['coconut'] || '' },
   hot: { f: 'hot', img: ITEM_PHOTOS['hot'] || '' },
   pop: { f: 'soft', img: ITEM_PHOTOS['pop'] || '' },
-  water: { f: 'soft', img: ITEM_PHOTOS['water'] || '' },
   beer: { f: 'beer', img: ITEM_PHOTOS['beer'] || '' },
   // gelato & shakes
   cone: { img: ITEM_PHOTOS['cone'] || '' },
@@ -86,7 +86,7 @@ const CHIP_GROUPS = new Set(['sugar', 'ice', 'salt', 'flav2']);
 /** Option photos ("item.option" → Unsplash id). */
 const OPT_IMG: Record<string, string> = {
   'wings.hot': '1608039755401-742074f0548d', 'wings.honey': '1567620832903-9fc6debc209f', 'wings.bbq': '1527477396000-e27163b481c2',
-  'fresh.orange': '1600271886742-f049cd451bba', 'fresh.pineapple': '1534353473418-4cfa6c56fd38', 'fresh.mix': 'assets/menu/juice-mix-cup.webp',
+  'fresh.orange': '1600271886742-f049cd451bba', 'fresh.pineapple': '1534353473418-4cfa6c56fd38', 'fresh.mix': 'assets/menu/juice-mix-cup.webp', 'pop.water': 'assets/menu/water.webp',
   'shake.mango': 'assets/menu/mango-shake.webp', 'shake.strawberry': 'assets/menu/strawberry-shake.webp', 'shake.banana': 'assets/menu/banana-shake.webp',
   'shake.badam': 'assets/menu/badam-shake.webp', 'shake.papaya': 'assets/menu/papaya-shake.webp',
 };
@@ -115,7 +115,7 @@ const CATS: Record<CategoryId, Category> = {
   },
   juice: {
     hero: { img: '1622597467836-f3285f2131b8', eyebrow: CAT_MENU.juice.label, t1: 'Fresh juice.', t2: 'Coffee and chai.', p: 'Fruit and sugarcane juice, lemonade, coffee, masala tea, pop, and beer by the bottle or can.' },
-    filters: [['all', 'All'], ['juice', 'Juice'], ['hot', 'Coffee & chai'], ['soft', 'Pop & water'], ['beer', 'Beer']],
+    filters: [['all', 'All'], ['juice', 'Juice'], ['hot', 'Coffee & chai'], ['soft', 'Cold drinks'], ['beer', 'Beer']],
     noun: 'drinks',
     items: withUi('juice'),
   },
@@ -235,17 +235,20 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
   const hero = { ...cat.hero, img: IMG(cat.hero.img, 2000) };
 
   const build = (it: Item) => {
-    const groups = it.groups || [];
+    const allGroups = it.groups || [];
     const mine = sel[it.id] || {};
-    const chosen = groups.map((g) => g.opts.find((x) => x.id === (mine[g.id] || (it.def && it.def[g.id]))) || g.opts[0]);
+    const pickIn = (g: Group) => g.opts.find((x) => x.id === (mine[g.id] || (it.def && it.def[g.id]))) || g.opts[0];
+    // Groups hidden by the current choice (e.g. can size when Water is picked) are left out entirely.
+    const groups = visibleGroups(allGroups, (id) => { const g = allGroups.find((x) => x.id === id); return g ? pickIn(g).id : undefined; });
+    const chosen = groups.map(pickIn);
     const priced = chosen.filter((c) => c.price != null).pop();
     const price = (priced ? priced.price : it.price) ?? 0;
     const pic = chosen.filter((c) => c.img).pop();
     const sub = chosen.filter((c) => !c.quiet).map((c) => c.long || c.label).join(' · ').replace(/ · and /g, ' and ');
     const justAdded = added === it.id;
-    const hasOpts = groups.length > 0;
+    const hasOpts = allGroups.length > 0;
     const minP = hasOpts
-      ? Math.min(...groups.flatMap((g) => g.opts.map((x) => x.price)).filter((p): p is number => p != null).concat(it.price != null ? [it.price] : []))
+      ? Math.min(...allGroups.flatMap((g) => g.opts.map((x) => x.price)).filter((p): p is number => p != null).concat(it.price != null ? [it.price] : []))
       : price;
     const rawImg = pic ? pic.img : it.img;
     const addLine = (q: number) => {

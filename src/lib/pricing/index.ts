@@ -3,7 +3,7 @@
 // Pure TypeScript (no React, DOM or import.meta.env) so the Cloudflare Worker can import it too.
 import type { CategoryId, SizeKey, SizePrices } from '../types';
 import {
-  CAT_MENU, CHEESES, COMBOS, COMBO_DIPS, COMBO_POPS, COMBO_SIDES, CRUSTS, CUTS, DONENESS, EXTRA_CHEESE, EXTRA_DIP, HALVES, HST_PERCENT,
+  CAT_MENU, visibleGroups, CHEESES, COMBOS, COMBO_DIPS, COMBO_POPS, COMBO_SIDES, CRUSTS, CUTS, DONENESS, EXTRA_CHEESE, EXTRA_DIP, HALVES, HST_PERCENT,
   MENU_SECTIONS, MOMOS, NOTES_MAX, OVENS, PASTA_BASES, PASTA_EXTRAS, PASTA_REMOVE, PASTA_SAUCES, PIZZAS, PIZZA_SAUCES, SEASONINGS, SIZE_KEYS, SIZE_NAMES,
   SPICES, TOPPINGS, TOP_PRICE, UPSELLS, includedFor, pricesFor, type CatItem,
 } from './data';
@@ -248,7 +248,7 @@ function price(spec: unknown): PricedLine {
       let summary: string;
       if (c.pizzas === 1 && !c.dips && !c.pops && !c.side) summary = comboPizzaBits(pizzas[0]);
       else {
-        const parts = pizzas.map((p, i) => 'Pizza ' + (i + 1) + ': ' + comboPizzaBits(p));
+        const parts = pizzas.map((p, i) => (c.pizzas > 1 ? 'Pizza ' + (i + 1) : 'Pizza') + ': ' + comboPizzaBits(p));
         const dl = COMBO_DIPS.filter(([id]) => dips[id]).map(([id, n]) => (dips[id] > 1 ? dips[id] + '× ' : '') + n);
         const pl = COMBO_POPS.filter((n) => pops[n]).map((n) => (pops[n] > 1 ? pops[n] + '× ' : '') + n);
         if (dl.length) parts.push('Dips: ' + dl.join(', '));
@@ -284,7 +284,7 @@ function price(spec: unknown): PricedLine {
       const sel = s.opts as Record<string, unknown>;
       if (Object.keys(sel).some((g) => !groups.some((x) => x.id === g))) bad('option group');
       // A group whose first choice is the quiet default (sugar, ice, black salt...) may be left out: carts saved before it existed still work.
-      const chosen = groups.map((g) => (sel[g.id] == null && g.opts[0].quiet ? g.opts[0] : g.opts.find((x) => x.id === sel[g.id]) || bad('option')));
+      const chosen = visibleGroups(groups, (id) => sel[id] as string | undefined).map((g) => (sel[g.id] == null && g.opts[0].quiet ? g.opts[0] : g.opts.find((x) => x.id === sel[g.id]) || bad('option')));
       const priced = chosen.filter((c) => c.price != null).pop();
       const unit = (priced ? priced.price : it.price) ?? 0;
       // Default "no change" choices (Regular sugar, No ice...) stay off the line and the kitchen ticket.

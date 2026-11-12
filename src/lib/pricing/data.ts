@@ -103,7 +103,7 @@ export const includedFor = (id: string): number =>
 
 export interface ComboDef { name: string; price: number; size: SizeKey; pizzas: number; tops: number; dips: number; pops: number; side: boolean }
 export const COMBOS: Record<string, ComboDef> = {
-  'one-large': { name: 'One Large', price: 11.99, size: 'L', pizzas: 1, tops: 1, dips: 0, pops: 0, side: false },
+  'one-large': { name: 'One Large', price: 11.99, size: 'L', pizzas: 1, tops: 1, dips: 1, pops: 0, side: false },
   'two-large': { name: 'Two Large', price: 36.0, size: 'L', pizzas: 2, tops: 4, dips: 2, pops: 2, side: true },
   'two-medium': { name: 'Two Medium', price: 32.0, size: 'M', pizzas: 2, tops: 4, dips: 2, pops: 2, side: true },
   'two-small': { name: 'Two Small', price: 25.99, size: 'S', pizzas: 2, tops: 4, dips: 2, pops: 0, side: false },
@@ -173,8 +173,7 @@ export const MENU_SECTIONS: MenuSection[] = [
     ['lemonade', 'Lemonade', '', SIZES3(LEMONADE)],
     ['coconut', 'Fresh coconut juice', '', [['', 8.01]]],
     ['hot', 'Hot drinks', 'Indian coffee, Italian espresso, cappuccino, hot chocolate, masala tea', [['', 3.1]]],
-    ['pop', 'Pop', 'Coke, Sprite, Canada Dry, Pepsi, Orange Crush', [['355 mL can', 1.99], ['2 L bottle', 5]]],
-    ['water', 'Water', '500 mL bottle', [['', 1.99]]],
+    ['pop', 'Cold drinks', 'Coke, Sprite, Canada Dry, Pepsi, Orange Crush or water', [['355 mL can', 1.99], ['2 L bottle', 5]]],
     ['beer', 'Beer', 'Canadian, Molson, Moosehead, Miller, Corona, Heineken, Stella', [['Bottle', 5.7], ['Can', 7.5]]],
   ] },
   // Dipping sauces always come last.
@@ -197,7 +196,16 @@ export const MENU_SECTIONS: MenuSection[] = [
 
 /** `quiet`: the default "no change" choice (Regular sugar, No ice...), left off the cart line and kitchen ticket. */
 export interface CatOpt { id: string; label: string; price?: number; long?: string; quiet?: boolean }
-export interface CatGroup { id: string; label?: string; opts: CatOpt[] }
+export interface CatGroup {
+  id: string;
+  label?: string;
+  opts: CatOpt[];
+  /** Hide this group (and leave it off the order) when another group has this choice, e.g. no can size for water. */
+  hideIf?: { group: string; opt: string };
+}
+/** Groups that apply to a selection (drops groups hidden by `hideIf`). */
+export const visibleGroups = <G extends CatGroup>(groups: G[], pickOf: (groupId: string) => string | undefined): G[] =>
+  groups.filter((g) => !g.hideIf || pickOf(g.hideIf.group) !== g.hideIf.opt);
 export interface CatItem {
   id: string;
   name: string;
@@ -274,13 +282,13 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
       { id: 'coconut', name: 'Fresh coconut juice', price: 8.01 },
       { id: 'hot', name: 'Hot drinks', price: 3.1, groups: [{ id: 'kind', label: 'Drink', opts: [o('coffee', 'Indian coffee'), o('espresso', 'Italian espresso'), o('cappuccino', 'Cappuccino'), o('choc', 'Hot chocolate'), o('masala', 'Masala tea')] }, SUGAR_GROUP] },
       {
-        id: 'pop', name: 'Pop', desc: '355 mL can or 2 L bottle',
+        // Pop and water in one item. Water has no can / 2 L choice.
+        id: 'pop', name: 'Cold drinks', desc: 'Pop or water',
         groups: [
-          { id: 'kind', label: 'Size', opts: [o('can', '355 mL can', { price: 1.99 }), o('2l', '2 L bottle', { price: 5 })] },
-          { id: 'brand', label: 'Brand', opts: ['Coke', 'Sprite', 'Canada Dry', 'Pepsi', 'Orange Crush'].map((b) => o(b.toLowerCase().replace(/\s+/g, '-'), b)) },
+          { id: 'brand', label: 'Drink', opts: [...['Coke', 'Sprite', 'Canada Dry', 'Pepsi', 'Orange Crush'].map((b) => o(b.toLowerCase().replace(/\s+/g, '-'), b)), o('water', 'Water', { price: 1.99, long: 'Water, 500 mL bottle' })] },
+          { id: 'kind', label: 'Size', hideIf: { group: 'brand', opt: 'water' }, opts: [o('can', '355 mL can', { price: 1.99 }), o('2l', '2 L bottle', { price: 5 })] },
         ],
       },
-      { id: 'water', name: 'Water', desc: '500 mL bottle', price: 1.99 },
       {
         id: 'beer', name: 'Beer', desc: 'Bottle or can',
         groups: [
