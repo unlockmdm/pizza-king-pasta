@@ -25,7 +25,7 @@ export const SPECIALS: Special[] = [
 export const DEALS: (Deal & { by: string; h: string })[] = [
   { id: 'one-large', name: COMBOS['one-large'].name, price: COMBOS['one-large'].price, desc: '1 large pizza with 1 topping and 1 dip, wood-fired or conventional oven', img: U('1593560708920-61dd98c46a4e'), by: 'Saundarya Srinivasan', h: 'saundiii' },
   { id: 'two-large', name: COMBOS['two-large'].name, price: COMBOS['two-large'].price, desc: '2 large pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', img: 'assets/combo/two-large.webp', by: '', h: '' },
-  { id: 'two-medium', name: COMBOS['two-medium'].name, price: COMBOS['two-medium'].price, desc: '2 medium pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', img: U('1682264788192-9abdec90c425'), by: 'Joanie Simon', h: 'joaniesimon' },
+  { id: 'two-medium', name: COMBOS['two-medium'].name, price: COMBOS['two-medium'].price, desc: '2 medium pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', img: 'assets/combo/two-medium.webp', by: '', h: '' },
   { id: 'two-small', name: COMBOS['two-small'].name, price: COMBOS['two-small'].price, desc: '2 small pizzas with 4 toppings each (meat counts as 2) and 2 dips', img: U('1600628421066-f6bda6a7b976'), by: 'Klara Kulikova', h: 'kkalerry' },
 ];
 
