@@ -155,14 +155,14 @@ export const MENU_SECTIONS: MenuSection[] = [
     ['chaat', 'Fruit chaat', 'With sweet potato', [['', 8.01]]],
   ] },
   { id: 'pasta', title: 'Pasta & momos', rows: [
-    ['pasta-rose', 'Rosé sauce pasta', 'Tomato, cream, parmesan, ginger, parsley', [['', 12.5]], true],
-    ['pasta-alfredo', 'Alfredo sauce pasta', 'Cream, parmesan, ginger, parsley', [['', 13]], true],
-    ['veg-pasta-rose', 'Veggie pasta, rosé', 'Green peppers, onions, broccoli, mushrooms', [['', 13.27]], true],
-    ['veg-pasta-tomato', 'Veggie pasta, tomato', 'Green peppers, onions, broccoli, mushrooms', [['', 12.5]], true],
-    ['veg-pasta-alfredo', 'Veggie pasta, Alfredo', 'Green peppers, onions, broccoli, mushrooms', [['', 13.72]], true],
-    ['ch-pasta-rose', 'Chicken pasta, rosé', 'Chicken, green peppers, onions', [['', 14.6]], true],
-    ['ch-pasta-tomato', 'Chicken pasta, tomato', 'Chicken, green peppers, onions', [['', 14]], true],
-    ['ch-pasta-alfredo', 'Chicken pasta, Alfredo', 'Chicken, green peppers, onions', [['', 15.04]], true],
+    ['ch-pasta-rose', 'Chicken pasta with rosé sauce', 'Chicken, green peppers, onions', [['', 14.6]], true],
+    ['veg-pasta-rose', 'Veggie pasta with rosé sauce', 'Green peppers, onions, broccoli, mushrooms', [['', 13.27]], true],
+    ['pasta-rose', 'Regular pasta with rosé sauce', 'Tomato, cream, parmesan, ginger, parsley', [['', 12.5]], true],
+    ['ch-pasta-alfredo', 'Chicken pasta with Alfredo sauce', 'Chicken, green peppers, onions', [['', 15.04]], true],
+    ['veg-pasta-alfredo', 'Veggie pasta with Alfredo sauce', 'Green peppers, onions, broccoli, mushrooms', [['', 13.72]], true],
+    ['pasta-alfredo', 'Regular pasta with Alfredo sauce', 'Cream, parmesan, ginger, parsley', [['', 13]], true],
+    ['ch-pasta-tomato', 'Chicken pasta with tomato sauce', 'Chicken, green peppers, onions', [['', 14]], true],
+    ['veg-pasta-tomato', 'Veggie pasta with tomato sauce', 'Green peppers, onions, broccoli, mushrooms', [['', 12.5]], true],
     ['momos', 'Momos', 'Veggie or non-veggie', [['Veggie', 9], ['Non-veggie', 11]]],
   ] },
   { id: 'gelato', title: 'Gelato & shakes', rows: [
@@ -326,9 +326,10 @@ export type PastaBaseId = 'classic' | 'veggie' | 'chicken';
 export const PASTA_SAUCES: [PastaSauceId, string][] = [['rose', 'Rosé'], ['alfredo', 'Alfredo'], ['tomato', 'Tomato']];
 /** Price per sauce. A missing sauce means the base isn't offered with it. */
 export const PASTA_BASES: { id: PastaBaseId; name: string; desc: string; p: Partial<Record<PastaSauceId, number>> }[] = [
-  { id: 'classic', name: 'Classic', desc: 'Ginger and parsley', p: { rose: 12.5, alfredo: 13 } },
-  { id: 'veggie', name: 'Veggie', desc: 'Green peppers, onions, broccoli, mushrooms', p: { rose: 13.27, tomato: 12.5, alfredo: 13.72 } },
   { id: 'chicken', name: 'Chicken', desc: 'Chicken, green peppers, onions', p: { rose: 14.6, tomato: 14, alfredo: 15.04 } },
+  { id: 'veggie', name: 'Veggie', desc: 'Green peppers, onions, broccoli, mushrooms', p: { rose: 13.27, tomato: 12.5, alfredo: 13.72 } },
+  // Square: "Regular Pasta With Rosé / Alfredo Sauce" (there is no regular pasta with tomato sauce).
+  { id: 'classic', name: 'Regular', desc: 'Ginger and parsley', p: { rose: 12.5, alfredo: 13 } },
 ];
 /** Square "Extra Pasta Topping(s)": [id, name, price]. */
 export const PASTA_EXTRAS: [string, string, number][] = [['chicken', 'Extra chicken', 1.5], ['sauce', 'Extra sauce', 1.5], ['green-pepper', 'Extra green pepper', 1], ['onion', 'Extra onion', 1], ['broccoli', 'Extra broccoli', 1], ['mushroom', 'Extra mushroom', 1]];

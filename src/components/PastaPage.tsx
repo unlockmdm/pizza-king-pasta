@@ -1,5 +1,5 @@
 // Port of design_handoff_pizza_king_website/prototype/PastaPage.dc.html
-// Pasta Bar (sauce → base → sticky summary) plus momos.
+// Pasta Bar (pastas grouped by sauce → sticky summary) plus momos.
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { PastaPageProps } from '../lib/types';
 import { Hov, Photo, IconBack, IconCheck, IconMinus, IconPlus } from '../lib/ui';
@@ -27,20 +27,13 @@ interface Base {
   id: BaseId;
   name: string;
   veg?: boolean;
-  /** Tile background behind the ingredient cut-outs. */
-  tint: string;
-  /** [ingredient file, x %, y %, width %, rotation deg] */
-  ings: readonly (readonly [file: string, x: number, y: number, w: number, r: number])[];
   desc: string;
   /** Price per sauce. A missing sauce means the base isn't offered with it. */
   p: Partial<Record<SauceId, number>>;
 }
-const BASE_UI: Record<BaseId, Pick<Base, 'veg' | 'tint' | 'ings'>> = {
-  classic: { tint: '#F6F0E4', ings: [['ginger', 34, 44, 46, -12], ['coriander', 68, 58, 44, 18]] },
-  veggie: { veg: true, tint: '#EAF3E6', ings: [['broccoli', 30, 36, 36, -10], ['mushrooms', 70, 34, 34, 14], ['green-peppers', 34, 70, 36, 8], ['red-onions', 70, 70, 34, -16]] },
-  chicken: { tint: '#F7ECE4', ings: [['tandoori-chicken', 46, 48, 52, -6], ['green-peppers', 78, 30, 30, 20], ['red-onions', 78, 72, 30, -12]] },
-};
-const BASES: readonly Base[] = PASTA_BASES.map((b) => ({ ...b, ...BASE_UI[b.id] }));
+const BASES: readonly Base[] = PASTA_BASES.map((b) => ({ ...b, veg: b.id === 'veggie' }));
+/** Square's wording: "Chicken pasta with rosé sauce", "Regular pasta with Alfredo sauce". */
+const pastaName = (base: string, sauce: SauceId) => base + ' pasta with ' + (sauce === 'alfredo' ? 'Alfredo' : sauce === 'rose' ? 'rosé' : 'tomato') + ' sauce';
 
 /** Bowl photo per `${base}-${sauce}`; falls back to the sauce photo. */
 const PHOTO: Partial<Record<`${BaseId}-${SauceId}`, string>> = {
@@ -58,9 +51,6 @@ const HERO_IMG_WIDE = 'assets/menu/pasta-rose.png';
 const MOMOS_IMG = itemPhoto('momos', 1000);
 
 // ---------- Static styles ----------
-
-const RING_ON = '0 0 0 3px #D7192D, 0 16px 32px rgba(215,25,45,.16)';
-const RING_OFF = '0 0 0 1px #E6E6EA';
 
 const S = {
   root: { fontFamily: "'Figtree',system-ui,sans-serif", color: '#1A1414', background: '#fff', paddingBottom: 96 },
@@ -84,23 +74,19 @@ const S = {
   body: { maxWidth: 1320, margin: '0 auto', padding: '40px clamp(16px,3vw,32px) 0', display: 'grid', gap: 40, alignItems: 'start' },
   steps: { display: 'flex', flexDirection: 'column', gap: 48, minWidth: 0 },
   step: { display: 'flex', flexDirection: 'column', gap: 18 },
-  stepHead: { display: 'flex', flexDirection: 'column', gap: 6 },
-  stepNum: { fontWeight: 900, fontSize: 14, letterSpacing: '.12em', color: '#D7192D' },
   h2: { margin: 0, fontWeight: 900, fontSize: 'clamp(28px,3vw,36px)', letterSpacing: '-.04em' },
-  choiceGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,200px),1fr))', gap: 14 },
-  choice: { display: 'flex', flexDirection: 'column', padding: 0, border: 0, borderRadius: 24, overflow: 'hidden', background: '#fff', fontFamily: 'inherit', color: '#1A1414', textAlign: 'left' },
-  liftHover: { transform: 'translateY(-3px)' },
-  choiceMedia: { position: 'relative', display: 'block', aspectRatio: '4/3', overflow: 'hidden' },
-  sauceImg: { display: 'block', flex: 'none', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'absolute', inset: 0, width: '100%', height: '100%', backgroundSize: 'cover', transition: 'transform .5s cubic-bezier(.2,.8,.2,1)' },
-  ing: { display: 'block', flex: 'none', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'absolute', aspectRatio: '1/1', backgroundSize: 'contain', filter: 'drop-shadow(0 10px 14px rgba(0,0,0,.18))', transition: 'transform .5s cubic-bezier(.2,.8,.2,1)' },
-  tick: { position: 'absolute', right: 12, top: 12, width: 28, height: 28, borderRadius: '50%', boxShadow: '0 0 0 2px #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'background .2s' },
-  vegBadge: { position: 'absolute', left: 12, top: 12, height: 28, padding: '0 10px 0 8px', borderRadius: 999, background: '#fff', color: '#12663A', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 12px rgba(0,0,0,.1)' },
-  vegDot: { width: 8, height: 8, borderRadius: '50%', background: '#1E9E4A' },
-  choiceText: { display: 'flex', flexDirection: 'column', gap: 4, padding: '16px 18px 18px' },
-  choiceName: { fontWeight: 900, fontSize: 21, letterSpacing: '-.03em' },
-  choiceDesc: { fontSize: 14, lineHeight: 1.4, color: '#646467' },
-  baseTitleRow: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 },
-  basePrice: { fontWeight: 900, fontSize: 17, whiteSpace: 'nowrap' },
+  groups: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,280px),1fr))', gap: 16, alignItems: 'start' },
+  group: { display: 'flex', flexDirection: 'column', borderRadius: 22, overflow: 'hidden', background: '#fff', transition: 'box-shadow .2s' },
+  groupHead: { display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px' },
+  groupPic: { flex: 'none', width: 52, height: 52, borderRadius: 14, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#EDEDF0' },
+  groupTitle: { fontWeight: 900, fontSize: 20, letterSpacing: '-.03em', lineHeight: 1.15 },
+  groupDesc: { fontSize: 13, color: '#646467' },
+  row: { display: 'flex', alignItems: 'center', gap: 12, width: '100%', minHeight: 64, padding: '12px 16px', border: 0, borderTop: '1px solid #EFEFF2', fontFamily: 'inherit', color: '#1A1414', textAlign: 'left', cursor: 'pointer', transition: 'background .15s' },
+  rowName: { fontWeight: 800, fontSize: 16, letterSpacing: '-.01em' },
+  rowVeg: { marginLeft: 8, fontSize: 12, fontWeight: 800, color: '#12663A' },
+  rowDesc: { fontSize: 13, lineHeight: 1.35, color: '#646467' },
+  rowPrice: { flex: 'none', fontWeight: 900, fontSize: 16, whiteSpace: 'nowrap' },
+  box: { flex: 'none', width: 24, height: 24, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'background .15s' },
 
   aside: { top: 96, display: 'flex', flexDirection: 'column', borderRadius: 28, overflow: 'hidden', background: '#1A1414', color: '#fff' },
   bowlMedia: { position: 'relative', background: '#2A2020', overflow: 'hidden' },
@@ -138,12 +124,6 @@ const S = {
   momoAdd: { height: 54, border: 0, borderRadius: 999, color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 22px', transition: 'background .2s' },
 } satisfies Record<string, CSSProperties>;
 
-const Tick = ({ on }: { on: boolean }) => (
-  <span style={{ ...S.tick, background: on ? '#D7192D' : 'rgba(0,0,0,.25)' }}>
-    <IconCheck size={13} stroke={3.6} />
-  </span>
-);
-
 // ---------- Component ----------
 
 export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
@@ -168,15 +148,6 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
   };
 
   const wide = w >= 980;
-  // Phones: sauce and pasta choices as a compact list (small photo, name, price, tick) instead of tall photo cards.
-  const ph = w < 600;
-  const gridS: CSSProperties = ph ? { display: 'flex', flexDirection: 'column', gap: 10 } : S.choiceGrid;
-  const choiceS: CSSProperties = ph ? { ...S.choice, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 10, borderRadius: 20 } : S.choice;
-  const mediaS: CSSProperties = ph ? { ...S.choiceMedia, width: 76, height: 76, aspectRatio: 'auto', flex: 'none', borderRadius: 14 } : S.choiceMedia;
-  const textS: CSSProperties = ph ? { ...S.choiceText, flex: 1, minWidth: 0, padding: 0, gap: 2 } : S.choiceText;
-  const nameS: CSSProperties = ph ? { ...S.choiceName, fontSize: 18 } : S.choiceName;
-  const descS: CSSProperties = ph ? { ...S.choiceDesc, fontSize: 13 } : S.choiceDesc;
-  const tickAt = (on: boolean) => (ph ? <span aria-hidden="true" style={{ flex: 'none', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', background: on ? '#D7192D' : '#fff', boxShadow: on ? 'none' : 'inset 0 0 0 2px #D9D9DE', marginRight: 4 }}>{on ? <IconCheck size={13} stroke={3.6} /> : null}</span> : null);
   const base = BASES.find((b) => b.id === baseId) || BASES[0];
   const sauce = SAUCES.find((x) => x[0] === sauceId) || SAUCES[0];
   // Removals only make sense for what's in this base (e.g. no "No chicken" on veggie pasta).
@@ -187,15 +158,10 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
   const toggle = (set: (f: (v: string[]) => string[]) => void, id: string) => set((v) => (v.includes(id) ? v.filter((x) => x !== id) : [...v, id]));
   const raw = PHOTO[`${baseId}-${sauceId}`] || sauce[3];
   const img = raw.indexOf('assets/') === 0 ? raw : U(raw, 900);
-  const rawTitle = (base.id === 'classic' ? '' : base.name + ' ') + 'pasta, ' + sauce[1].toLowerCase() + ' sauce';
-  const title = rawTitle.charAt(0).toUpperCase() + rawTitle.slice(1);
+  const title = pastaName(base.name, sauceId);
   const momoSel = MOMOS.find((m) => m[0] === momo) || MOMOS[0];
 
   const back = (e?: { preventDefault?: () => void }) => { e?.preventDefault?.(); onBack?.(); };
-  const pickSauce = (id: SauceId) => {
-    setSauce(id);
-    setBase((cur) => (BASES.find((b) => b.id === cur)?.p[id] != null ? cur : 'veggie'));
-  };
   const add = () => {
     const spec: LineSpec = { k: 'pasta', base: baseId, sauce: sauceId, spice, ...(extras.length ? { extras } : {}), ...(removeNow.length ? { remove: removeNow } : {}) };
     const q = mustPrice(spec);
@@ -232,7 +198,7 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
                 <br />
                 <span style={{ color: '#F2B53A' }}>cooked to order.</span>
               </h1>
-              <p style={S.heroP}>Choose rosé, Alfredo or tomato sauce, then classic, veggie or chicken. Finished with parmesan, ginger and parsley.</p>
+              <p style={S.heroP}>Chicken, veggie or regular, in rosé, Alfredo or tomato sauce. Finished with parmesan, ginger and parsley.</p>
             </div>
           </div>
           {wide ? (
@@ -247,88 +213,48 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
       <section style={{ ...S.body, gridTemplateColumns: wide ? 'minmax(0,1fr) 380px' : 'minmax(0,1fr)' }}>
         <div style={S.steps}>
           <div style={S.step}>
-            <div style={S.stepHead}>
-              <span style={S.stepNum}>01</span>
-              <h2 style={S.h2}>Choose your sauce</h2>
-            </div>
-            <div role="radiogroup" aria-label="Sauce" style={gridS}>
-              {SAUCES.map(([id, name, desc, pic]) => {
-                const on = sauceId === id;
+            <h2 style={S.h2}>Choose your pasta</h2>
+            {/* Grouped by sauce, three pastas each, one tap to pick (the shop's own layout). */}
+            <div style={S.groups}>
+              {SAUCES.map(([sid, sname, sdesc, pic]) => {
+                const inGroup = sauceId === sid;
                 return (
-                  <Hov
-                    as="button"
-                    key={id}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    onClick={() => pickSauce(id)}
-                    style={{ ...choiceS, boxShadow: on ? RING_ON : RING_OFF, cursor: 'pointer', transition: 'box-shadow .2s,transform .2s' }}
-                    hover={S.liftHover}
-                  >
-                    <span style={{ ...mediaS, background: '#EDEDF0' }}>
-                      {/* Local photos (assets/...) as-is; Unsplash ids through U(). */}
-                      <span aria-hidden="true" style={{ ...S.sauceImg, backgroundImage: `url('${pic.indexOf('assets/') === 0 ? pic : U(pic, 600)}')`, transform: `scale(${on && !ph ? 1.06 : 1})` }} />
-                      {ph ? null : <Tick on={on} />}
-                    </span>
-                    <span style={textS}>
-                      <span style={nameS}>{name}</span>
-                      <span style={descS}>{desc}</span>
-                    </span>
-                    {tickAt(on)}
-                  </Hov>
-                );
-              })}
-            </div>
-          </div>
-
-          <div style={S.step}>
-            <div style={S.stepHead}>
-              <span style={S.stepNum}>02</span>
-              <h2 style={S.h2}>Choose your pasta</h2>
-            </div>
-            <div role="radiogroup" aria-label="Pasta" style={gridS}>
-              {BASES.map((b) => {
-                const p = b.p[sauceId];
-                const ok = p != null;
-                const on = baseId === b.id;
-                const zoom = on ? 1.08 : 1;
-                return (
-                  <Hov
-                    as="button"
-                    key={b.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    aria-disabled={!ok}
-                    onClick={() => { if (ok) setBase(b.id); }}
-                    style={{ ...choiceS, boxShadow: on ? RING_ON : RING_OFF, opacity: ok ? 1 : 0.4, cursor: ok ? 'pointer' : 'default', transition: 'box-shadow .2s,transform .2s,opacity .2s' }}
-                    hover={ok ? S.liftHover : undefined}
-                  >
-                    <span style={{ ...mediaS, background: b.tint }}>
-                      {b.ings.map(([f, x, y, iw, r]) => (
-                        <span
-                          key={f}
-                          aria-hidden="true"
-                          style={{ ...S.ing, backgroundImage: `url('assets/ingredients/${f}.png')`, left: x + '%', top: y + '%', width: iw + '%', transform: `translate(-50%,-50%) rotate(${r}deg) scale(${zoom})` }}
-                        />
-                      ))}
-                      {ph ? null : <Tick on={on} />}
-                      {b.veg && !ph ? (
-                        <span style={S.vegBadge}>
-                          <span style={S.vegDot} />
-                          Veg
-                        </span>
-                      ) : null}
-                    </span>
-                    <span style={{ ...textS, flex: 1 }}>
-                      <span style={S.baseTitleRow}>
-                        <span style={nameS}>{b.name}{b.veg && ph ? <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 800, color: '#12663A', letterSpacing: 0 }}>Veg</span> : null}</span>
-                        <span style={S.basePrice}>{ok ? money(p) : ''}</span>
+                  <div key={sid} role="radiogroup" aria-label={sname + ' sauce pasta'} style={{ ...S.group, boxShadow: inGroup ? '0 0 0 2px #D7192D' : '0 0 0 1px #E6E6EA' }}>
+                    <div style={S.groupHead}>
+                      <span aria-hidden="true" style={{ ...S.groupPic, backgroundImage: `url('${pic.indexOf('assets/') === 0 ? pic : U(pic, 200)}')` }} />
+                      <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                        <span style={S.groupTitle}>{sname} sauce pasta</span>
+                        <span style={S.groupDesc}>{sdesc}</span>
                       </span>
-                      <span style={descS}>{ok ? b.desc : 'Rosé or Alfredo only'}</span>
-                    </span>
-                    {tickAt(on)}
-                  </Hov>
+                    </div>
+                    {BASES.filter((b) => b.p[sid] != null).map((b) => {
+                      const on = inGroup && baseId === b.id;
+                      const p = b.p[sid] as number;
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={on}
+                          aria-label={pastaName(b.name, sid) + ', ' + money(p)}
+                          onClick={() => { setSauce(sid); setBase(b.id); }}
+                          style={{ ...S.row, background: on ? '#FFF3F4' : '#fff' }}
+                        >
+                          <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <span style={S.rowName}>
+                              {b.name} pasta
+                              {b.veg ? <span style={S.rowVeg}>Veg</span> : null}
+                            </span>
+                            <span style={S.rowDesc}>{b.desc}</span>
+                          </span>
+                          <span style={S.rowPrice}>{money(p)}</span>
+                          <span aria-hidden="true" style={{ ...S.box, background: on ? '#D7192D' : '#fff', boxShadow: on ? 'none' : 'inset 0 0 0 2px #CFCFD5' }}>
+                            {on ? <IconCheck size={14} stroke={3.6} /> : null}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 );
               })}
             </div>
