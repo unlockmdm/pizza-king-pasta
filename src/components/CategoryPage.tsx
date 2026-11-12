@@ -331,7 +331,8 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
               <Hov as="article" key={it.id} onClick={b.openOrAdd} style={ph ? { ...S.card, borderRadius: 18 } : S.card} hover={S.cardHover}>
                 {/* Items without a real photo keep an empty image box on purpose (owner rule). */}
                 <div style={S.cardMedia}>
-                  <Photo src={b.img} alt={it.name} credit={b.credit} creditHref="https://unsplash.com" />
+                  {/* Cards show the item's own photo (same as the full menu); the pop-up switches with the chosen flavour. */}
+                  <Photo src={it.img ? IMG(it.img) : b.img} alt={it.name} credit={b.credit} creditHref="https://unsplash.com" />
                   <div style={ph ? { ...S.badges, left: 8, top: 8, transform: 'scale(.85)', transformOrigin: 'left top' } : S.badges}>
                     {it.tag ? <span style={S.tag}>{it.tag}</span> : null}
                     {it.veg ? (

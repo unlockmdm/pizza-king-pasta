@@ -80,7 +80,7 @@ export const ITEM_PHOTOS: Record<string, string> = {
   'v-salad': 'assets/menu/garden-salad.webp',
   corn: 'assets/menu/sweet-corn.webp',
   chaat: '1490474418585-ba9bad8fd0ea',
-  fresh: 'assets/menu/juice-mix-card.webp',
+  fresh: 'assets/menu/juice-two-cups.webp',
   sugarcane: 'assets/menu/sugarcane.webp',
   lemonade: 'assets/menu/lemonade.webp',
   coconut: 'assets/menu/coconut.webp',
