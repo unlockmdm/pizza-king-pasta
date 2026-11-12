@@ -99,8 +99,8 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
         <div style={{ display: 'grid', gridTemplateColumns: bentoCols, gridTemplateRows: bentoRows, gridTemplateAreas: bentoAreas, gap: ph ? 10 : 14, height: bentoH }}>
           {/* Hero tile */}
           <div style={{ gridArea: 'hero', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, overflow: 'hidden', color: '#fff', background: '#1A1414' }}>
-            <img src={U('1565299624946-b28f40a0ae38', 1800).replace('q=72', 'q=75')} alt="Wood-fired pizza at Pizza King & Pasta in Brampton" {...{ fetchpriority: "high" }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: 'pkZoom 18s ease-in-out infinite alternate' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(14,8,8,.9),rgba(14,8,8,.1) 62%)' }} />
+            <img src="assets/hero-oven.webp" alt="Pizza coming out of the wood-fired oven at Pizza King & Pasta in Brampton" {...{ fetchpriority: "high" }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 35%', animation: 'pkZoom 18s ease-in-out infinite alternate' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(14,8,8,.94) 0%,rgba(14,8,8,.72) 38%,rgba(14,8,8,.12) 72%)' }} />
             <div style={{ position: 'absolute', left: 'clamp(22px,3vw,40px)', right: 'clamp(22px,3vw,40px)', bottom: 'clamp(22px,3vw,40px)', display: 'flex', flexDirection: 'column', gap: 24 }}>
               <h1 style={{ margin: 0, fontWeight: 900, fontSize: bentoFont, lineHeight: 0.86, letterSpacing: '-.065em' }}>
                 <span style={{ display: 'block', marginBottom: ph ? 12 : 16, fontSize: ph ? 12 : 14, fontWeight: 800, lineHeight: 1.3, letterSpacing: ph ? '.08em' : '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.82)', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) both' }}>{w < 440 ? 'Desi & wood-fired pizza · Brampton' : 'Indian-style & wood-fired pizza · Brampton'}</span>
