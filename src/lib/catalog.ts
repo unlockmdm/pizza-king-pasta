@@ -84,7 +84,7 @@ export const ITEM_PHOTOS: Record<string, string> = {
   sugarcane: 'assets/menu/sugarcane-cup.webp',
   lemonade: 'assets/menu/lemonade-glass.webp',
   coconut: 'assets/menu/coconut.webp',
-  hot: 'assets/menu/hot-drinks.webp',
+  hot: 'assets/menu/hot-drinks-dark.webp',
   pop: 'assets/menu/cold-drinks.webp',
   beer: 'assets/menu/beer.webp',
   cone: '1497034825429-c343d7c6a68f',
