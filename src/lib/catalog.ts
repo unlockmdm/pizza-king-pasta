@@ -55,7 +55,7 @@ export const PIZZA_PHOTOS: Record<string, string> = {
   bismark: 'assets/pizzas/bismark.webp',
   'chicken-shawarma': 'assets/pizzas/shawarma.webp',
   'butter-chicken': 'assets/pizzas/butter-chicken.webp',
-  'shahi-paneer': 'assets/pizzas/shahi-paneer.png',
+  'shahi-paneer': 'assets/pizzas/shahi-paneer.webp',
   hawaiian: 'assets/pizzas/hawaiian.webp',
   'meat-lover': 'assets/pizzas/meat-lover.webp',
   canadian: 'assets/pizzas/canadian-photo.webp',
