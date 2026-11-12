@@ -211,7 +211,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
                 ) : t.full || t.fill ? (
                   <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, aspectRatio: '1/1' }}>
                     <img src={t.img} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: t.fill ? '50% 30%' : undefined }} />
-                    <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '22%', background: 'linear-gradient(180deg,' + t.bg + ',' + t.bg + '00)' }} />
+                    <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '34%', background: 'linear-gradient(180deg,' + t.bg + ' 0%,' + t.bg + 'B3 35%,' + t.bg + '00 100%)' }} />
                   </div>
                 ) : (
                   <div style={{ position: 'absolute', left: w < 400 ? '17%' : '9%', right: w < 400 ? '17%' : '9%', bottom: w < 400 ? '-10%' : '-13%', aspectRatio: '1/1', borderRadius: '50%', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,.28)' }}>
