@@ -202,9 +202,15 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
                   <span style={{ fontWeight: 900, fontSize: w < 400 ? 18 : 21, lineHeight: 1.05, letterSpacing: '-.025em' }}>{t.name}</span>
                   <span style={{ fontSize: w < 400 ? 13 : 14, fontWeight: 600, opacity: 0.8, lineHeight: 1.3 }}>{t.sub}</span>
                 </div>
-                {t.full ? (
+                {/* Portrait photos fill the tile on wide screens; on phones the text wraps, so they sit at the bottom like `full`. */}
+                {t.fill && w >= 720 ? (
+                  <div style={{ position: 'absolute', inset: 0 }}>
+                    <img src={t.img} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 100%' }} />
+                    <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '30%', background: 'linear-gradient(180deg,' + t.bg + 'CC,' + t.bg + '00)' }} />
+                  </div>
+                ) : t.full || t.fill ? (
                   <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, aspectRatio: '1/1' }}>
-                    <img src={t.img} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={t.img} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: t.fill ? '50% 30%' : undefined }} />
                     <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '22%', background: 'linear-gradient(180deg,' + t.bg + ',' + t.bg + '00)' }} />
                   </div>
                 ) : (

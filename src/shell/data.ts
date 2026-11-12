@@ -43,12 +43,14 @@ export interface Tile {
   target?: string;
   /** Photo fills the bottom of the tile edge to edge (its top blends into `bg`) instead of the round photo. */
   full?: boolean;
+  /** Portrait photo that fills the whole tile (title sits on the photo's plain top area). */
+  fill?: boolean;
 }
 
 export const TILES: Tile[] = [
   { id: 'byo', name: 'Build Your Own', sub: '4 Toppings · Meat Counts as 2', bg: '#EDEDF0', fg: '#1A1414', img: pizzaPhoto('byo'), by: 'Saundarya Srinivasan', h: 'saundiii' },
   { id: 'specials', name: 'House Specials', sub: 'Indian-Fusion and Classic', bg: '#D7192D', fg: '#fff', img: U('1565299624946-b28f40a0ae38'), by: 'Chad Montano', h: 'briewilly', target: 'bestsellers' },
-  { id: 'meat', name: 'Meat Favourites', sub: 'Pepperoni, Bacon, Sausage', bg: '#C2511F', fg: '#fff', img: U('1611915365928-565c527a0590'), by: 'Tamas Pap', h: 'tamasp' },
+  { id: 'meat', name: 'Meat Favourites', sub: 'Pepperoni, Bacon, Sausage', bg: '#520000', fg: '#fff', img: 'assets/menu/meat-tile.webp', fill: true },
   { id: 'combos', name: 'Pickup Combos', sub: 'From ' + money(Math.min(...Object.values(COMBOS).map((c) => c.price))), bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
   { id: 'pasta', name: 'Pasta & Momos', sub: 'Rosé, Alfredo, Tomato', bg: '#F2B53A', fg: '#1A1414', img: 'assets/menu/pasta-rose.png' },
   { id: 'wings', name: 'Wings & Sides', sub: 'Wings, Tandoori, Salads, Sides', bg: '#250703', fg: '#fff', img: 'assets/menu/wings-sides-tile.webp', full: true },
