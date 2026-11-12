@@ -305,8 +305,8 @@ function price(spec: unknown): PricedLine {
       const extras = pick(s.extras, PASTA_EXTRAS.map((x) => x[0]), 'pasta extras');
       const remove = pick(s.remove, PASTA_REMOVE.filter((x) => x[2].includes(base.id)).map((x) => x[0]), 'pasta remove');
       const extraCost = extras.reduce((a, id) => a + PASTA_EXTRAS.find((x) => x[0] === id)![2], 0);
-      // Square's wording, e.g. "Chicken pasta with rosé sauce", "Regular pasta with Alfredo sauce".
-      const raw = base.name + ' pasta with ' + (sauce[0] === 'alfredo' ? sauce[1] : lc(sauce[1])) + ' sauce';
+      // e.g. "Chicken Pasta with Rosé Sauce", "Regular Pasta with Alfredo Sauce" (owner wants Pasta and Sauce capitalized).
+      const raw = base.name + ' Pasta with ' + sauce[1] + ' Sauce';
       const changes = [...remove.map((id) => PASTA_REMOVE.find((x) => x[0] === id)![1]), ...extras.map((id) => PASTA_EXTRAS.find((x) => x[0] === id)![1])];
       const summary = [base.desc, s.spice as string, ...changes].join(' · ');
       return { unit: round2(unit + extraCost), name: raw.charAt(0).toUpperCase() + raw.slice(1), summary, note: summary };

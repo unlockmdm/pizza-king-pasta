@@ -20,7 +20,7 @@ const TSCALE: Record<string, number> = { pineapple: 0.62, tomatoes: 0.7, broccol
 /**
  * Topping cut-out sprites: [path under assets/toppings/ without .png, size as % of pizza width].
  * Tandoori paneer (`paneer`) uses the reddish-orange tpan-* pieces; Shahi paneer uses the yellow shahi-* pieces.
- * Toppings without an entry (feta, extra cheese) have no cut-out yet and don't render on the pizza.
+ * Toppings without an entry (extra cheese) have no cut-out yet and don't render on the pizza.
  */
 const SPR: Record<string, [string, number][]> = {"mushrooms":[["pz/mushroom-0",16.5],["pz/mushroom-1",13.8]],"green-peppers":[["pz/gp-0",20.1],["pz/gp-1",15.1],["pz/gp-2",9.1],["pz/gp-3",11.1]],"red-pepper":[["pz/rp-0",15.6],["pz/rp-1",8.6],["pz/rp-2",12.1]],"tomatoes":[["pz/tomato-0",18.5]],"green-olives":[["pz/gol-0",8]],"olives":[["pz/bol-0",9.6]],"hot-peppers":[["pz/hotp-0",17.1]],"pineapple":[["pz/pine-0",14.3]],"jalapenos":[["pz/jal-0",13.2]],"sun-dried":[["pz/sund-0",15.1]],"broccoli":[["pz/broc-0",18.5]],"corn":[["pz/corn-0",6],["pz/corn-1",6],["pz/corn-2",6],["pz/corn-3",6],["pz/corn-4",6],["pz/corn-5",6],["pz/corn-6",6],["pz/corn-7",6],["pz/corn-8",6]],"pepperoni":[["pz/mpep-0",19.6],["pz/mpep-1",19]],"veg-pepperoni":[["pz/mpep-0",19.6],["pz/mpep-1",19]],"hot-salami":[["pz/mpep-0",19.6],["pz/mpep-1",19]],"zucchini":[["pz/zuc-0",18.5]],"eggplant":[["pz/egg-0",17]],"red-onions":[["pz/onion-0",15],["pz/onion-1",10.2]],"paneer":[["pz/tpan-0",10.5],["pz/tpan-1",9.3],["pz/tpan-2",15.3]],"shahi-paneer":[["pz/shahi-0",12.3],["pz/shahi-1",12.3]],"soya-champ":[["pz/paneer-1",12.3],["pz/paneer-2",9.3]],"sausage":[["pz/isaus-0",16]],"shrimp":[["pz/shrimp-0",14.2]],"seafood-mix":[["pz/shrimp-0",14.2],["pz/anch-0",21.5]],"anchovies":[["pz/anch-0",21.5]],"bacon":[["pz/bacon-0",23]],"ham":[["pz/ham-0",23]],"tandoori-chicken":[["pz/tand-0",19],["pz/tand-1",16.5]],"butter-chicken":[["pz/butter-0",11.5],["pz/butter-1",13],["pz/butter-2",10]],"grilled-chicken":[["pz/grilled-0",25.5],["pz/grilled-1",17]],"shawarma-chicken":[["pz/shaw-0",17]],"chicken-kabab":[["pz/kabab-0",22]]};
 
@@ -51,10 +51,10 @@ const TOP_IMG: Record<string, string | null> = {
   'green-olives': 'olives.png', 'soya-champ': 'soya-champ.jpg', olives: 'olives.png', 'red-onions': 'red-onions.png',
   'hot-peppers': 'chilli.png', pineapple: 'pineapple.png', jalapenos: 'jalapenos.png', 'sun-dried': 'sun-dried.png',
   broccoli: 'broccoli.png', corn: 'corn.jpg', 'shahi-paneer': 'shahi-paneer-y.jpg', paneer: 'paneer.jpg',
-  'veg-pepperoni': 'pepperoni.jpg', 'extra-mozz': 'extra-mozz.png', feta: 'feta.jpg', zucchini: 'zucchini.png', eggplant: 'eggplant.png',
+  'extra-mozz': 'extra-mozz.png', zucchini: 'zucchini.png', eggplant: 'eggplant.png',
   pepperoni: 'pepperoni.jpg', anchovies: null, bacon: 'bacon.png', ham: 'ham.png', sausage: 'sausage.png',
   'grilled-chicken': 'shawarma-chicken.png', 'tandoori-chicken': 'tandoori-chicken.png', 'butter-chicken': 'butter-chicken.png',
-  'shawarma-chicken': 'shawarma-chicken.png', 'seafood-mix': 'shrimp.png', shrimp: 'shrimp.png', 'chicken-kabab': null, 'hot-salami': 'pepperoni.jpg',
+  'shawarma-chicken': 'shawarma-chicken.png', 'chicken-kabab': null, 'hot-salami': 'pepperoni.jpg',
 };
 const TOP_ROWS: [string, string, TopCat, string | null, number][] = TOPPING_ROWS.map(([id, name, cat, wt]) => [id, name, cat, TOP_IMG[id] ?? null, wt]);
 

@@ -28,7 +28,6 @@ export const PIZZA_PRICES: Record<string, SizePrices> = {
   pepperoni: { S: 12.0, M: 15.5, L: 17.3, XL: 23.8 },
   bismark: CLASSIC_XL_2250,
   'non-veg': CLASSIC_XL_2250,
-  'sea-food': CLASSIC_XL_2250,
 };
 export const pricesFor = (id: string): SizePrices => PIZZA_PRICES[id] || SIZE_PRICES;
 
@@ -51,10 +50,10 @@ export const TOPPING_ROWS: [string, string, TopCat, number][] = [
   ['green-olives', 'Green olives', 'Veggie', 1], ['soya-champ', 'Soya champ', 'Veggie', 1], ['olives', 'Black olives', 'Veggie', 1], ['red-onions', 'Onions', 'Veggie', 1],
   ['hot-peppers', 'Hot pepper', 'Veggie', 1], ['pineapple', 'Pineapple', 'Veggie', 1], ['jalapenos', 'Jalapeño pepper', 'Veggie', 1], ['sun-dried', 'Sun dried tomatoes', 'Veggie', 1],
   ['broccoli', 'Broccoli', 'Veggie', 1], ['corn', 'Sweet corn', 'Veggie', 1], ['shahi-paneer', 'Shahi paneer', 'Veggie', 2], ['paneer', 'Tandoori paneer', 'Veggie', 2],
-  ['veg-pepperoni', 'Veggie pepperoni', 'Veggie', 1], ['extra-mozz', 'Extra cheese', 'Veggie', 2], ['feta', 'Feta cheese', 'Veggie', 1], ['zucchini', 'Zucchini', 'Veggie', 1], ['eggplant', 'Eggplant', 'Veggie', 1],
+  ['extra-mozz', 'Extra cheese', 'Veggie', 2], ['zucchini', 'Zucchini', 'Veggie', 1], ['eggplant', 'Eggplant', 'Veggie', 1],
   ['pepperoni', 'Pepperoni', 'Meat', 2], ['anchovies', 'Anchovies', 'Meat', 2], ['bacon', 'Bacon', 'Meat', 2], ['ham', 'Ham', 'Meat', 2], ['sausage', 'Hot Italian sausage', 'Meat', 2],
   ['grilled-chicken', 'Grilled chicken', 'Meat', 2], ['tandoori-chicken', 'Tandoori chicken', 'Meat', 2], ['butter-chicken', 'Butter chicken', 'Meat', 2],
-  ['shawarma-chicken', 'Shawarma chicken', 'Meat', 2], ['seafood-mix', 'Sea food mix', 'Meat', 2], ['shrimp', 'Shrimp', 'Meat', 2], ['chicken-kabab', 'Chicken kabab', 'Meat', 2], ['hot-salami', 'Hot salami', 'Meat', 2],
+  ['shawarma-chicken', 'Shawarma chicken', 'Meat', 2], ['chicken-kabab', 'Chicken kabab', 'Meat', 2], ['hot-salami', 'Hot salami', 'Meat', 2],
 ];
 export interface ToppingInfo { id: string; name: string; cat: TopCat; wt: number }
 export const TOPPINGS: Record<string, ToppingInfo> = Object.fromEntries(TOPPING_ROWS.map(([id, name, cat, wt]) => [id, { id, name, cat, wt }]));
@@ -85,11 +84,9 @@ export const PIZZAS: Record<string, { name: string; tops: string[] }> = {
   'italian-veg': { name: 'Italian Vegetarian', tops: ['zucchini', 'red-pepper', 'eggplant', 'red-onions'] },
   'non-veg': { name: 'Non-Vegetarian', tops: ['grilled-chicken', 'sausage', 'hot-salami', 'ham'] },
   bismark: { name: 'Bismark', tops: ['sun-dried', 'grilled-chicken', 'sausage'] },
-  'sea-food': { name: 'Sea Food', tops: ['shrimp', 'seafood-mix'] },
   'chicken-shawarma': { name: 'Shawarma Chicken', tops: ['shawarma-chicken', 'hot-peppers', 'red-onions'] },
   'butter-chicken': { name: 'Butter Chicken', tops: ['tandoori-chicken', 'green-peppers', 'red-onions'] },
   'shahi-paneer': { name: 'Shahi Paneer', tops: ['paneer', 'green-peppers', 'red-onions', 'jalapenos'] },
-  greek: { name: 'Greek', tops: ['feta', 'olives', 'tomatoes'] },
   hawaiian: { name: 'Hawaiian', tops: ['pineapple', 'bacon', 'ham'] },
   'meat-lover': { name: 'Meat Lover', tops: ['pepperoni', 'ham', 'bacon', 'sausage'] },
   canadian: { name: 'Canadian', tops: ['pepperoni', 'mushrooms', 'bacon'] },
@@ -155,14 +152,14 @@ export const MENU_SECTIONS: MenuSection[] = [
     ['chaat', 'Fruit chaat', 'With sweet potato', [['', 8.01]]],
   ] },
   { id: 'pasta', title: 'Pasta & momos', rows: [
-    ['ch-pasta-rose', 'Chicken pasta with rosé sauce', 'Chicken, green peppers, onions', [['', 14.6]], true],
-    ['veg-pasta-rose', 'Veggie pasta with rosé sauce', 'Green peppers, onions, broccoli, mushrooms', [['', 13.27]], true],
-    ['pasta-rose', 'Regular pasta with rosé sauce', 'Tomato, cream, parmesan, ginger, parsley', [['', 12.5]], true],
-    ['ch-pasta-alfredo', 'Chicken pasta with Alfredo sauce', 'Chicken, green peppers, onions', [['', 15.04]], true],
-    ['veg-pasta-alfredo', 'Veggie pasta with Alfredo sauce', 'Green peppers, onions, broccoli, mushrooms', [['', 13.72]], true],
-    ['pasta-alfredo', 'Regular pasta with Alfredo sauce', 'Cream, parmesan, ginger, parsley', [['', 13]], true],
-    ['ch-pasta-tomato', 'Chicken pasta with tomato sauce', 'Chicken, green peppers, onions', [['', 14]], true],
-    ['veg-pasta-tomato', 'Veggie pasta with tomato sauce', 'Green peppers, onions, broccoli, mushrooms', [['', 12.5]], true],
+    ['ch-pasta-rose', 'Chicken Pasta with Rosé Sauce', 'Chicken, green peppers, onions', [['', 14.6]], true],
+    ['veg-pasta-rose', 'Veggie Pasta with Rosé Sauce', 'Green peppers, onions, broccoli, mushrooms', [['', 13.27]], true],
+    ['pasta-rose', 'Regular Pasta with Rosé Sauce', 'Tomato, cream, parmesan, ginger, parsley', [['', 12.5]], true],
+    ['ch-pasta-alfredo', 'Chicken Pasta with Alfredo Sauce', 'Chicken, green peppers, onions', [['', 15.04]], true],
+    ['veg-pasta-alfredo', 'Veggie Pasta with Alfredo Sauce', 'Green peppers, onions, broccoli, mushrooms', [['', 13.72]], true],
+    ['pasta-alfredo', 'Regular Pasta with Alfredo Sauce', 'Cream, parmesan, ginger, parsley', [['', 13]], true],
+    ['ch-pasta-tomato', 'Chicken Pasta with Tomato Sauce', 'Chicken, green peppers, onions', [['', 14]], true],
+    ['veg-pasta-tomato', 'Veggie Pasta with Tomato Sauce', 'Green peppers, onions, broccoli, mushrooms', [['', 12.5]], true],
     ['momos', 'Momos', 'Veggie or non-veggie', [['Veggie', 9], ['Non-veggie', 11]]],
   ] },
   { id: 'gelato', title: 'Gelato & shakes', rows: [
@@ -171,7 +168,7 @@ export const MENU_SECTIONS: MenuSection[] = [
     ['shake', 'Shake', 'Mango, strawberry, banana, badam, papaya', SIZES3(SHAKE)],
   ] },
   { id: 'drinks', title: 'Drinks', rows: [
-    ['fruit-juice', 'Fresh fruit juice', 'Mix, orange, pineapple, guava', SIZES3(JUICE)],
+    ['fruit-juice', 'Fresh fruit juice', 'Mix, orange or pineapple', SIZES3(JUICE)],
     ['sugarcane', 'Sugarcane juice', '', SIZES3(JUICE)],
     ['lemonade', 'Lemonade', '', SIZES3(LEMONADE)],
     ['coconut', 'Fresh coconut juice', '', [['', 8.01]]],
@@ -264,9 +261,9 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
     label: 'Drinks',
     items: [
       {
-        id: 'fresh', name: 'Fresh fruit juice', desc: 'Orange, pineapple, guava or mix', def: { size: 'L' },
+        id: 'fresh', name: 'Fresh fruit juice', desc: 'Mix, orange or pineapple', def: { size: 'L' },
         groups: [
-          { id: 'flav', label: 'Flavour', opts: [o('orange', 'Orange'), o('pineapple', 'Pineapple'), o('guava', 'Guava'), o('mix', 'Mix')] },
+          { id: 'flav', label: 'Flavour', opts: [o('mix', 'Mix'), o('orange', 'Orange'), o('pineapple', 'Pineapple')] },
           { id: 'size', label: 'Size', opts: CSIZES3(JUICE) },
           BLACK_SALT_GROUP,
           ADD_ICE_GROUP,
@@ -341,6 +338,6 @@ export const MOMOS: [MomoId, string, number][] = [['veg', 'Veggie', 9], ['nonveg
 export interface UpsellDef { key: string; name: string; unit: number; summary: string; flavours: string[] }
 // Upsells ask for a flavour before adding, so the kitchen always knows what to make.
 export const UPSELLS: UpsellDef[] = [
-  { key: 'fruit-juice', name: 'Fresh fruit juice', unit: JUICE[0], summary: 'Medium', flavours: ['Orange', 'Pineapple', 'Guava', 'Mix'] },
+  { key: 'fruit-juice', name: 'Fresh fruit juice', unit: JUICE[0], summary: 'Medium', flavours: ['Mix', 'Orange', 'Pineapple'] },
   { key: 'gelato-cone', name: 'Gelato cone', unit: GELATO_SCOOP, summary: '', flavours: GELATO_FLAVOURS },
 ];

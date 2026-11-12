@@ -20,7 +20,6 @@ const JUICE: Record<string, Photo> = {
   orange: cut('assets/menu/juice-cup-orange.webp'),
   pineapple: cut('assets/menu/juice-cup-pineapple.webp'),
   mix: cut('assets/menu/juice-cup-clean.webp'),
-  guava: cover('assets/menu/guava-juice.webp'),
 };
 const DIP: Record<string, string> = { 'dip-garlic': 'garlic', 'dip-ranch': 'ranch', 'dip-chipotle': 'chipotle', 'dip-jalapeno': 'jalapeno-cheddar', 'dip-marinara': 'marinara' };
 const WINGS: Record<string, string> = { hot: '1608039755401-742074f0548d', honey: '1567620832903-9fc6debc209f', 'honey-garlic': '1567620832903-9fc6debc209f', garlic: '1567620832903-9fc6debc209f', bbq: '1527477396000-e27163b481c2' };

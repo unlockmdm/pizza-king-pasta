@@ -86,11 +86,11 @@ const CHIP_GROUPS = new Set(['sugar', 'ice', 'salt', 'flav2']);
 /** Option photos ("item.option" → Unsplash id). */
 const OPT_IMG: Record<string, string> = {
   'wings.hot': '1608039755401-742074f0548d', 'wings.honey': '1567620832903-9fc6debc209f', 'wings.bbq': '1527477396000-e27163b481c2',
-  'fresh.orange': '1600271886742-f049cd451bba', 'fresh.pineapple': '1534353473418-4cfa6c56fd38', 'fresh.guava': 'assets/menu/guava-juice.webp', 'fresh.mix': 'assets/menu/juice-mix-cup.webp',
+  'fresh.orange': '1600271886742-f049cd451bba', 'fresh.pineapple': '1534353473418-4cfa6c56fd38', 'fresh.mix': 'assets/menu/juice-mix-cup.webp',
   'shake.mango': 'assets/menu/mango-shake.webp', 'shake.strawberry': 'assets/menu/strawberry-shake.webp', 'shake.banana': 'assets/menu/banana-shake.webp',
   'shake.badam': 'assets/menu/badam-shake.webp', 'shake.papaya': 'assets/menu/papaya-shake.webp',
 };
-/** Fresh-juice pop-up: real cut-out cup photos on a soft tinted glow (Guava uses a regular photo). */
+/** Fresh-juice pop-up: real cut-out cup photos on a soft tinted glow . */
 const JUICE_CUPS: Record<string, { src: string; tint: string; alt: string }> = {
   mix: { src: 'assets/menu/juice-cup-clean.webp', tint: '#E2335A', alt: 'Mixed juice' },
   orange: { src: 'assets/menu/juice-cup-orange.webp', tint: '#F59A1F', alt: 'Orange juice' },

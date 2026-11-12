@@ -1,12 +1,13 @@
 // Port of design_handoff_pizza_king_website/prototype/PastaPage.dc.html
-// Pasta Bar (pastas grouped by sauce → sticky summary) plus momos.
+// Pasta Bar: one card per sauce, each opening PastaSheet (pasta, spice, extras), plus momos.
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { PastaPageProps } from '../lib/types';
-import { Hov, Photo, IconBack, IconCheck, IconMinus, IconPlus } from '../lib/ui';
+import { Hov, Photo, IconBack } from '../lib/ui';
 import { useWidth } from '../lib/hooks';
 import { U, itemPhoto } from '../lib/catalog';
 import { money } from '../lib/format';
-import { MOMOS as MOMO_DATA, PASTA_BASES, PASTA_EXTRAS, PASTA_REMOVE, PASTA_SAUCES, SPICES as SPICE_LIST, mustPrice, type LineSpec } from '../lib/pricing';
+import { MOMOS as MOMO_DATA, PASTA_BASES, PASTA_SAUCES, mustPrice, type LineSpec } from '../lib/pricing';
+import PastaSheet from './PastaSheet';
 
 // ---------- Data (the prototype's `const` arrays are the spec) ----------
 
@@ -32,17 +33,8 @@ interface Base {
   p: Partial<Record<SauceId, number>>;
 }
 const BASES: readonly Base[] = PASTA_BASES.map((b) => ({ ...b, veg: b.id === 'veggie' }));
-/** Square's wording: "Chicken pasta with rosé sauce", "Regular pasta with Alfredo sauce". */
-const pastaName = (base: string, sauce: SauceId) => base + ' pasta with ' + (sauce === 'alfredo' ? 'Alfredo' : sauce === 'rose' ? 'rosé' : 'tomato') + ' sauce';
-
-/** Bowl photo per `${base}-${sauce}`; falls back to the sauce photo. */
-const PHOTO: Partial<Record<`${BaseId}-${SauceId}`, string>> = {
-  'chicken-tomato': '1611270629569-8b357cb88da9',
-};
 
 type MomoId = 'veg' | 'nonveg';
-/** Spice level, same options as the shop's Square "Pasta Spice Level" list. */
-const SPICES = SPICE_LIST;
 
 const MOMOS: readonly (readonly [id: MomoId, name: string, price: number])[] = MOMO_DATA;
 
@@ -71,41 +63,18 @@ const S = {
   heroMediaWide: { position: 'relative', minHeight: '100%' },
   heroShadeWide: { position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(90deg,#1A1210 0%,rgba(26,18,16,0) 40%)' },
 
-  body: { maxWidth: 1320, margin: '0 auto', padding: '40px clamp(16px,3vw,32px) 0', display: 'grid', gap: 40, alignItems: 'start' },
-  steps: { display: 'flex', flexDirection: 'column', gap: 48, minWidth: 0 },
-  step: { display: 'flex', flexDirection: 'column', gap: 18 },
+  body: { maxWidth: 1320, margin: '0 auto', padding: '40px clamp(16px,3vw,32px) 0', display: 'flex', flexDirection: 'column', gap: 18 },
   h2: { margin: 0, fontWeight: 900, fontSize: 'clamp(28px,3vw,36px)', letterSpacing: '-.04em' },
-  groups: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,280px),1fr))', gap: 16, alignItems: 'start' },
-  group: { display: 'flex', flexDirection: 'column', borderRadius: 22, overflow: 'hidden', background: '#fff', transition: 'box-shadow .2s' },
-  groupHead: { display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px' },
-  groupPic: { flex: 'none', width: 52, height: 52, borderRadius: 14, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#EDEDF0' },
-  groupTitle: { fontWeight: 900, fontSize: 20, letterSpacing: '-.03em', lineHeight: 1.15 },
-  groupDesc: { fontSize: 13, color: '#646467' },
-  row: { display: 'flex', alignItems: 'center', gap: 12, width: '100%', minHeight: 64, padding: '12px 16px', border: 0, borderTop: '1px solid #EFEFF2', fontFamily: 'inherit', color: '#1A1414', textAlign: 'left', cursor: 'pointer', transition: 'background .15s' },
-  rowName: { fontWeight: 800, fontSize: 16, letterSpacing: '-.01em' },
-  rowVeg: { marginLeft: 8, fontSize: 12, fontWeight: 800, color: '#12663A' },
-  rowDesc: { fontSize: 13, lineHeight: 1.35, color: '#646467' },
-  rowPrice: { flex: 'none', fontWeight: 900, fontSize: 16, whiteSpace: 'nowrap' },
-  box: { flex: 'none', width: 24, height: 24, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'background .15s' },
-
-  aside: { top: 96, display: 'flex', flexDirection: 'column', borderRadius: 28, overflow: 'hidden', background: '#1A1414', color: '#fff' },
-  bowlMedia: { position: 'relative', background: '#2A2020', overflow: 'hidden' },
-  bowlImg: { display: 'block', flex: 'none', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'absolute', inset: 0, width: '100%', height: '100%', backgroundSize: 'cover' },
-  bowlShade: { position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(26,20,20,1) 0%,rgba(26,20,20,0) 55%)' },
-  bowlPill: {
-    position: 'absolute', left: 20, top: 18, height: 30, padding: '0 12px', borderRadius: 999, background: 'rgba(255,255,255,.16)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-    fontSize: 12, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center',
-  },
-  bowlBody: { display: 'flex', flexDirection: 'column', gap: 18, padding: '0 22px 22px', marginTop: -28, position: 'relative' },
-  bowlHead: { display: 'flex', flexDirection: 'column', gap: 6 },
-  bowlTitle: { fontWeight: 900, fontSize: 26, letterSpacing: '-.035em', lineHeight: 1.1 },
-  bowlDesc: { fontSize: 14, lineHeight: 1.5, color: '#CFC6C0' },
-  bowlActions: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 },
-  stepper: { flex: 'none', display: 'flex', alignItems: 'center', gap: 2, height: 52, padding: '0 4px', borderRadius: 999, background: 'rgba(255,255,255,.1)' },
-  stepBtn: { width: 44, height: 44, border: 0, borderRadius: '50%', background: 'transparent', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  stepBtnHover: { background: 'rgba(255,255,255,.12)' },
-  qty: { minWidth: 20, textAlign: 'center', fontWeight: 900, fontSize: 17 },
-  addBtn: { flex: '1 1 190px', minWidth: 0, height: 52, whiteSpace: 'nowrap', border: 0, borderRadius: 999, color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 20px', transition: 'background .2s' },
+  cards: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,280px),1fr))', gap: 16 },
+  card: { display: 'flex', flexDirection: 'column', padding: 0, border: 0, borderRadius: 24, overflow: 'hidden', background: '#fff', boxShadow: '0 0 0 1px #E6E6EA', fontFamily: 'inherit', color: '#1A1414', textAlign: 'left', cursor: 'pointer', transition: 'transform .2s,box-shadow .2s' },
+  cardHover: { transform: 'translateY(-3px)', boxShadow: '0 0 0 1px #E6E6EA, 0 16px 32px rgba(26,20,20,.10)' },
+  cardImg: { display: 'block', aspectRatio: '16/10', backgroundColor: '#EDEDF0', backgroundSize: 'cover', backgroundPosition: 'center' },
+  cardBody: { display: 'flex', flexDirection: 'column', gap: 6, padding: '16px 18px 18px' },
+  cardTitle: { fontWeight: 900, fontSize: 22, letterSpacing: '-.03em', lineHeight: 1.15 },
+  cardDesc: { fontSize: 14, lineHeight: 1.4, color: '#646467' },
+  cardFoot: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 8 },
+  cardPrice: { fontWeight: 900, fontSize: 17 },
+  cardCta: { height: 40, padding: '0 18px', borderRadius: 999, background: '#D7192D', color: '#fff', fontWeight: 800, fontSize: 15, display: 'flex', alignItems: 'center' },
   redHover: { background: '#B5121F' },
 
   momoSection: { maxWidth: 1320, margin: '0 auto', padding: '48px clamp(16px,3vw,32px) 0' },
@@ -129,13 +98,7 @@ const S = {
 export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
   const w = useWidth();
   const [momo, setMomo] = useState<MomoId>('veg');
-  const [sauceId, setSauce] = useState<SauceId>('rose');
-  const [baseId, setBase] = useState<BaseId>('classic');
-  const [qty, setQty] = useState(1);
-  const [spice, setSpice] = useState(SPICES[0]);
-  const [extras, setExtras] = useState<string[]>([]);
-  const [remove, setRemove] = useState<string[]>([]);
-  const [added, setAdded] = useState(false);
+  const [open, setOpen] = useState<SauceId | null>(null);
   const [addedM, setAddedM] = useState<MomoId | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -144,30 +107,13 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
   const flash = (apply: () => void) => {
     clearTimeout(timer.current);
     apply();
-    timer.current = setTimeout(() => { setAdded(false); setAddedM(null); }, 1400);
+    timer.current = setTimeout(() => setAddedM(null), 1400);
   };
 
   const wide = w >= 980;
-  const base = BASES.find((b) => b.id === baseId) || BASES[0];
-  const sauce = SAUCES.find((x) => x[0] === sauceId) || SAUCES[0];
-  // Removals only make sense for what's in this base (e.g. no "No chicken" on veggie pasta).
-  const removable = PASTA_REMOVE.filter((x) => x[2].includes(baseId));
-  const removeNow = remove.filter((id) => removable.some((x) => x[0] === id));
-  const extraCost = extras.reduce((a, id) => a + (PASTA_EXTRAS.find((x) => x[0] === id)?.[2] || 0), 0);
-  const price = (base.p[sauceId] ?? 0) + extraCost;
-  const toggle = (set: (f: (v: string[]) => string[]) => void, id: string) => set((v) => (v.includes(id) ? v.filter((x) => x !== id) : [...v, id]));
-  const raw = PHOTO[`${baseId}-${sauceId}`] || sauce[3];
-  const img = raw.indexOf('assets/') === 0 ? raw : U(raw, 900);
-  const title = pastaName(base.name, sauceId);
   const momoSel = MOMOS.find((m) => m[0] === momo) || MOMOS[0];
 
   const back = (e?: { preventDefault?: () => void }) => { e?.preventDefault?.(); onBack?.(); };
-  const add = () => {
-    const spec: LineSpec = { k: 'pasta', base: baseId, sauce: sauceId, spice, ...(extras.length ? { extras } : {}), ...(removeNow.length ? { remove: removeNow } : {}) };
-    const q = mustPrice(spec);
-    onAdd?.({ key: ['pasta', baseId, sauceId, spice, ...[...extras].sort(), ...removeNow.map((r) => 'no-' + r)].join('-'), name: q.name, summary: q.summary, unit: q.unit, spec }, qty);
-    flash(() => { setAdded(true); setQty(1); setExtras([]); setRemove([]); });
-  };
   const addMomo = () => {
     const m = momoSel;
     const spec: LineSpec = { k: 'momo', id: m[0] };
@@ -210,138 +156,38 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
         </div>
       </section>
 
-      <section style={{ ...S.body, gridTemplateColumns: wide ? 'minmax(0,1fr) 380px' : 'minmax(0,1fr)' }}>
-        <div style={S.steps}>
-          <div style={S.step}>
-            <h2 style={S.h2}>Choose your pasta</h2>
-            {/* Grouped by sauce, three pastas each, one tap to pick (the shop's own layout). */}
-            <div style={S.groups}>
-              {SAUCES.map(([sid, sname, sdesc, pic]) => {
-                const inGroup = sauceId === sid;
-                return (
-                  <div key={sid} role="radiogroup" aria-label={sname + ' sauce pasta'} style={{ ...S.group, boxShadow: inGroup ? '0 0 0 2px #D7192D' : '0 0 0 1px #E6E6EA' }}>
-                    <div style={S.groupHead}>
-                      <span aria-hidden="true" style={{ ...S.groupPic, backgroundImage: `url('${pic.indexOf('assets/') === 0 ? pic : U(pic, 200)}')` }} />
-                      <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-                        <span style={S.groupTitle}>{sname} sauce pasta</span>
-                        <span style={S.groupDesc}>{sdesc}</span>
-                      </span>
-                    </div>
-                    {BASES.filter((b) => b.p[sid] != null).map((b) => {
-                      const on = inGroup && baseId === b.id;
-                      const p = b.p[sid] as number;
-                      return (
-                        <button
-                          key={b.id}
-                          type="button"
-                          role="radio"
-                          aria-checked={on}
-                          aria-label={pastaName(b.name, sid) + ', ' + money(p)}
-                          onClick={() => { setSauce(sid); setBase(b.id); }}
-                          style={{ ...S.row, background: on ? '#FFF3F4' : '#fff' }}
-                        >
-                          <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <span style={S.rowName}>
-                              {b.name} pasta
-                              {b.veg ? <span style={S.rowVeg}>Veg</span> : null}
-                            </span>
-                            <span style={S.rowDesc}>{b.desc}</span>
-                          </span>
-                          <span style={S.rowPrice}>{money(p)}</span>
-                          <span aria-hidden="true" style={{ ...S.box, background: on ? '#D7192D' : '#fff', boxShadow: on ? 'none' : 'inset 0 0 0 2px #CFCFD5' }}>
-                            {on ? <IconCheck size={14} stroke={3.6} /> : null}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        <aside style={{ ...S.aside, position: wide ? 'sticky' : 'relative', top: wide ? 96 : undefined }}>
-          <div style={{ ...S.bowlMedia, aspectRatio: wide ? '4/3' : '16/10' }}>
-            <span role="img" aria-label={title} style={{ ...S.bowlImg, backgroundImage: `url('${img}')` }} />
-            <div style={S.bowlShade} />
-            <span style={S.bowlPill}>Your bowl</span>
-          </div>
-          <div style={S.bowlBody}>
-            <div style={S.bowlHead}>
-              <span style={S.bowlTitle}>{title}</span>
-              <span style={S.bowlDesc}>{base.desc + ' · ' + sauce[2] + '. Prices before tax.'}</span>
-            </div>
-            {/* Spice is optional: tick one, or leave all unticked for no spice (sent to the kitchen as "No spice"). */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
-                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#9C928C' }}>Spice level</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#9C928C' }}>Optional</span>
-              </span>
-              <div role="group" aria-label="Spice level" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {SPICES.slice(1).map((v, i) => {
-                  const on = spice === v;
-                  return (
-                    <button key={v} type="button" aria-pressed={on} onClick={() => setSpice((cur) => (cur === v ? SPICES[0] : v))} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 48, padding: '0 12px 0 14px', border: 0, borderRadius: 12, background: on ? 'rgba(255,255,255,.14)' : 'rgba(255,255,255,.06)', color: '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 15, cursor: 'pointer', textAlign: 'left', transition: 'background .15s' }}>
-                      <span aria-hidden="true" style={{ display: 'flex', gap: 3 }}>
-                        {[0, 1, 2].map((d) => <span key={d} style={{ width: 6, height: 6, borderRadius: '50%', background: d <= i ? '#FF5A4E' : 'rgba(255,255,255,.22)' }} />)}
-                      </span>
-                      <span style={{ flex: 1 }}>{v}</span>
-                      <span aria-hidden="true" style={{ flex: 'none', width: 22, height: 22, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', background: on ? '#D7192D' : 'transparent', boxShadow: on ? 'none' : 'inset 0 0 0 2px rgba(255,255,255,.4)', color: '#fff' }}>
-                        {on ? <IconCheck size={13} stroke={3.6} /> : null}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            {/* Square "Extra Pasta Topping(s)" and "Remove Pasta Toppings". */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#9C928C' }}>Extras</span>
-              <div role="group" aria-label="Extras" style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {PASTA_EXTRAS.map(([id, name, p]) => {
-                  const on = extras.includes(id);
-                  return (
-                    <button key={id} type="button" aria-pressed={on} onClick={() => toggle(setExtras, id)} style={{ height: 38, padding: '0 12px', border: 0, borderRadius: 999, background: on ? '#fff' : 'rgba(255,255,255,.08)', color: on ? '#1A1414' : '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                      {name.replace(/^Extra /, '').replace(/^./, (c) => c.toUpperCase())} <span style={{ opacity: 0.7, fontWeight: 600 }}>+{money(p)}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            {removable.length ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#9C928C' }}>Leave out</span>
-                <div role="group" aria-label="Leave out" style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {removable.map(([id, name]) => {
-                    const on = removeNow.includes(id);
-                    return (
-                      <button key={id} type="button" aria-pressed={on} onClick={() => toggle(setRemove, id)} style={{ height: 38, padding: '0 12px', border: 0, borderRadius: 999, background: on ? '#fff' : 'rgba(255,255,255,.08)', color: on ? '#1A1414' : '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                        {name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : null}
-            <div style={S.bowlActions}>
-              <div style={S.stepper}>
-                <Hov as="button" type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease quantity" style={S.stepBtn} hover={S.stepBtnHover}>
-                  <IconMinus size={15} stroke={3} />
-                </Hov>
-                <span style={S.qty}>{qty}</span>
-                <Hov as="button" type="button" onClick={() => setQty((q) => Math.min(20, q + 1))} aria-label="Increase quantity" style={S.stepBtn} hover={S.stepBtnHover}>
-                  <IconPlus size={15} stroke={3} />
-                </Hov>
-              </div>
-              <Hov as="button" type="button" onClick={add} style={{ ...S.addBtn, background: added ? '#1E8A4C' : '#D7192D' }} hover={S.redHover}>
-                <span>{added ? 'Added' : 'Add to order'}</span>
-                <span>{money(price * qty)}</span>
+      <section style={S.body}>
+        <h2 style={S.h2}>Choose your pasta</h2>
+        {/* One card per sauce; the card opens the pasta choices (chicken / veggie / regular), spice and extras. */}
+        <div style={S.cards}>
+          {SAUCES.map(([sid, sname, sdesc, pic]) => {
+            const from = Math.min(...BASES.map((b) => b.p[sid] ?? Infinity));
+            const img = pic.indexOf('assets/') === 0 ? pic : U(pic, 900);
+            return (
+              <Hov as="button" key={sid} type="button" onClick={() => setOpen(sid)} aria-label={sname + ' Sauce Pasta, from ' + money(from)} style={S.card} hover={S.cardHover}>
+                <span aria-hidden="true" style={{ ...S.cardImg, backgroundImage: `url('${img}')` }} />
+                <span style={S.cardBody}>
+                  <span style={S.cardTitle}>{sname} Sauce Pasta</span>
+                  <span style={S.cardDesc}>{sdesc} · Chicken, veggie{BASES.some((b) => b.id === 'classic' && b.p[sid] != null) ? ' or regular' : ''}</span>
+                  <span style={S.cardFoot}>
+                    <span style={S.cardPrice}>From {money(from)}</span>
+                    <span style={S.cardCta}>Choose</span>
+                  </span>
+                </span>
               </Hov>
-            </div>
-          </div>
-        </aside>
+            );
+          })}
+        </div>
       </section>
+
+      {open ? (
+        <PastaSheet
+          sauce={open}
+          img={(() => { const p = (SAUCES.find((x) => x[0] === open) || SAUCES[0])[3]; return p.indexOf('assets/') === 0 ? p : U(p, 900); })()}
+          onClose={() => setOpen(null)}
+          onAdd={(line, qty) => { setOpen(null); onAdd?.(line, qty); }}
+        />
+      ) : null}
 
       <section style={S.momoSection}>
         <div style={{ maxWidth: 'none' }}>
