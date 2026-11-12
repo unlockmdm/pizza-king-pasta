@@ -29,7 +29,7 @@ export { HST, PIZZA_PRICES, SIZE_NAMES, SIZE_PRICES, pricesFor } from './pricing
 export const DELIVERY_FEE = 4.99;
 
 /** Unsplash image URL, same params as the prototype. */
-export const U = (id: string, w = 900) =>
+export const U = (id: string, w = 900) => id.indexOf('assets/') === 0 ? id :
   'https://images.unsplash.com/photo-' + id + '?fm=jpg&q=72&w=' + w + '&auto=format&fit=crop';
 
 /** Build the credit/creditHref pair the prototype derives from `by`/`h`/`creditText`. */

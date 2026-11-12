@@ -29,7 +29,7 @@ const PIZZA_PHOTO: Record<string, string> = {
   'non-veg': '1600628421055-4d30de868b8f',
   bismark: '1595708684082-a173bb3a06c5',
   'sea-food': '1552539618-7eec9b4d1796',
-  'chicken-shawarma': '1565299624946-b28f40a0ae38',
+  'chicken-shawarma': 'assets/pizzas/shawarma-chicken.webp',
   'butter-chicken': 'assets/pizzas/butter-chicken.png',
   'shahi-paneer': 'assets/pizzas/shahi-paneer.png',
   greek: '1573821663912-6df460f9c684',

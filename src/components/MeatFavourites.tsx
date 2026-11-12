@@ -30,7 +30,7 @@ interface MeatPizza {
 const PIZZA_LIST: Omit<MeatPizza, 'tops'>[] = [
   { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', pic: '1692737580547-b45bb4a02356', by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
   { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', pic: '1604382354936-07c5d9983bd3', by: 'Shourav Sheikh', h: 'shouravsheikh', chicken: true },
-  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', pic: '1590947132387-155cc02f3212', by: 'Vit Ch', h: 'v_uk_europe', chicken: true, tag: 'Spicy' },
+  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', pic: 'assets/pizzas/shawarma-chicken.webp', by: '', h: '', chicken: true, tag: 'Spicy' },
   { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', pic: '1593560708920-61dd98c46a4e', by: 'Saundarya Srinivasan', h: 'saundiii', chicken: true, cured: true },
   { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', pic: '1611915365928-565c527a0590', by: 'Tamas Pap', h: 'tamasp', cured: true },
   { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', pic: '1565299624946-b28f40a0ae38', by: 'Chad Montano', h: 'briewilly', cured: true },

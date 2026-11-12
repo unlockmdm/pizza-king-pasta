@@ -18,7 +18,7 @@ export interface Special {
 export const SPECIALS: Special[] = [
   { id: 'shahi-paneer', name: 'Shahi Paneer', desc: 'Tandoori paneer, green peppers, red onions, jalapeños', veg: true, img: U('1655673654158-9f7285b7d1ea'), by: 'RUSU CIPRIAN', h: 'tehnosign' },
   { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', veg: false, img: U('1604382354936-07c5d9983bd3'), by: 'Shourav Sheikh', h: 'shouravsheikh' },
-  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', veg: false, tag: 'Spicy', img: U('1590947132387-155cc02f3212'), by: 'Vit Ch', h: 'v_uk_europe' },
+  { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', veg: false, tag: 'Spicy', img: 'assets/pizzas/shawarma-chicken.webp', by: '', h: '' },
   { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', veg: false, img: U('1692737580547-b45bb4a02356'), by: 'David Foodphototasty', h: 'phototastyfood' },
 ];
 
