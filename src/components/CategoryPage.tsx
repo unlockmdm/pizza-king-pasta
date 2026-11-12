@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from
 import type { CategoryId, CategoryPageProps } from '../lib/types';
 import { Hov, Photo, IconArrow, IconBack, IconCheck, IconClose, IconMinus, IconPlus } from '../lib/ui';
 import { useLockBody, useWidth } from '../lib/hooks';
-import { U } from '../lib/catalog';
+import { ITEM_PHOTOS, U } from '../lib/catalog';
 import { money } from '../lib/format';
 import { CAT_MENU, mustPrice, type LineSpec } from '../lib/pricing';
 
@@ -55,31 +55,31 @@ const IMG = (id: string | undefined, w = 800) => (!id ? '' : id.indexOf('assets/
 /** Per item: filter id, tag, vegetarian, photo (Unsplash id or `assets/...`; empty = no real photo on purpose). */
 const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: string }> = {
   // wings & sides
-  wings: { f: 'tandoor', tag: 'Wood oven', img: '1608039755401-742074f0548d' },
-  leg: { f: 'tandoor', img: '1617692855027-33b14f061079' },
-  fish: { f: 'tandoor', img: '' },
-  wedges: { f: 'sides', veg: true, img: '1623238913973-21e45cced554' },
-  'garlic-bread': { f: 'sides', veg: true, img: 'assets/menu/garlic-bread.webp' },
-  sub: { f: 'sides', img: '1509722747041-616f39b57569' },
-  'nv-salad': { f: 'sides', img: 'assets/menu/chicken-salad.webp' },
-  'v-salad': { f: 'sides', veg: true, img: 'assets/menu/garden-salad.webp' },
-  corn: { f: 'sides', veg: true, img: 'assets/menu/sweet-corn.webp' },
-  chaat: { f: 'sides', veg: true, img: '1490474418585-ba9bad8fd0ea' },
+  wings: { f: 'tandoor', tag: 'Wood oven', img: ITEM_PHOTOS['wings'] || '' },
+  leg: { f: 'tandoor', img: ITEM_PHOTOS['leg'] || '' },
+  fish: { f: 'tandoor', img: ITEM_PHOTOS['fish'] || '' },
+  wedges: { f: 'sides', veg: true, img: ITEM_PHOTOS['wedges'] || '' },
+  'garlic-bread': { f: 'sides', veg: true, img: ITEM_PHOTOS['garlic-bread'] || '' },
+  sub: { f: 'sides', img: ITEM_PHOTOS['sub'] || '' },
+  'nv-salad': { f: 'sides', img: ITEM_PHOTOS['nv-salad'] || '' },
+  'v-salad': { f: 'sides', veg: true, img: ITEM_PHOTOS['v-salad'] || '' },
+  corn: { f: 'sides', veg: true, img: ITEM_PHOTOS['corn'] || '' },
+  chaat: { f: 'sides', veg: true, img: ITEM_PHOTOS['chaat'] || '' },
   // drinks
-  fresh: { f: 'juice', img: '1600271886742-f049cd451bba' },
-  sugarcane: { f: 'juice', img: 'assets/menu/sugarcane.webp' },
-  lemonade: { f: 'juice', img: '' },
-  coconut: { f: 'juice', img: '' },
-  lassi: { f: 'lassi', img: '' },
-  espresso: { f: 'hot', img: '1510591509098-f4fdc6d0ff04' },
-  hot: { f: 'hot', img: '1509042239860-f550ce710b93' },
-  pop: { f: 'soft', img: '' },
-  water: { f: 'soft', img: '' },
-  beer: { f: 'beer', img: '1600788886242-5c96aabe3757' },
+  fresh: { f: 'juice', img: ITEM_PHOTOS['fresh'] || '' },
+  sugarcane: { f: 'juice', img: ITEM_PHOTOS['sugarcane'] || '' },
+  lemonade: { f: 'juice', img: ITEM_PHOTOS['lemonade'] || '' },
+  coconut: { f: 'juice', img: ITEM_PHOTOS['coconut'] || '' },
+  lassi: { f: 'lassi', img: ITEM_PHOTOS['lassi'] || '' },
+  espresso: { f: 'hot', img: ITEM_PHOTOS['espresso'] || '' },
+  hot: { f: 'hot', img: ITEM_PHOTOS['hot'] || '' },
+  pop: { f: 'soft', img: ITEM_PHOTOS['pop'] || '' },
+  water: { f: 'soft', img: ITEM_PHOTOS['water'] || '' },
+  beer: { f: 'beer', img: ITEM_PHOTOS['beer'] || '' },
   // gelato & shakes
-  cone: { img: '1497034825429-c343d7c6a68f' },
-  cup: { img: 'assets/menu/gelato-cup.webp' },
-  shake: { img: '1505252585461-04db1eb84625' },
+  cone: { img: ITEM_PHOTOS['cone'] || '' },
+  cup: { img: ITEM_PHOTOS['cup'] || '' },
+  shake: { img: ITEM_PHOTOS['shake'] || '' },
 };
 /** Option groups shown as wrapping chips instead of a segmented control ("item.group"; spice is always chips). */
 const CHIPS = new Set(['lassi.flav', 'hot.kind', 'pop.brand', 'beer.brand', 'cone.flav', 'cup.flav', 'shake.flav', 'wings.flav', 'fish.w']);

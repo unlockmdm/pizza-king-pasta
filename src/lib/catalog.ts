@@ -66,3 +66,36 @@ export const PIZZA_PHOTOS: Record<string, string> = {
 };
 /** Photo URL for a pizza id at width `w` (local assets pass through). */
 export const pizzaPhoto = (id: string, w = 900) => (PIZZA_PHOTOS[id] ? U(PIZZA_PHOTOS[id], w) : '');
+
+/**
+ * The one photo for every non-pizza item (Unsplash id or local `assets/...` path; empty = no real
+ * photo yet). The category pages, the full menu and cart thumbnails all read from here.
+ */
+export const ITEM_PHOTOS: Record<string, string> = {
+  wings: '1608039755401-742074f0548d',
+  leg: '1617692855027-33b14f061079',
+  fish: '',
+  wedges: '1623238913973-21e45cced554',
+  'garlic-bread': 'assets/menu/garlic-bread.webp',
+  sub: '1509722747041-616f39b57569',
+  'nv-salad': 'assets/menu/chicken-salad.webp',
+  'v-salad': 'assets/menu/garden-salad.webp',
+  corn: 'assets/menu/sweet-corn.webp',
+  chaat: '1490474418585-ba9bad8fd0ea',
+  fresh: '1600271886742-f049cd451bba',
+  sugarcane: 'assets/menu/sugarcane.webp',
+  lemonade: 'assets/menu/lemonade.webp',
+  coconut: '',
+  lassi: 'assets/menu/lassi.webp',
+  espresso: '1510591509098-f4fdc6d0ff04',
+  hot: '1544787219-7f47ccb76574',
+  pop: 'assets/menu/pop.webp',
+  water: 'assets/menu/water.webp',
+  beer: '1600788886242-5c96aabe3757',
+  cone: '1497034825429-c343d7c6a68f',
+  cup: 'assets/menu/gelato-cup.webp',
+  shake: 'assets/menu/mango-shake.webp',
+  momos: '1534422298391-e4f8c172dddb',
+};
+/** Photo URL for an item id at width `w` (local assets pass through). */
+export const itemPhoto = (id: string, w = 600) => (ITEM_PHOTOS[id] ? U(ITEM_PHOTOS[id], w) : '');

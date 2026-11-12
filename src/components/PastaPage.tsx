@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { PastaPageProps } from '../lib/types';
 import { Hov, Photo, IconBack, IconCheck, IconMinus, IconPlus } from '../lib/ui';
 import { useWidth } from '../lib/hooks';
-import { U } from '../lib/catalog';
+import { U, itemPhoto } from '../lib/catalog';
 import { money } from '../lib/format';
 import { MOMOS as MOMO_DATA, PASTA_BASES, PASTA_EXTRAS, PASTA_REMOVE, PASTA_SAUCES, SPICES as SPICE_LIST, mustPrice, type LineSpec } from '../lib/pricing';
 
@@ -55,7 +55,7 @@ const MOMOS: readonly (readonly [id: MomoId, name: string, price: number])[] = M
 
 const HERO_IMG = 'assets/menu/pasta-rose.png';
 const HERO_IMG_WIDE = 'assets/menu/pasta-rose.png';
-const MOMOS_IMG = 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?fm=jpg&q=72&w=1000&auto=format&fit=crop';
+const MOMOS_IMG = itemPhoto('momos', 1000);
 
 // ---------- Static styles ----------
 

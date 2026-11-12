@@ -3,7 +3,7 @@
 import type { CSSProperties } from 'react';
 import type { CartLine, Half } from '../lib/types';
 import { PIZZAS, SLICES, type LineSpec, type PizzaOpts } from '../lib/pricing';
-import { U } from '../lib/catalog';
+import { ITEM_PHOTOS, U } from '../lib/catalog';
 import { PizzaArt } from './PizzaBuilder';
 
 type Photo = { src: string; fit: 'cover' | 'contain' };
@@ -37,27 +37,10 @@ function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Ph
   if (/pasta-rose$/.test(id)) return cover('assets/menu/pasta-rose.png');
   if (/pasta-alfredo$/.test(id)) return cover('assets/menu/pasta-alfredo.png');
   if (/pasta-tomato$/.test(id)) return un('1598866594230-a7c12756260f');
-  const map: Record<string, Photo> = {
-    sugarcane: cover('assets/menu/sugarcane.webp'),
-    cone: un('1497034825429-c343d7c6a68f'),
-    'gelato-cone': un('1497034825429-c343d7c6a68f'),
-    cup: cover('assets/menu/gelato-cup.webp'),
-    corn: cover('assets/menu/sweet-corn.webp'),
-    leg: un('1617692855027-33b14f061079'),
-    fish: cut('assets/ingredients/tandoori-chicken.png'),
-    wedges: un('1623238913973-21e45cced554'),
-    sub: un('1509722747041-616f39b57569'),
-    'nv-salad': cover('assets/menu/chicken-salad.webp'),
-    'v-salad': cover('assets/menu/garden-salad.webp'),
-    chaat: un('1490474418585-ba9bad8fd0ea'),
-    espresso: un('1510591509098-f4fdc6d0ff04'),
-    hot: un('1509042239860-f550ce710b93'),
-    beer: un('1600788886242-5c96aabe3757'),
-    momos: un('1534422298391-e4f8c172dddb'),
-    lemonade: un('1621263764928-df1444c5e859'),
-    'garlic-bread': cover('assets/menu/garlic-bread.webp'),
-  };
-  return map[id] || null;
+  // Same photo as the item's card on the category pages and the full menu.
+  const shared = ITEM_PHOTOS[id === 'gelato-cone' ? 'cone' : id];
+  if (!shared) return null;
+  return shared.indexOf('assets/') === 0 ? (/\.png$/.test(shared) ? cut(shared) : cover(shared)) : un(shared);
 }
 
 type Look = { pizzas: { sauce: string; tops: [string, Half][]; doneness: string; slices: number }[] } | Photo;

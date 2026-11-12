@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Mous
 import type { BuilderItem, CategoryId, MenuPageProps, NewLine } from '../lib/types';
 import { Hov, Photo } from '../lib/ui';
 import { useEscape, useWidth } from '../lib/hooks';
-import { PIZZA_PHOTOS, pricesFor, SIZE_PRICES, U } from '../lib/catalog';
+import { PIZZA_PHOTOS, itemPhoto, pricesFor, SIZE_PRICES, U } from '../lib/catalog';
 import { CAT_MENU, COMBOS, MENU_SECTIONS, PIZZAS as PIZZA_DATA, SPICES, mustPrice, type LineSpec, type PastaBaseId, type PastaSauceId, type MenuOpt, type MenuRow, type MenuSection } from '../lib/pricing';
 import { money } from '../lib/format';
 import PizzaBuilder from './PizzaBuilder';
@@ -19,32 +19,13 @@ const PIZZA_IMG = U(PIZZA_PHOTOS.byo, 1000);
 const UI = (id: string) => 'https://images.unsplash.com/photo-' + id + '?fm=jpg&q=70&w=600&auto=format&fit=crop';
 /** Pizza photos come from the shared PIZZA_PHOTOS list (same photo on every page). */
 const PIZZA_PHOTO = PIZZA_PHOTOS;
-/**
- * Row photos. The prototype also maps `lassi` to assets/menu/juice.jpg (the mixed-juice photo);
- * that is dropped here because the README lists lassi as an item with no real photo
- * ("leave an empty image box rather than a misleading picture").
- */
+/** Row photos for pasta and dips. Everything else comes from the shared ITEM_PHOTOS / PIZZA_PHOTOS lists. */
 const ROW_PIC: Record<string, string> = {
-  sugarcane: 'assets/menu/sugarcane.webp',
-  'fruit-juice': 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  espresso: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  hot: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  beer: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  shake: 'assets/menu/mango-shake.webp',
-  momos: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  chaat: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  sub: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  'nv-salad': 'assets/menu/chicken-salad.webp',
-  'v-salad': 'assets/menu/garden-salad.webp',
-  wedges: 'https://images.unsplash.com/photo-1623238913973-21e45cced554?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  'garlic-bread': 'assets/menu/garlic-bread.webp',
-  leg: 'https://images.unsplash.com/photo-1617692855027-33b14f061079?fm=jpg&q=70&w=600&auto=format&fit=crop',
   'dip-garlic': 'assets/dips/menu-garlic.png',
   'dip-ranch': 'assets/dips/menu-ranch.png',
   'dip-chipotle': 'assets/dips/menu-chipotle.png',
   'dip-jalapeno': 'assets/dips/menu-jalapeno-cheddar.png',
   'dip-marinara': 'assets/dips/menu-marinara.png',
-  wings: 'assets/ingredients/tandoori-chicken.png',
   'pasta-rose': 'assets/menu/pasta-rose.png',
   'pasta-alfredo': 'assets/menu/pasta-alfredo.png',
   'veg-pasta-rose': 'assets/menu/pasta-rose.png',
@@ -53,9 +34,6 @@ const ROW_PIC: Record<string, string> = {
   'ch-pasta-alfredo': 'assets/menu/pasta-alfredo.png',
   'veg-pasta-tomato': 'https://images.unsplash.com/photo-1598866594230-a7c12756260f?fm=jpg&q=70&w=600&auto=format&fit=crop',
   'ch-pasta-tomato': 'https://images.unsplash.com/photo-1598866594230-a7c12756260f?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  cone: 'https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  cup: 'assets/menu/gelato-cup.webp',
-  corn: 'assets/menu/sweet-corn.webp',
 };
 
 /** Per-section colours used by the photo-card grid (the prototype's unused list-row fields are omitted). */
@@ -343,7 +321,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
       if (twin && twinItem) {
         const hasOpts = !!twinItem.groups?.length;
         return {
-          key, img: ROW_PIC[key] || '', name, desc, veg: false,
+          key, img: itemPhoto(twin[1]), name, desc, veg: false,
           priceText: (hasOpts && multi ? 'From ' : '') + money(min),
           cta: hasOpts ? 'Choose' : 'Add',
           act: hasOpts
@@ -356,7 +334,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
       }
       return {
         key,
-        img: ROW_PIC[key] || '',
+        img: itemPhoto(key) || ROW_PIC[key] || '',
         name,
         desc,
         veg: false,
