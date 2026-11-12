@@ -99,7 +99,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
         <div style={{ display: 'grid', gridTemplateColumns: bentoCols, gridTemplateRows: bentoRows, gridTemplateAreas: bentoAreas, gap: ph ? 10 : 14, height: bentoH }}>
           {/* Hero tile */}
           <div style={{ gridArea: 'hero', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, overflow: 'hidden', color: '#fff', background: '#1A1414' }}>
-            <img src="assets/hero-oven.webp" alt="Pizza coming out of the wood-fired oven at Pizza King & Pasta in Brampton" {...{ fetchpriority: "high" }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 35%', animation: 'pkZoom 18s ease-in-out infinite alternate' }} />
+            <img src="assets/hero-oven.webp" alt="Pizza coming out of the wood-fired oven at Pizza King & Pasta in Brampton" {...{ fetchpriority: "high" }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 35%' }} />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(14,8,8,.94) 0%,rgba(14,8,8,.72) 38%,rgba(14,8,8,.12) 72%)' }} />
             <div style={{ position: 'absolute', left: 'clamp(22px,3vw,40px)', right: 'clamp(22px,3vw,40px)', bottom: 'clamp(22px,3vw,40px)', display: 'flex', flexDirection: 'column', gap: 24 }}>
               <h1 style={{ margin: 0, fontWeight: 900, fontSize: bentoFont, lineHeight: 0.86, letterSpacing: '-.065em' }}>
@@ -174,7 +174,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
 
           {/* Fresh pasta tile */}
           <Hov as="button" onClick={h.onPasta} aria-label="Fresh pasta: rosé, Alfredo, tomato" style={{ gridArea: 'pasta', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: ph ? 24 : 36, overflow: 'hidden', background: '#F2F2F5', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
-            <img src="assets/menu/pasta-trio.webp" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: 'pkZoom 16s ease-in-out -4s infinite alternate' }} />
+            <img src="assets/menu/pasta-trio.webp" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
             <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(14,8,8,.78) 0%,rgba(14,8,8,.35) 30%,rgba(14,8,8,0) 55%)' }} />
             <span style={{ position: 'absolute', left: ph ? 16 : 24, right: ph ? 16 : 24, top: ph ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 2, textShadow: '0 1px 8px rgba(0,0,0,.35)' }}>
               <span style={{ fontWeight: 900, fontSize: ph ? 19 : 24, lineHeight: 1.1, letterSpacing: '-.03em', whiteSpace: 'nowrap' }}>Fresh pasta</span>
