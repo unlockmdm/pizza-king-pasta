@@ -8,6 +8,7 @@ import path from 'node:path';
 import { PAGES, PAGE_IDS, SITE_URL, canonicalUrl, type PageId } from '../src/lib/seo.ts';
 import { CAT_MENU, COMBOS, MENU_SECTIONS, MOMOS, PASTA_BASES, PASTA_SAUCES, PIZZAS, SIZE_KEYS, SIZE_NAMES, TOPPINGS, pricesFor } from '../src/lib/pricing/index.ts';
 import { SHOP } from '../src/lib/catalog.ts';
+import { FAQ } from '../src/shell/data.ts';
 
 const DIST = path.resolve('dist');
 const template = fs.readFileSync(path.join(DIST, 'index.html'), 'utf8');
@@ -38,11 +39,20 @@ const restaurant = {
   paymentAccepted: 'Credit card, Debit card, Apple Pay, Google Pay',
   currenciesAccepted: 'CAD',
   sameAs: [SHOP.doordash],
+  hasMap: SHOP.mapsSearch,
+  keywords: 'Indian pizza, butter chicken pizza, shahi paneer pizza, tandoori pizza, wood-fired pizza, late night pizza, pizza Brampton',
   potentialAction: {
     '@type': 'OrderAction',
     target: { '@type': 'EntryPoint', urlTemplate: SITE_URL + '/menu', inLanguage: 'en-CA', actionPlatform: ['https://schema.org/DesktopWebPlatform', 'https://schema.org/MobileWebPlatform'] },
     deliveryMethod: ['http://purl.org/goodrelations/v1#DeliveryModePickUp'],
   },
+};
+
+/** The homepage FAQ, in the form search engines read. */
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
 };
 
 const offer = (prices: number[]) =>
@@ -120,7 +130,10 @@ function body(id: PageId): string {
       '<p>Pizza King &amp; Pasta is a pizza shop on Ray Lawson Blvd in Brampton. We make Indian-style pizzas such as butter chicken, shahi paneer, shawarma chicken and tandoori fish, ' +
       'classic pizzas like Meat Lover, Hawaiian and Canadian, and build-your-own pizzas, baked in a wood-fired or conventional oven. We also serve pasta, steamed momos, tandoori wings, fresh juice and gelato, and we are open late, until 2 AM every night.</p>' +
       '<h2>Popular pizzas</h2>' + list(['Butter Chicken', 'Shahi Paneer', 'Shawarma Chicken', 'Tandoori Fish', 'Meat Lover', 'Hawaiian'].map((n) => esc(n) + ' pizza')) +
-      '<h2>Pickup combos</h2>' + list(Object.values(COMBOS).map((c) => esc(c.name) + ' combo: ' + money(c.price)));
+      '<h2>Pickup combos</h2>' + list(Object.values(COMBOS).map((c) => esc(c.name) + ' combo: ' + money(c.price))) +
+      '<h2>Indian pizza in Brampton</h2><p>Looking for Indian pizza near you in Brampton? Our butter chicken pizza, shahi paneer pizza, tandoori chicken pizza and shawarma chicken pizza are made to order on fresh dough and baked in a wood-fired oven. ' +
+      'We are open late every night until 2 AM, with pickup ordering online and delivery through DoorDash.</p>' +
+      '<h2>Questions</h2>' + FAQ.map(([q, a]) => '<h3>' + esc(q) + '</h3><p>' + esc(a) + '</p>').join('');
   } else if (id === 'menu') {
     main = '<h2>Pizzas</h2>' + list(Object.entries(PIZZAS).map(([k, p]) => '<strong>' + esc(k === 'byo' ? 'Build your own' : p.name) + '</strong>: ' + sizePrices(k))) +
       '<h2>Pickup combos</h2>' + list(Object.values(COMBOS).map((c) => esc(c.name) + ' combo ' + money(c.price))) +
@@ -166,7 +179,7 @@ for (const id of PAGE_IDS) {
   html = setTag(html, /(<meta property="og:description" content=")[^"]*(")/, m.description);
   html = setTag(html, /(<meta property="og:url" content=")[^"]*(")/, canonicalUrl(id));
   if (id === 'terms' || id === 'privacy') html = html.replace('content="index, follow, max-image-preview:large"', 'content="index, follow"');
-  const ld = [restaurant, id === 'menu' ? menuLd : null, breadcrumb(id)].filter(Boolean);
+  const ld = [restaurant, id === 'menu' ? menuLd : null, id === 'home' ? faqLd : null, breadcrumb(id)].filter(Boolean);
   html = html.replace('<!--SEO-JSONLD-->', ld.map((o) => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>').join('\n    '));
   html = html.replace('<!--SEO-BODY-->', body(id));
   fs.writeFileSync(path.join(DIST, id === 'home' ? 'index.html' : m.slug + '.html'), html);

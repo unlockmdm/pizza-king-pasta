@@ -85,7 +85,9 @@ export const BYO_SETS: [string, string[], number][][] = [
 
 /** Footer FAQ: short, factual answers (also what people tend to search for). */
 export const FAQ: [string, string][] = [
+  ['Where can I get Indian pizza in Brampton?', 'Pizza King & Pasta at 511 Ray Lawson Blvd, Unit 10, Brampton. We make butter chicken, shahi paneer, tandoori chicken, shawarma chicken and tandoori fish pizza, open every day until 2 AM. Order online for pickup or get delivery through DoorDash.'],
   ['What is Indian-style pizza?', 'Pizza with Indian flavours: butter chicken or shahi paneer sauce, tandoori chicken or paneer, green chilli, ginger and coriander. Pick one from the menu, or build your own with these toppings.'],
+  ['Are you open late?', 'Yes. We are open every day from 4 PM to 2 AM, so you can get pizza late at night in Brampton.'],
   ['What are your hours?', 'Every day, 4 PM to 2 AM. You can also order ahead online and pick a later pickup time.'],
   ['Do you deliver?', 'Delivery is through DoorDash. For pickup, order on this website and pay online, then collect your order at the counter.'],
   ['Where are you located?', '511 Ray Lawson Blvd, Unit 10, Brampton, ON L6Y 0N2. Call us at 905-460-9494.'],
