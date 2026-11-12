@@ -70,7 +70,6 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   sugarcane: { f: 'juice', img: ITEM_PHOTOS['sugarcane'] || '' },
   lemonade: { f: 'juice', img: ITEM_PHOTOS['lemonade'] || '' },
   coconut: { f: 'juice', img: ITEM_PHOTOS['coconut'] || '' },
-  espresso: { f: 'hot', img: ITEM_PHOTOS['espresso'] || '' },
   hot: { f: 'hot', img: ITEM_PHOTOS['hot'] || '' },
   pop: { f: 'soft', img: ITEM_PHOTOS['pop'] || '' },
   water: { f: 'soft', img: ITEM_PHOTOS['water'] || '' },
