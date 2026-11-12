@@ -46,14 +46,14 @@ export interface Tile {
 }
 
 export const TILES: Tile[] = [
-  { id: 'byo', name: 'Build your own', sub: '4 toppings · meat counts as 2', bg: '#EDEDF0', fg: '#1A1414', img: pizzaPhoto('byo'), by: 'Saundarya Srinivasan', h: 'saundiii' },
-  { id: 'specials', name: 'House specials', sub: 'Indian-fusion and classic', bg: '#D7192D', fg: '#fff', img: U('1565299624946-b28f40a0ae38'), by: 'Chad Montano', h: 'briewilly', target: 'bestsellers' },
-  { id: 'meat', name: 'Meat favourites', sub: 'Pepperoni, bacon, sausage', bg: '#C2511F', fg: '#fff', img: U('1611915365928-565c527a0590'), by: 'Tamas Pap', h: 'tamasp' },
-  { id: 'combos', name: 'Pickup combos', sub: 'From ' + money(Math.min(...Object.values(COMBOS).map((c) => c.price))), bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
-  { id: 'pasta', name: 'Pasta & momos', sub: 'Rosé, Alfredo, tomato', bg: '#F2B53A', fg: '#1A1414', img: 'assets/menu/pasta-rose.png' },
-  { id: 'wings', name: 'Wings & sides', sub: 'Wings, tandoori, salads, sides', bg: '#250703', fg: '#fff', img: 'assets/menu/wings-sides-tile.webp', full: true },
-  { id: 'juice', name: 'Drinks', sub: 'Juice, coffee, pop, beer', bg: '#00332A', fg: '#fff', img: 'assets/menu/drinks-tile.webp', full: true },
-  { id: 'gelato', name: 'Gelato & shakes', sub: 'Cones, cups, thick shakes', bg: '#F4C6CF', fg: '#1A1414', img: 'assets/menu/gelato-cup.webp' },
+  { id: 'byo', name: 'Build Your Own', sub: '4 Toppings · Meat Counts as 2', bg: '#EDEDF0', fg: '#1A1414', img: pizzaPhoto('byo'), by: 'Saundarya Srinivasan', h: 'saundiii' },
+  { id: 'specials', name: 'House Specials', sub: 'Indian-Fusion and Classic', bg: '#D7192D', fg: '#fff', img: U('1565299624946-b28f40a0ae38'), by: 'Chad Montano', h: 'briewilly', target: 'bestsellers' },
+  { id: 'meat', name: 'Meat Favourites', sub: 'Pepperoni, Bacon, Sausage', bg: '#C2511F', fg: '#fff', img: U('1611915365928-565c527a0590'), by: 'Tamas Pap', h: 'tamasp' },
+  { id: 'combos', name: 'Pickup Combos', sub: 'From ' + money(Math.min(...Object.values(COMBOS).map((c) => c.price))), bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
+  { id: 'pasta', name: 'Pasta & Momos', sub: 'Rosé, Alfredo, Tomato', bg: '#F2B53A', fg: '#1A1414', img: 'assets/menu/pasta-rose.png' },
+  { id: 'wings', name: 'Wings & Sides', sub: 'Wings, Tandoori, Salads, Sides', bg: '#250703', fg: '#fff', img: 'assets/menu/wings-sides-tile.webp', full: true },
+  { id: 'juice', name: 'Drinks', sub: 'Juice, Coffee, Pop, Beer', bg: '#00332A', fg: '#fff', img: 'assets/menu/drinks-tile.webp', full: true },
+  { id: 'gelato', name: 'Gelato & Shakes', sub: 'Cones, Cups, Thick Shakes', bg: '#F4C6CF', fg: '#1A1414', img: 'assets/menu/gelato-cup.webp' },
 ];
 
 /** Toppings already on each house special when it opens in the builder. */
