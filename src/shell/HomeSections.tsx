@@ -104,11 +104,13 @@ function ComboSlides({ ph, w, onDeal }: { ph: boolean; w: number; onDeal: (id: s
         const r1 = ph ? -46 : -60, t1 = ph ? -40 : -90, r2 = ph ? 54 : 170, t2 = ph ? 104 : 110;
         const c1x = r1 + (big * d.scale) / 2, c1y = t1 + (big * d.scale) / 2;
         const dx = r2 + small / 2 - (r1 + big / 2), dy = t2 + small / 2 - (t1 + big / 2);
-        const p2 = { right: c1x + dx * d.scale - (small * d.scale) / 2, top: c1y + dy * d.scale - (small * d.scale) / 2 };
+        // Smaller pizzas drop down a little so they sit just above the dips instead of floating near the top.
+        const down = (1 - d.scale) * big * 1.1;
+        const p2 = { right: c1x + dx * d.scale - (small * d.scale) / 2, top: c1y + dy * d.scale - (small * d.scale) / 2 + down };
         return (
           <div key={d.id} aria-hidden={!on} style={fade(on)}>
             {/* Pizzas: smaller for smaller sizes, same spot so the switch feels like the same table. */}
-            <div style={{ position: 'absolute', right: ph ? -46 : -60, top: ph ? -40 : -90, width: big * d.scale, height: big * d.scale, transition: 'width .7s, height .7s' }}>
+            <div style={{ position: 'absolute', right: r1, top: t1 + down, width: big * d.scale, height: big * d.scale }}>
               <span aria-hidden="true" style={shade(1)} />
               <img src="assets/combo/pizza-meat.webp" alt="" decoding="async" style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', animation: 'pkSpin 40s linear infinite', willChange: 'transform' }} />
             </div>
