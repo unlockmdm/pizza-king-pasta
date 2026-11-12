@@ -1,4 +1,5 @@
 // Live pizza builder. Port of design_handoff_pizza_king_website 2/prototype/PizzaBuilder.dc.html.
+import { scatter } from '../lib/scatter';
 import { Fragment, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import type { Half, NewLine, PizzaBuilderProps, PizzaConfig, SizeKey, SizePrices } from '../lib/types';
 import { Hov } from '../lib/ui';
@@ -139,55 +140,45 @@ const DEFAULTS = { size: 'L' as SizeKey, crust: 'Regular', bake: 'Wood-fired', s
 interface Piece { key: string; src: string; x: string; y: string; w: string; tf: string }
 
 function buildPieces(tops: Record<string, Half>): Piece[] {
-  // Each topping is spread evenly over the whole pizza (or its half) on its own sunflower spiral,
-  // so every slice gets some: a generous, even look instead of a few clumps.
+  // Generous, even coverage with no pieces touching: see lib/scatter.
   const keys = Object.keys(tops).filter((k) => SPR[k]);
-  const GA = 2.39996323; // golden angle
   const avgOf = (k: string) => (SPR[k].reduce((t, x) => t + x[1], 0) / SPR[k].length) * (TSCALE[k] || 0.8);
   const want = keys.map((k, ti) => {
     const avg = avgOf(k);
-    const full = avg <= 6.5 ? 30 : avg <= 9 ? 22 : avg <= 12 ? 18 : 15;
+    const full = avg <= 6.5 ? 22 : avg <= 9 ? 16 : avg <= 12 ? 13 : 11;
     const side = tops[k];
     return { k, ti, side, avg, n: side === 'whole' ? full : Math.ceil(full * 0.55) };
   });
-  // Shrink pieces (not the count) when many toppings share the pizza, so it stays covered but not buried.
-  const disc = Math.PI * 0.42 * 0.42;
-  const area = want.reduce((a, w) => a + w.n * (w.avg / 100) ** 2 * 0.7 * (w.side === 'whole' ? 1 : 1), 0);
-  const fit = Math.max(0.62, Math.min(1, Math.sqrt((disc * 0.62) / Math.max(area, 1e-6))));
-  const pieces: Piece[] = [];
-  const order: { k: string; i: number; x: number; y: number; size: number; src: string }[] = [];
-  want.forEach((w) => {
-    const sp = SPR[w.k];
-    const rot = w.ti * 0.91 + hash(w.k + 'o') * Math.PI * 2; // each topping's spiral is turned, so they interleave
-    const total = w.side === 'whole' ? w.n : w.n * 2;
-    let i = 0;
-    for (let p = 0; p < total && i < w.n; p++) {
-      const size = sp[(p + w.ti) % sp.length][1] * (TSCALE[w.k] || 0.8) * fit * (0.9 + hash(w.k + 'z' + p) * 0.2);
-      const rr = size / 200;
-      const maxR = 0.43 - rr * 0.85;
-      const r = maxR * Math.sqrt((p + 0.5) / total) + (hash(w.k + 'j' + p) - 0.5) * 0.03;
-      const a = p * GA + rot + (hash(w.k + 'a' + p) - 0.5) * 0.35;
-      const x = Math.cos(a) * r, y = Math.sin(a) * r;
-      if (w.side === 'left' && x > -rr * 0.5) continue;
-      if (w.side === 'right' && x < rr * 0.5) continue;
-      order.push({ k: w.k, i, x, y, size, src: sp[(p + w.ti) % sp.length][0] });
-      i++;
-    }
-  });
-  // Big pieces first so small ones sit on top and stay visible.
-  order.sort((p, q) => q.size - p.size || (p.k < q.k ? -1 : 1));
-  order.forEach((it) => {
-    const cx = 50 + it.x * 100, cy = 50 + it.y * 100;
-    pieces.push({
+  // Keep total coverage to about half the pizza so there is always cheese between pieces:
+  // shrink pieces a little first, then use fewer of each if still crowded.
+  const disc = Math.PI * 0.43 * 0.43;
+  const area = (shrink: number) => want.reduce((a, w) => a + w.n * Math.PI * ((w.avg * shrink) / 200) ** 2 * 0.75, 0);
+  const shrink = Math.max(0.74, Math.min(1, Math.sqrt((disc * 0.6) / Math.max(area(1), 1e-6))));
+  const over = area(shrink) / (disc * 0.6);
+  if (over > 1) want.forEach((w) => { w.n = Math.max(w.side === 'whole' ? 5 : 3, Math.floor(w.n / over)); });
+  // Interleave toppings (a, b, c, a, b, c...) so they mix instead of one topping claiming an area first.
+  const items: { k: string; i: number; side: Half; src: string; size: number }[] = [];
+  const most = Math.max(0, ...want.map((w) => w.n));
+  for (let i = 0; i < most; i++) {
+    want.forEach((w) => {
+      if (i >= w.n) return;
+      const sp = SPR[w.k];
+      const pick = sp[(i + w.ti) % sp.length];
+      items.push({ k: w.k, i, side: w.side, src: pick[0], size: pick[1] * (TSCALE[w.k] || 0.8) * shrink * (0.92 + hash(w.k + 'z' + i) * 0.16) });
+    });
+  }
+  const pos = scatter(items.map((it) => ({ k: it.k, r: (it.size / 200) * 0.82, side: it.side })), 0.43, keys.join('|'));
+  return items.map((it, n) => {
+    const cx = 50 + pos[n].x * 100, cy = 50 + pos[n].y * 100;
+    return {
       key: it.k + '-' + it.i,
       src: 'assets/toppings/' + it.src + '.png',
       x: (cx - it.size / 2).toFixed(2) + '%',
       y: (cy - it.size / 2).toFixed(2) + '%',
       w: it.size.toFixed(2) + '%',
       tf: 'rotate(' + Math.round(hash(it.k + 'r' + it.i) * 360) + 'deg)' + (hash(it.k + 'f' + it.i) > 0.5 ? ' scaleX(-1)' : ''),
-    });
+    };
   });
-  return pieces;
 }
 
 /** Layers of the live pizza: base photo (swapped per sauce), topping cut-outs, knife lines. */

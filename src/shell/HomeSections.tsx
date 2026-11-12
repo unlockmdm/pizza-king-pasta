@@ -3,6 +3,7 @@ import { creditOf, pricesFor, SHOP, U } from '../lib/catalog';
 import { money } from '../lib/format';
 import { COMBOS } from '../lib/pricing';
 import { Hov, IconArrow, IconPlus, Photo } from '../lib/ui';
+import { scatter } from '../lib/scatter';
 import { BYO_SETS, DEALS, SPECIALS, TILES, type Tile } from './data';
 
 const SECTION: CSSProperties = { maxWidth: 1320, margin: '0 auto', padding: 'clamp(56px,7vw,96px) clamp(16px,3vw,32px) 0', display: 'flex', flexDirection: 'column', gap: 24, scrollMarginTop: 84 };
@@ -13,37 +14,34 @@ const ARROW_DOT_SM: CSSProperties = { ...ARROW_DOT, right: 12, bottom: 12, width
 const PRODUCT_SHADOW = 'drop-shadow(0 8px 10px rgba(70,0,10,.35)) drop-shadow(0 2px 3px rgba(70,0,10,.35))';
 
 /** Build Your Own tile: topping cut-outs drop onto the pizza in a sunflower spiral, cycling every 2.6s. */
-function ByoToppings({ si }: { si: number }) {
+export function ByoToppings({ si }: { si: number }) {
   const set = BYO_SETS[si % BYO_SETS.length];
-  // Each topping gets its own even spread over the whole pizza (turned so they interleave),
-  // with a little jitter: no lines or S-shapes, every slice gets some of everything.
-  const per = 7, GA = 2.39996;
-  const jit = (n: number) => (Math.sin(n * 12.9898 + si * 78.233) * 43758.5453) % 1;
-  const out: JSX.Element[] = [];
-  for (let k = 0; k < per; k++) {
-    set.forEach(([, imgs, w], t) => {
-      const i = k * set.length + t;
-      const rr = Math.min(132, Math.sqrt((k + 0.5) / per) * 132 + jit(i) * 10);
-      const a = k * GA + (t * Math.PI * 2) / set.length + t * 0.6 + si * 0.7 + jit(i + 99) * 0.5;
-      const rot = ((i * 73 + si * 41) % 360) + 'deg';
-      out.push(
-        <img
-          key={si + '-' + i}
-          src={'assets/toppings/pz/' + imgs[(k + t) % imgs.length] + '.png'}
-          alt=""
-          style={{
-            position: 'absolute', left: 180 + Math.cos(a) * rr + 'px', top: 180 + Math.sin(a) * rr + 'px',
-            width: w * (0.9 + ((i * 37) % 20) / 100) + 'px', '--r': rot, transform: 'translate(-50%,-50%) rotate(' + rot + ')',
-            opacity: 0,
-            animation: 'pkDrop .5s cubic-bezier(.2,.8,.2,1) ' + (i * 0.025).toFixed(3) + 's forwards',
-          } as CSSProperties}
-        />,
-      );
-    });
-  }
-  return <>{out}</>;
+  // Evenly spread, nothing touching (lib/scatter); toppings interleaved so they mix.
+  const per = 7;
+  const items: { k: string; t: number; i: number; src: string; w: number }[] = [];
+  for (let i = 0; i < per; i++) set.forEach(([name, imgs, w], t) => items.push({ k: name, t, i, src: imgs[(i + t) % imgs.length], w: w * (0.92 + ((i * 37 + t * 11) % 16) / 100) }));
+  const pos = scatter(items.map((it) => ({ k: it.k, r: it.w * 0.42 })), 140, 'byo' + si);
+  return (
+    <>
+      {items.map((it, n) => {
+        const rot = ((n * 73 + si * 41) % 360) + 'deg';
+        return (
+          <img
+            key={si + '-' + n}
+            src={'assets/toppings/pz/' + it.src + '.png'}
+            alt=""
+            style={{
+              position: 'absolute', left: 180 + pos[n].x + 'px', top: 180 + pos[n].y + 'px',
+              width: it.w + 'px', '--r': rot, transform: 'translate(-50%,-50%) rotate(' + rot + ')',
+              opacity: 0,
+              animation: 'pkDrop .5s cubic-bezier(.2,.8,.2,1) ' + (n * 0.025).toFixed(3) + 's forwards',
+            } as CSSProperties}
+          />
+        );
+      })}
+    </>
+  );
 }
-
 
 function ByoTile({ ph, onClick }: { ph: boolean; onClick: () => void }) {
   const [byoSi, setByoSi] = useState(0);
