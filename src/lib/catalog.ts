@@ -53,7 +53,7 @@ export const PIZZA_PHOTOS: Record<string, string> = {
   'italian-veg': '1617470702892-e01504297e84',
   'non-veg': '1600628421055-4d30de868b8f',
   bismark: 'assets/pizzas/bismark.webp',
-  'chicken-shawarma': 'assets/pizzas/shawarma-chicken.webp',
+  'chicken-shawarma': 'assets/pizzas/shawarma.webp',
   'butter-chicken': 'assets/pizzas/butter-chicken.webp',
   'shahi-paneer': 'assets/pizzas/shahi-paneer.png',
   hawaiian: 'assets/pizzas/hawaiian.webp',
