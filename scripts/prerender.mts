@@ -117,7 +117,7 @@ function body(id: PageId): string {
   let main = '';
   if (id === 'home') {
     main =
-      '<p>Pizza King &amp; Pasta is a pizza shop on Ray Lawson Blvd in Brampton. We make Indian-style (desi) pizzas such as butter chicken, shahi paneer, shawarma chicken and tandoori fish, ' +
+      '<p>Pizza King &amp; Pasta is a pizza shop on Ray Lawson Blvd in Brampton. We make Indian-style pizzas such as butter chicken, shahi paneer, shawarma chicken and tandoori fish, ' +
       'classic pizzas like Meat Lover, Hawaiian and Canadian, and build-your-own pizzas, baked in a wood-fired or conventional oven. We also serve pasta, steamed momos, tandoori wings, fresh juice and gelato, and we are open late, until 2 AM every night.</p>' +
       '<h2>Popular pizzas</h2>' + list(['Butter Chicken', 'Shahi Paneer', 'Shawarma Chicken', 'Tandoori Fish', 'Meat Lover', 'Hawaiian'].map((n) => esc(n) + ' pizza')) +
       '<h2>Pickup combos</h2>' + list(Object.values(COMBOS).map((c) => esc(c.name) + ' combo: ' + money(c.price)));

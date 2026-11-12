@@ -37,7 +37,7 @@ export default function Footer({
               <span style={{ fontWeight: 900, fontSize: 24, letterSpacing: '-.03em' }}>Pizza King <span style={{ color: '#FF5A6A' }}>&amp;</span> Pasta</span>
             </div>
             <p style={{ margin: 0, maxWidth: 380, fontSize: 14, lineHeight: 1.6, color: '#A9A9AE' }}>
-              Indian-style and wood-fired pizza in Brampton, open every day until 2 AM. Desi favourites like butter chicken and shahi paneer,
+              Indian-style and wood-fired pizza in Brampton, open every day until 2 AM. Indian favourites like butter chicken and shahi paneer,
               classic pizzas, pasta, momos and tandoori wings.
             </p>
             <Hov as="button" onClick={onStart} style={{ border: 0, background: '#D7192D', color: '#fff', borderRadius: 999, padding: '16px 28px', fontWeight: 800, fontSize: 16, cursor: 'pointer' }} hover={{ background: '#B5121F' }}>

@@ -315,7 +315,7 @@ const photoSpan = (img: string, w: string, fit: string, extra?: CSSProperties): 
 type BuilderState = typeof DEFAULTS & { tops: Record<string, Half>; free: Record<string, boolean>; cat: TopCat; sec: SecKey };
 
 export default function PizzaBuilder({ item, sizePrices, combo, onClose, onAdd }: PizzaBuilderProps) {
-  // Size prices come from the shared pricing module by pizza id (desi specials cost more than the classics),
+  // Size prices come from the shared pricing module by pizza id (Indian-style specials cost more than the classics),
   // so what the builder shows is exactly what the payment server charges.
   void sizePrices;
   const w = useWidth();

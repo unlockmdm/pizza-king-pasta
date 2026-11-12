@@ -21,7 +21,7 @@ export const PAGES: Record<PageId, PageMeta> = {
   home: {
     slug: '',
     title: 'Pizza King & Pasta | Indian & Wood-Fired Pizza, Brampton',
-    description: 'Desi and classic pizza from our wood-fired oven, plus pasta, momos and tandoori wings. Order online for pickup in Brampton. Open daily 4 PM to 2 AM.',
+    description: 'Indian-style and classic pizza from our wood-fired oven, plus pasta, momos and tandoori wings. Order online for pickup in Brampton. Open daily 4 PM to 2 AM.',
     h1: 'Indian-style and wood-fired pizza in Brampton',
     priority: 1,
   },
@@ -34,9 +34,9 @@ export const PAGES: Record<PageId, PageMeta> = {
   },
   meat: {
     slug: 'pizza',
-    title: 'Desi & Classic Pizzas in Brampton | Pizza King & Pasta',
+    title: 'Indian-Style & Classic Pizzas in Brampton | Pizza King & Pasta',
     description: 'Butter chicken, shahi paneer, shawarma chicken and tandoori pizzas, plus Meat Lover, Hawaiian and more. Wood-fired or conventional oven. Order for pickup.',
-    h1: 'Desi and classic pizzas',
+    h1: 'Indian-style and classic pizzas',
     priority: 0.9,
   },
   pasta: {

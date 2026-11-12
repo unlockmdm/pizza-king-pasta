@@ -203,7 +203,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(14,8,8,.9) 0%,rgba(14,8,8,.5) 34%,rgba(14,8,8,.08) 66%)' }} />
             <div style={{ position: 'absolute', left: 'clamp(22px,3vw,40px)', right: 'clamp(22px,3vw,40px)', bottom: 'clamp(22px,3vw,40px)', display: 'flex', flexDirection: 'column', gap: 24 }}>
               <h1 style={{ margin: 0, fontWeight: 700, fontSize: bentoFont, lineHeight: 0.9, letterSpacing: '-.045em', textShadow: '0 2px 18px rgba(0,0,0,.45)' }}>
-                <span style={{ display: 'block', marginBottom: ph ? 12 : 16, fontSize: ph ? 12 : 14, fontWeight: 800, lineHeight: 1.3, letterSpacing: ph ? '.08em' : '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.82)', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) both' }}>{w < 440 ? 'Desi & wood-fired pizza · Brampton' : 'Indian-style & wood-fired pizza · Brampton'}</span>
+                <span style={{ display: 'block', marginBottom: ph ? 12 : 16, fontSize: ph ? 12 : 14, fontWeight: 800, lineHeight: 1.3, letterSpacing: ph ? '.08em' : '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.82)', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) both' }}>{w < 440 ? 'Wood-fired pizza · Brampton' : 'Indian-style & wood-fired pizza · Brampton'}</span>
                 <span style={{ display: 'block', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) both' }}>Wood-fired.</span>
                 <span style={{ display: 'block', color: '#FF4B57', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) .12s both' }}>Made to order.</span>
               </h1>
