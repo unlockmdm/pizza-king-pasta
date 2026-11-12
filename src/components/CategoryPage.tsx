@@ -80,7 +80,7 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   shake: { img: ITEM_PHOTOS['shake'] || '' },
 };
 /** Option groups shown as wrapping chips instead of a segmented control ("item.group"; spice is always chips). */
-const CHIPS = new Set(['hot.kind', 'pop.brand', 'beer.brand', 'cone.flav', 'cup.flav', 'shake.flav', 'wings.flav', 'fish.w']);
+const CHIPS = new Set(['fresh.flav', 'hot.kind', 'pop.brand', 'beer.brand', 'cone.flav', 'cup.flav', 'shake.flav', 'wings.flav', 'fish.w']);
 /** Groups shown as chips wherever they appear (Square drink adjustments, second gelato flavour). */
 const CHIP_GROUPS = new Set(['sugar', 'ice', 'salt', 'flav2']);
 /** Option photos ("item.option" → Unsplash id). */
@@ -93,6 +93,7 @@ const OPT_IMG: Record<string, string> = {
 /** Fresh-juice pop-up: real cut-out cup photos on a soft tinted glow . */
 const JUICE_CUPS: Record<string, { src: string; tint: string; alt: string }> = {
   mix: { src: 'assets/menu/juice-cup-clean.webp', tint: '#E2335A', alt: 'Mixed juice' },
+  'orange-carrot': { src: 'assets/menu/juice-cup-orange.webp', tint: '#F07A1A', alt: 'Orange and carrot juice' },
   orange: { src: 'assets/menu/juice-cup-orange.webp', tint: '#F59A1F', alt: 'Orange juice' },
   pineapple: { src: 'assets/menu/juice-cup-pineapple.webp', tint: '#F2C230', alt: 'Pineapple juice' },
 };

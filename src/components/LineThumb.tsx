@@ -19,6 +19,7 @@ const SHAKE: Record<string, string> = { mango: 'mango', strawberry: 'strawberry'
 const JUICE: Record<string, Photo> = {
   orange: cut('assets/menu/juice-cup-orange.webp'),
   pineapple: cut('assets/menu/juice-cup-pineapple.webp'),
+  'orange-carrot': cut('assets/menu/juice-cup-orange.webp'),
   mix: cut('assets/menu/juice-cup-clean.webp'),
 };
 const DIP: Record<string, string> = { 'dip-garlic': 'garlic', 'dip-ranch': 'ranch', 'dip-chipotle': 'chipotle', 'dip-jalapeno': 'jalapeno-cheddar', 'dip-marinara': 'marinara' };
