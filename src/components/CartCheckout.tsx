@@ -11,6 +11,7 @@ import { Hov } from '../lib/ui';
 import { useEscape, useKeyboardOpen, useLockBody, useWidth } from '../lib/hooks';
 import './CartCheckout.css';
 import OrderConfirmation, { type Confirmation } from './OrderConfirmation';
+import IdNotice from './IdNotice';
 import LineThumb from './LineThumb';
 
 // ---------- Data (from the prototype) ----------
@@ -1062,6 +1063,7 @@ export default function CartCheckout(p: CartCheckoutProps) {
                   </div>
                 ))}
               </div>
+              {lines.some((l) => l.spec?.k === 'cat' && l.spec.id === 'beer') ? <IdNotice /> : null}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 15, color: '#636366' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>Subtotal</span>

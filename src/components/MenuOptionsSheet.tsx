@@ -5,6 +5,7 @@ import { useState } from 'react';
 import type { CategoryId, NewLine } from '../lib/types';
 import { CAT_MENU, PASTA_EXTRAS, PASTA_REMOVE, SPICES, mustPrice, visibleGroups, type LineSpec, type PastaBaseId, type PastaSauceId } from '../lib/pricing';
 import { money } from '../lib/format';
+import IdNotice from './IdNotice';
 import { Hov } from '../lib/ui';
 
 export type SheetTarget =
@@ -53,6 +54,7 @@ export default function MenuOptionsSheet({ target, onAdd, onClose }: { target: S
           </button>
         </div>
         <div style={{ overflowY: 'auto', overscrollBehavior: 'contain', padding: '8px 22px 16px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {item?.notice ? <IdNotice /> : null}
           {groups.map((g) => (
             <div key={g.id} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <span style={label}>{g.label || 'Option'}</span>

@@ -6,6 +6,7 @@ import { Hov, Photo, IconArrow, IconBack, IconCheck, IconClose, IconMinus, IconP
 import { useLockBody, useWidth } from '../lib/hooks';
 import { ITEM_PHOTOS, U } from '../lib/catalog';
 import { money } from '../lib/format';
+import IdNotice from './IdNotice';
 import { CAT_MENU, mustPrice, visibleGroups, type LineSpec } from '../lib/pricing';
 
 // ---------- Data (the prototype's `const` arrays are the spec) ----------
@@ -41,6 +42,7 @@ interface Item {
   /** Default option id per group id. */
   def?: Record<string, string>;
   groups?: Group[];
+  notice?: boolean;
 }
 interface Category {
   hero: { img: string; eyebrow: string; t1: string; t2: string; p: string };
@@ -73,7 +75,7 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   coconut: { f: 'juice', img: ITEM_PHOTOS['coconut'] || '' },
   hot: { f: 'hot', img: ITEM_PHOTOS['hot'] || '' },
   pop: { f: 'soft', img: ITEM_PHOTOS['pop'] || '' },
-  beer: { f: 'beer', img: ITEM_PHOTOS['beer'] || '' },
+  beer: { f: 'beer', tag: '19+', img: ITEM_PHOTOS['beer'] || '' },
   // gelato & shakes
   cone: { img: ITEM_PHOTOS['cone'] || '' },
   cup: { img: ITEM_PHOTOS['cup'] || '' },
@@ -402,6 +404,7 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
                   <span style={S.sheetName}>{m.it.name}</span>
                   {m.it.desc ? <span style={S.sheetDesc}>{m.it.desc}</span> : null}
                 </div>
+                {m.it.notice ? <IdNotice /> : null}
                 <div style={S.groups}>
                   {m.groups.map((g, gi) => (
                     <div key={g.id} style={S.group}>

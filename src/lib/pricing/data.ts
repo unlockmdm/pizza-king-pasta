@@ -102,6 +102,11 @@ export const includedFor = (id: string): number =>
 // ---------------------------------------------------------------------------
 
 export interface ComboDef { name: string; price: number; size: SizeKey; pizzas: number; tops: number; dips: number; pops: number; side: boolean }
+/** Ontario: 19+, valid government photo ID (AGCO list of acceptable ID). */
+export const BEER_ID_NOTICE = {
+  title: '19+ only. Bring photo ID to pick up.',
+  body: "Beer is for customers 19 and older. Bring valid, unexpired photo ID: a driver's licence, Ontario Photo Card, Canadian passport, Canadian citizenship card, Permanent Resident Card or LCBO BYID card. We can't hand over beer without it.",
+};
 export const COMBOS: Record<string, ComboDef> = {
   'one-large': { name: 'One Large', price: 11.99, size: 'L', pizzas: 1, tops: 1, dips: 1, pops: 0, side: false },
   'two-large': { name: 'Two Large', price: 36.0, size: 'L', pizzas: 2, tops: 4, dips: 2, pops: 2, side: true },
@@ -215,6 +220,8 @@ export interface CatItem {
   /** Default option id per group id. */
   def?: Record<string, string>;
   groups?: CatGroup[];
+  /** Shown in the item's pop-up (e.g. the beer age / ID rule). */
+  notice?: boolean;
 }
 const o = (id: string, label: string, x?: Partial<CatOpt>): CatOpt => ({ id, label, ...(x || {}) });
 const CSIZES3 = (p: [number, number, number]): CatOpt[] => [
@@ -290,7 +297,7 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
         ],
       },
       {
-        id: 'beer', name: 'Beer', desc: 'Bottle or can',
+        id: 'beer', name: 'Beer', desc: 'Bottle or can', notice: true,
         groups: [
           { id: 'kind', label: 'Bottle or can', opts: [o('bottle', 'Bottle', { price: 5.7 }), o('can', 'Can', { price: 7.5 })] },
           { id: 'brand', label: 'Brand', opts: ['Canadian', 'Molson', 'Moosehead Blue', 'Miller', 'Corona', 'Heineken', 'Stella'].map((b) => o(b.toLowerCase().replace(/\s+/g, '-'), b)) },
