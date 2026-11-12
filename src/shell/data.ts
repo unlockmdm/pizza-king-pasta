@@ -51,7 +51,7 @@ export const TILES: Tile[] = [
   { id: 'meat', name: 'Meat favourites', sub: 'Pepperoni, bacon, sausage', bg: '#C2511F', fg: '#fff', img: U('1611915365928-565c527a0590'), by: 'Tamas Pap', h: 'tamasp' },
   { id: 'combos', name: 'Pickup combos', sub: 'From ' + money(Math.min(...Object.values(COMBOS).map((c) => c.price))), bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
   { id: 'pasta', name: 'Pasta & momos', sub: 'Rosé, Alfredo, tomato', bg: '#F2B53A', fg: '#1A1414', img: 'assets/menu/pasta-rose.png' },
-  { id: 'wings', name: 'Wings & sides', sub: 'Wings, tandoori, salads, sides', bg: '#7A2E1D', fg: '#fff', img: 'assets/ingredients/tandoori-chicken.png' },
+  { id: 'wings', name: 'Wings & sides', sub: 'Wings, tandoori, salads, sides', bg: '#250703', fg: '#fff', img: 'assets/menu/wings-sides-tile.webp', full: true },
   { id: 'juice', name: 'Drinks', sub: 'Juice, coffee, pop, beer', bg: '#00332A', fg: '#fff', img: 'assets/menu/drinks-tile.webp', full: true },
   { id: 'gelato', name: 'Gelato & shakes', sub: 'Cones, cups, thick shakes', bg: '#F4C6CF', fg: '#1A1414', img: 'assets/menu/gelato-cup.webp' },
 ];
