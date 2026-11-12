@@ -94,6 +94,7 @@ const OPT_IMG: Record<string, string> = {
 const JUICE_CUPS: Record<string, { src: string; tint: string; alt: string }> = {
   mix: { src: 'assets/menu/juice-cup-clean.webp', tint: '#E2335A', alt: 'Mixed juice' },
   'orange-carrot': { src: 'assets/menu/juice-cup-orange.webp', tint: '#F07A1A', alt: 'Orange and carrot juice' },
+  'orange-pineapple': { src: 'assets/menu/juice-cup-pineapple.webp', tint: '#F4B021', alt: 'Orange and pineapple juice' },
   orange: { src: 'assets/menu/juice-cup-orange.webp', tint: '#F59A1F', alt: 'Orange juice' },
   pineapple: { src: 'assets/menu/juice-cup-pineapple.webp', tint: '#F2C230', alt: 'Pineapple juice' },
 };

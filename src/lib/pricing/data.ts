@@ -168,7 +168,7 @@ export const MENU_SECTIONS: MenuSection[] = [
     ['shake', 'Shake', 'Mango, strawberry, banana, badam, papaya', SIZES3(SHAKE)],
   ] },
   { id: 'drinks', title: 'Drinks', rows: [
-    ['fruit-juice', 'Fresh fruit juice', 'Mix, orange, pineapple or orange & carrot', SIZES3(JUICE)],
+    ['fruit-juice', 'Fresh fruit juice', 'Mix, orange, pineapple, orange & carrot or orange & pineapple', SIZES3(JUICE)],
     ['sugarcane', 'Sugarcane juice', '', SIZES3(JUICE)],
     ['lemonade', 'Lemonade', '', SIZES3(LEMONADE)],
     ['coconut', 'Fresh coconut juice', '', [['', 8.01]]],
@@ -269,9 +269,9 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
     label: 'Drinks',
     items: [
       {
-        id: 'fresh', name: 'Fresh fruit juice', desc: 'Mix, orange, pineapple or orange & carrot', def: { size: 'L' },
+        id: 'fresh', name: 'Fresh fruit juice', desc: 'Mix, orange, pineapple, orange & carrot or orange & pineapple', def: { size: 'L' },
         groups: [
-          { id: 'flav', label: 'Flavour', opts: [o('mix', 'Mix'), o('orange', 'Orange'), o('pineapple', 'Pineapple'), o('orange-carrot', 'Orange & carrot')] },
+          { id: 'flav', label: 'Flavour', opts: [o('mix', 'Mix'), o('orange', 'Orange'), o('pineapple', 'Pineapple'), o('orange-carrot', 'Orange & carrot'), o('orange-pineapple', 'Orange & pineapple')] },
           { id: 'size', label: 'Size', opts: CSIZES3(JUICE) },
           BLACK_SALT_GROUP,
           ADD_ICE_GROUP,
@@ -346,6 +346,6 @@ export const MOMOS: [MomoId, string, number][] = [['veg', 'Veggie', 9], ['nonveg
 export interface UpsellDef { key: string; name: string; unit: number; summary: string; flavours: string[] }
 // Upsells ask for a flavour before adding, so the kitchen always knows what to make.
 export const UPSELLS: UpsellDef[] = [
-  { key: 'fruit-juice', name: 'Fresh fruit juice', unit: JUICE[0], summary: 'Medium', flavours: ['Mix', 'Orange', 'Pineapple', 'Orange & carrot'] },
+  { key: 'fruit-juice', name: 'Fresh fruit juice', unit: JUICE[0], summary: 'Medium', flavours: ['Mix', 'Orange', 'Pineapple', 'Orange & carrot', 'Orange & pineapple'] },
   { key: 'gelato-cone', name: 'Gelato cone', unit: GELATO_SCOOP, summary: '', flavours: GELATO_FLAVOURS },
 ];
