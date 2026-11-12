@@ -139,61 +139,45 @@ const DEFAULTS = { size: 'L' as SizeKey, crust: 'Regular', bake: 'Wood-fired', s
 interface Piece { key: string; src: string; x: string; y: string; w: string; tf: string }
 
 function buildPieces(tops: Record<string, Half>): Piece[] {
-  const keys = Object.keys(tops);
-  const want: { k: string; ti: number; sp: [string, number][]; side: Half; n: number }[] = [];
-  keys.forEach((k, ti) => {
-    const sp = SPR[k];
-    if (!sp) return;
+  // Each topping is spread evenly over the whole pizza (or its half) on its own sunflower spiral,
+  // so every slice gets some: a generous, even look instead of a few clumps.
+  const keys = Object.keys(tops).filter((k) => SPR[k]);
+  const GA = 2.39996323; // golden angle
+  const avgOf = (k: string) => (SPR[k].reduce((t, x) => t + x[1], 0) / SPR[k].length) * (TSCALE[k] || 0.8);
+  const want = keys.map((k, ti) => {
+    const avg = avgOf(k);
+    const full = avg <= 6.5 ? 30 : avg <= 9 ? 22 : avg <= 12 ? 18 : 15;
     const side = tops[k];
-    const avg = (sp.reduce((t, x) => t + x[1], 0) / sp.length) * (TSCALE[k] || 0.8);
-    const full = avg <= 6.5 ? 14 : avg <= 9 ? 10 : avg <= 12 ? 8 : 7;
-    want.push({ k, ti, sp, side, n: side === 'whole' ? full : Math.ceil(full * 0.55) });
+    return { k, ti, side, avg, n: side === 'whole' ? full : Math.ceil(full * 0.55) };
   });
-  const cap = 0.42 * 0.42 * Math.PI * 0.42;
-  let area = 0;
-  want.forEach((w) => {
-    const avg = ((w.sp.reduce((t, x) => t + x[1], 0) / w.sp.length) * (TSCALE[w.k] || 0.8)) / 100;
-    area += w.n * avg * avg * 0.7;
-  });
-  const fit = area > cap ? Math.sqrt(cap / area) : 1;
-  const items: { k: string; i: number; side: Half; src: string; size: number }[] = [];
-  want.forEach((w) => {
-    const n = Math.max(w.side === 'whole' ? 3 : 2, Math.round(w.n * Math.min(1, fit * 1.15)));
-    const shrink = Math.max(0.78, Math.min(1, fit * 1.25));
-    for (let i = 0; i < n; i++) {
-      const pick = w.sp[(i + w.ti) % w.sp.length];
-      items.push({ k: w.k, i, side: w.side, src: pick[0], size: pick[1] * (TSCALE[w.k] || 0.8) * shrink * (0.88 + hash(w.k + 'z' + i) * 0.24) });
-    }
-  });
-  items.sort((p, q) => q.size - p.size || (p.k < q.k ? -1 : 1));
-  const placed: { k: string; x: number; y: number; r: number }[] = [];
+  // Shrink pieces (not the count) when many toppings share the pizza, so it stays covered but not buried.
+  const disc = Math.PI * 0.42 * 0.42;
+  const area = want.reduce((a, w) => a + w.n * (w.avg / 100) ** 2 * 0.7 * (w.side === 'whole' ? 1 : 1), 0);
+  const fit = Math.max(0.62, Math.min(1, Math.sqrt((disc * 0.62) / Math.max(area, 1e-6))));
   const pieces: Piece[] = [];
-  items.forEach((it) => {
-    const rr = it.size / 200;
-    const maxR = 0.425 - rr * 0.9;
-    let best: { x: number; y: number } | null = null;
-    let bestScore = -1e9;
-    for (let c = 0; c < 48; c++) {
-      const u = hash(it.k + 'u' + it.i + '-' + c), v = hash(it.k + 'v' + it.i + '-' + c);
-      let ang = u * Math.PI * 2;
-      if (it.side === 'left') ang = Math.PI / 2 + u * Math.PI;
-      if (it.side === 'right') ang = -Math.PI / 2 + u * Math.PI;
-      const rad = Math.sqrt(v) * maxR;
-      const x = Math.cos(ang) * rad, y = Math.sin(ang) * rad;
-      if (it.side === 'left' && x > -rr * 0.6) continue;
-      if (it.side === 'right' && x < rr * 0.6) continue;
-      let score = 1e9;
-      placed.forEach((p) => {
-        const d = Math.hypot(p.x - x, p.y - y) - (p.r + rr) * 0.92;
-        const same = p.k === it.k ? 0.6 : 1;
-        if (d * same < score) score = d * same;
-      });
-      score = Math.min(score, (maxR - rad) * 1.4 + 0.02);
-      if (score > bestScore) { bestScore = score; best = { x, y }; }
+  const order: { k: string; i: number; x: number; y: number; size: number; src: string }[] = [];
+  want.forEach((w) => {
+    const sp = SPR[w.k];
+    const rot = w.ti * 0.91 + hash(w.k + 'o') * Math.PI * 2; // each topping's spiral is turned, so they interleave
+    const total = w.side === 'whole' ? w.n : w.n * 2;
+    let i = 0;
+    for (let p = 0; p < total && i < w.n; p++) {
+      const size = sp[(p + w.ti) % sp.length][1] * (TSCALE[w.k] || 0.8) * fit * (0.9 + hash(w.k + 'z' + p) * 0.2);
+      const rr = size / 200;
+      const maxR = 0.43 - rr * 0.85;
+      const r = maxR * Math.sqrt((p + 0.5) / total) + (hash(w.k + 'j' + p) - 0.5) * 0.03;
+      const a = p * GA + rot + (hash(w.k + 'a' + p) - 0.5) * 0.35;
+      const x = Math.cos(a) * r, y = Math.sin(a) * r;
+      if (w.side === 'left' && x > -rr * 0.5) continue;
+      if (w.side === 'right' && x < rr * 0.5) continue;
+      order.push({ k: w.k, i, x, y, size, src: sp[(p + w.ti) % sp.length][0] });
+      i++;
     }
-    if (!best) best = { x: 0, y: 0 };
-    placed.push({ k: it.k, x: best.x, y: best.y, r: rr });
-    const cx = 50 + best.x * 100, cy = 50 + best.y * 100;
+  });
+  // Big pieces first so small ones sit on top and stay visible.
+  order.sort((p, q) => q.size - p.size || (p.k < q.k ? -1 : 1));
+  order.forEach((it) => {
+    const cx = 50 + it.x * 100, cy = 50 + it.y * 100;
     pieces.push({
       key: it.k + '-' + it.i,
       src: 'assets/toppings/' + it.src + '.png',

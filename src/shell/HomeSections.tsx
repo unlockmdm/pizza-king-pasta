@@ -15,13 +15,16 @@ const PRODUCT_SHADOW = 'drop-shadow(0 8px 10px rgba(70,0,10,.35)) drop-shadow(0 
 /** Build Your Own tile: topping cut-outs drop onto the pizza in a sunflower spiral, cycling every 2.6s. */
 function ByoToppings({ si }: { si: number }) {
   const set = BYO_SETS[si % BYO_SETS.length];
-  const per = 5, N = set.length * per, GA = 2.39996;
+  // Each topping gets its own even spread over the whole pizza (turned so they interleave),
+  // with a little jitter: no lines or S-shapes, every slice gets some of everything.
+  const per = 7, GA = 2.39996;
+  const jit = (n: number) => (Math.sin(n * 12.9898 + si * 78.233) * 43758.5453) % 1;
   const out: JSX.Element[] = [];
   for (let k = 0; k < per; k++) {
     set.forEach(([, imgs, w], t) => {
       const i = k * set.length + t;
-      const rr = Math.sqrt((i + 0.6) / N) * 128;
-      const a = i * GA + si * 0.7;
+      const rr = Math.min(132, Math.sqrt((k + 0.5) / per) * 132 + jit(i) * 10);
+      const a = k * GA + (t * Math.PI * 2) / set.length + t * 0.6 + si * 0.7 + jit(i + 99) * 0.5;
       const rot = ((i * 73 + si * 41) % 360) + 'deg';
       out.push(
         <img
