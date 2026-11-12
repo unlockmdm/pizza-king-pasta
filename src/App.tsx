@@ -68,7 +68,7 @@ function applyMeta(v: View) {
 /** Thumbnail for the "Added" toast when a line doesn't bring its own image. */
 function guessImg(t: string) {
   t = t.toLowerCase();
-  if (/juice|lassi|sugarcane|coconut/.test(t)) return 'assets/menu/juice-mix.png';
+  if (/juice|lemonade|sugarcane|coconut/.test(t)) return 'assets/menu/juice-mix.png';
   if (/gelato|shake|scoop|cone/.test(t)) return 'assets/menu/gelato-cup.webp';
   if (/pasta|penne|spaghetti|alfredo|ros[eé]|momo/.test(t)) return 'assets/menu/pasta-rose.png';
   if (/pizza|combo|crust|small|medium|large|paneer|pepperoni|meat|veg/.test(t)) return 'assets/pizza-base.webp';

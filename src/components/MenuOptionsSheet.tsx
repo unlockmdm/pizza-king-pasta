@@ -70,9 +70,9 @@ export default function MenuOptionsSheet({ target, onAdd, onClose }: { target: S
           {target.kind === 'pasta' ? (
             <>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <span style={label}>Spice level</span>
-                <div role="radiogroup" aria-label="Spice level" style={chipRow}>
-                  {SPICES.map((v) => <button key={v} type="button" role="radio" aria-checked={spice === v} onClick={() => setSpice(v)} style={chip(spice === v)}>{v}</button>)}
+                <span style={label}>Spice level <span style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 600 }}>· optional</span></span>
+                <div role="group" aria-label="Spice level" style={chipRow}>
+                  {SPICES.slice(1).map((v) => <button key={v} type="button" aria-pressed={spice === v} onClick={() => setSpice((cur) => (cur === v ? SPICES[0] : v))} style={chip(spice === v)}>{v}</button>)}
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

@@ -272,17 +272,24 @@ export default function PastaPage({ onAdd, onBack }: PastaPageProps) {
               <span style={S.bowlTitle}>{title}</span>
               <span style={S.bowlDesc}>{base.desc + ' · ' + sauce[2] + '. Prices before tax.'}</span>
             </div>
+            {/* Spice is optional: tick one, or leave all unticked for no spice (sent to the kitchen as "No spice"). */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#9C928C' }}>Spice level</span>
-              <div role="radiogroup" aria-label="Spice level" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: 6 }}>
-                {SPICES.map((v, i) => {
+              <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#9C928C' }}>Spice level</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#9C928C' }}>Optional</span>
+              </span>
+              <div role="group" aria-label="Spice level" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {SPICES.slice(1).map((v, i) => {
                   const on = spice === v;
                   return (
-                    <button key={v} type="button" role="radio" aria-checked={on} onClick={() => setSpice(v)} style={{ display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 12px', border: 0, borderRadius: 12, background: on ? '#fff' : 'rgba(255,255,255,.08)', color: on ? '#1A1414' : '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'background .15s,color .15s' }}>
+                    <button key={v} type="button" aria-pressed={on} onClick={() => setSpice((cur) => (cur === v ? SPICES[0] : v))} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 48, padding: '0 12px 0 14px', border: 0, borderRadius: 12, background: on ? 'rgba(255,255,255,.14)' : 'rgba(255,255,255,.06)', color: '#fff', fontFamily: 'inherit', fontWeight: 700, fontSize: 15, cursor: 'pointer', textAlign: 'left', transition: 'background .15s' }}>
                       <span aria-hidden="true" style={{ display: 'flex', gap: 3 }}>
-                        {[0, 1, 2].map((d) => <span key={d} style={{ width: 6, height: 6, borderRadius: '50%', background: d < i ? '#FF5A4E' : on ? '#E3E3E7' : 'rgba(255,255,255,.22)' }} />)}
+                        {[0, 1, 2].map((d) => <span key={d} style={{ width: 6, height: 6, borderRadius: '50%', background: d <= i ? '#FF5A4E' : 'rgba(255,255,255,.22)' }} />)}
                       </span>
-                      {v}
+                      <span style={{ flex: 1 }}>{v}</span>
+                      <span aria-hidden="true" style={{ flex: 'none', width: 22, height: 22, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', background: on ? '#D7192D' : 'transparent', boxShadow: on ? 'none' : 'inset 0 0 0 2px rgba(255,255,255,.4)', color: '#fff' }}>
+                        {on ? <IconCheck size={13} stroke={3.6} /> : null}
+                      </span>
                     </button>
                   );
                 })}

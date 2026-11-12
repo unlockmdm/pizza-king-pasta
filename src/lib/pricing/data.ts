@@ -175,7 +175,6 @@ export const MENU_SECTIONS: MenuSection[] = [
     ['sugarcane', 'Sugarcane juice', '', SIZES3(JUICE)],
     ['lemonade', 'Lemonade', '', SIZES3(LEMONADE)],
     ['coconut', 'Fresh coconut juice', '', [['', 8.01]]],
-    ['lassi', 'Lassi', 'Mango, mint, strawberry, sweet, salty', [['', 6.8]]],
     ['espresso', 'Italian espresso', '', [['', 3.1]]],
     ['hot', 'Hot drinks', 'Indian coffee, cappuccino, hot chocolate, masala tea', [['', 3.1]]],
     ['pop', 'Pop', 'Coke, Sprite, Canada Dry, Pepsi, Orange Crush', [['355 mL can', 1.99], ['2 L bottle', 5]]],
@@ -277,7 +276,6 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
       { id: 'sugarcane', name: 'Sugarcane juice', def: { size: 'L' }, groups: [{ id: 'size', label: 'Size', opts: CSIZES3(JUICE) }, BLACK_SALT_GROUP, ADD_ICE_GROUP] },
       { id: 'lemonade', name: 'Lemonade', def: { size: 'L' }, groups: [{ id: 'size', label: 'Size', opts: CSIZES3(LEMONADE) }, SUGAR_GROUP, LEMONADE_ICE_GROUP] },
       { id: 'coconut', name: 'Fresh coconut juice', price: 8.01 },
-      { id: 'lassi', name: 'Lassi', price: 6.8, groups: [{ id: 'flav', label: 'Flavour', opts: [o('mango', 'Mango'), o('mint', 'Mint'), o('strawberry', 'Strawberry'), o('sweet', 'Sweet'), o('salty', 'Salty')] }] },
       { id: 'espresso', name: 'Italian espresso', price: 3.1, groups: [SUGAR_GROUP] },
       { id: 'hot', name: 'Hot drinks', price: 3.1, groups: [{ id: 'kind', label: 'Drink', opts: [o('coffee', 'Indian coffee'), o('cappuccino', 'Cappuccino'), o('choc', 'Hot chocolate'), o('masala', 'Masala tea')] }, SUGAR_GROUP] },
       {

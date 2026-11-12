@@ -28,7 +28,7 @@ export const PAGES: Record<PageId, PageMeta> = {
   menu: {
     slug: 'menu',
     title: 'Menu: Pizza, Pasta, Wings & Drinks | Pizza King & Pasta',
-    description: 'Full menu with prices: butter chicken, shahi paneer and classic pizzas, pickup combos, pasta, momos, tandoori wings, juice, lassi and gelato in Brampton.',
+    description: 'Full menu with prices: butter chicken, shahi paneer and classic pizzas, pickup combos, pasta, momos, tandoori wings, fresh juice and gelato in Brampton.',
     h1: 'Pizza King & Pasta menu',
     priority: 0.9,
   },
@@ -42,7 +42,7 @@ export const PAGES: Record<PageId, PageMeta> = {
   pasta: {
     slug: 'pasta',
     title: 'Pasta & Momos in Brampton | Pizza King & Pasta',
-    description: 'Rosé, Alfredo or tomato pasta, classic, veggie or chicken, cooked to order, plus steamed veggie and non-veggie momos. Order online for pickup in Brampton.',
+    description: 'Chicken, veggie or regular pasta in rosé, Alfredo or tomato sauce, cooked to order, plus steamed veggie and non-veggie momos. Order online for pickup in Brampton.',
     h1: 'Pasta and momos',
     priority: 0.8,
   },
@@ -55,9 +55,9 @@ export const PAGES: Record<PageId, PageMeta> = {
   },
   juice: {
     slug: 'drinks',
-    title: 'Fresh Juice, Lassi & Chai in Brampton | Pizza King & Pasta',
-    description: 'Fresh fruit and sugarcane juice, lassi, masala tea, coffee, pop and beer. Order with your pizza for pickup at Pizza King & Pasta in Brampton.',
-    h1: 'Juice, lassi and drinks',
+    title: 'Fresh Juice, Coffee & Chai in Brampton | Pizza King & Pasta',
+    description: 'Fresh fruit and sugarcane juice, lemonade, masala tea, coffee, pop and beer. Order with your pizza for pickup at Pizza King & Pasta in Brampton.',
+    h1: 'Juice, coffee and drinks',
     priority: 0.7,
   },
   gelato: {

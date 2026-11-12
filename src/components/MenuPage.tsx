@@ -202,7 +202,7 @@ interface Tile {
 const CAT_TWIN: Record<string, [CategoryId, string]> = {
   wings: ['wings', 'wings'], leg: ['wings', 'leg'], fish: ['wings', 'fish'], wedges: ['wings', 'wedges'], 'garlic-bread': ['wings', 'garlic-bread'],
   sub: ['wings', 'sub'], 'nv-salad': ['wings', 'nv-salad'], 'v-salad': ['wings', 'v-salad'], corn: ['wings', 'corn'], chaat: ['wings', 'chaat'],
-  'fruit-juice': ['juice', 'fresh'], sugarcane: ['juice', 'sugarcane'], lemonade: ['juice', 'lemonade'], coconut: ['juice', 'coconut'], lassi: ['juice', 'lassi'],
+  'fruit-juice': ['juice', 'fresh'], sugarcane: ['juice', 'sugarcane'], lemonade: ['juice', 'lemonade'], coconut: ['juice', 'coconut'],
   espresso: ['juice', 'espresso'], hot: ['juice', 'hot'], pop: ['juice', 'pop'], water: ['juice', 'water'], beer: ['juice', 'beer'],
   cone: ['gelato', 'cone'], cup: ['gelato', 'cup'], shake: ['gelato', 'shake'],
 };

@@ -70,7 +70,6 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   sugarcane: { f: 'juice', img: ITEM_PHOTOS['sugarcane'] || '' },
   lemonade: { f: 'juice', img: ITEM_PHOTOS['lemonade'] || '' },
   coconut: { f: 'juice', img: ITEM_PHOTOS['coconut'] || '' },
-  lassi: { f: 'lassi', img: ITEM_PHOTOS['lassi'] || '' },
   espresso: { f: 'hot', img: ITEM_PHOTOS['espresso'] || '' },
   hot: { f: 'hot', img: ITEM_PHOTOS['hot'] || '' },
   pop: { f: 'soft', img: ITEM_PHOTOS['pop'] || '' },
@@ -82,14 +81,13 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   shake: { img: ITEM_PHOTOS['shake'] || '' },
 };
 /** Option groups shown as wrapping chips instead of a segmented control ("item.group"; spice is always chips). */
-const CHIPS = new Set(['lassi.flav', 'hot.kind', 'pop.brand', 'beer.brand', 'cone.flav', 'cup.flav', 'shake.flav', 'wings.flav', 'fish.w']);
+const CHIPS = new Set(['hot.kind', 'pop.brand', 'beer.brand', 'cone.flav', 'cup.flav', 'shake.flav', 'wings.flav', 'fish.w']);
 /** Groups shown as chips wherever they appear (Square drink adjustments, second gelato flavour). */
 const CHIP_GROUPS = new Set(['sugar', 'ice', 'salt', 'flav2']);
 /** Option photos ("item.option" → Unsplash id). */
 const OPT_IMG: Record<string, string> = {
   'wings.hot': '1608039755401-742074f0548d', 'wings.honey': '1567620832903-9fc6debc209f', 'wings.bbq': '1527477396000-e27163b481c2',
   'fresh.orange': '1600271886742-f049cd451bba', 'fresh.pineapple': '1534353473418-4cfa6c56fd38', 'fresh.guava': 'assets/menu/guava-juice.webp', 'fresh.mix': 'assets/menu/juice-mix-cup.webp',
-  'lassi.strawberry': '1589733955941-5eeaf752f6dd',
   'shake.mango': 'assets/menu/mango-shake.webp', 'shake.strawberry': 'assets/menu/strawberry-shake.webp', 'shake.banana': 'assets/menu/banana-shake.webp',
   'shake.badam': 'assets/menu/badam-shake.webp', 'shake.papaya': 'assets/menu/papaya-shake.webp',
 };
@@ -117,8 +115,8 @@ const CATS: Record<CategoryId, Category> = {
     items: withUi('wings'),
   },
   juice: {
-    hero: { img: '1622597467836-f3285f2131b8', eyebrow: CAT_MENU.juice.label, t1: 'Fresh juice.', t2: 'Lassi and chai.', p: 'Fruit and sugarcane juice, lassi, coffee, masala tea, pop, and beer by the bottle or can.' },
-    filters: [['all', 'All'], ['juice', 'Juice'], ['lassi', 'Lassi'], ['hot', 'Coffee & chai'], ['soft', 'Pop & water'], ['beer', 'Beer']],
+    hero: { img: '1622597467836-f3285f2131b8', eyebrow: CAT_MENU.juice.label, t1: 'Fresh juice.', t2: 'Coffee and chai.', p: 'Fruit and sugarcane juice, lemonade, coffee, masala tea, pop, and beer by the bottle or can.' },
+    filters: [['all', 'All'], ['juice', 'Juice'], ['hot', 'Coffee & chai'], ['soft', 'Pop & water'], ['beer', 'Beer']],
     noun: 'drinks',
     items: withUi('juice'),
   },
