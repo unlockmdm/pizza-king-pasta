@@ -23,20 +23,21 @@ const PIZZA_PICS: string[] = [
 ].map(UI);
 /** Unsplash id, or a local asset path. */
 const PIZZA_PHOTO: Record<string, string> = {
-  napoli: '1571066811602-716837d681de',
+  napoli: 'assets/pizzas/napoli.webp',
   'four-seasons': '1559978137-8c560d91e9e1',
   'italian-veg': '1617470702892-e01504297e84',
   'non-veg': '1600628421055-4d30de868b8f',
-  bismark: '1595708684082-a173bb3a06c5',
-  'sea-food': '1552539618-7eec9b4d1796',
+  bismark: 'assets/pizzas/bismark.webp',
+  'sea-food': 'assets/pizzas/sea-food.webp',
   'chicken-shawarma': 'assets/pizzas/shawarma-chicken.webp',
   'butter-chicken': 'assets/pizzas/butter-chicken.png',
   'shahi-paneer': 'assets/pizzas/shahi-paneer.png',
   greek: '1573821663912-6df460f9c684',
-  hawaiian: '1576458088443-04a19bb13da6',
+  hawaiian: 'assets/pizzas/hawaiian.webp',
   'meat-lover': '1628840042765-356cda07504e',
-  canadian: '1534308983496-4fabb1a015ee',
-  'tandoori-fish': '1589187151053-5ec8818e661b',
+  canadian: 'assets/pizzas/canadian.webp',
+  'tandoori-fish': 'assets/pizzas/tandoori-fish.webp',
+  pepperoni: '1692737580547-b45bb4a02356',
 };
 /**
  * Row photos. The prototype also maps `lassi` to assets/menu/juice.jpg (the mixed-juice photo);
@@ -49,7 +50,7 @@ const ROW_PIC: Record<string, string> = {
   espresso: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?fm=jpg&q=70&w=600&auto=format&fit=crop',
   hot: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?fm=jpg&q=70&w=600&auto=format&fit=crop',
   beer: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  shake: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  shake: 'assets/menu/mango-shake.webp',
   momos: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?fm=jpg&q=70&w=600&auto=format&fit=crop',
   chaat: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?fm=jpg&q=70&w=600&auto=format&fit=crop',
   sub: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?fm=jpg&q=70&w=600&auto=format&fit=crop',
@@ -69,11 +70,10 @@ const ROW_PIC: Record<string, string> = {
   'veg-pasta-alfredo': 'assets/menu/pasta-alfredo.png',
   'ch-pasta-rose': 'assets/menu/pasta-rose.png',
   'ch-pasta-alfredo': 'assets/menu/pasta-alfredo.png',
-  'veg-pasta-tomato': 'assets/menu/pasta.jpg',
-  'ch-pasta-tomato': 'assets/menu/pasta.jpg',
+  'veg-pasta-tomato': 'https://images.unsplash.com/photo-1598866594230-a7c12756260f?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  'ch-pasta-tomato': 'https://images.unsplash.com/photo-1598866594230-a7c12756260f?fm=jpg&q=70&w=600&auto=format&fit=crop',
   cone: 'https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?fm=jpg&q=70&w=600&auto=format&fit=crop',
   cup: 'assets/menu/gelato-cup.webp',
-  lassi: 'assets/menu/juice.jpg',
   corn: 'assets/menu/sweet-corn.webp',
 };
 

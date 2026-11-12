@@ -69,8 +69,8 @@ function applyMeta(v: View) {
 function guessImg(t: string) {
   t = t.toLowerCase();
   if (/juice|lassi|sugarcane|coconut/.test(t)) return 'assets/menu/juice-mix.png';
-  if (/gelato|shake|scoop|cone/.test(t)) return 'assets/menu/gelato.jpg';
-  if (/pasta|penne|spaghetti|alfredo|ros[eé]|momo/.test(t)) return 'assets/menu/pasta.jpg';
+  if (/gelato|shake|scoop|cone/.test(t)) return 'assets/menu/gelato-cup.webp';
+  if (/pasta|penne|spaghetti|alfredo|ros[eé]|momo/.test(t)) return 'assets/menu/pasta-rose.png';
   if (/pizza|combo|crust|small|medium|large|paneer|pepperoni|meat|veg/.test(t)) return 'assets/pizza-base.webp';
   return '';
 }

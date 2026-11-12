@@ -25,7 +25,7 @@ interface Upsell {
 }
 // Upsells ask for a flavour before adding, so the kitchen always knows what to make.
 // Names, prices and flavours come from the shared pricing module; only the photos live here.
-const UPSELL_IMG: Record<string, string> = { 'fruit-juice': 'assets/menu/juice-mix.png', 'gelato-cone': 'assets/menu/gelato.jpg' };
+const UPSELL_IMG: Record<string, string> = { 'fruit-juice': 'assets/menu/juice-mix.png', 'gelato-cone': 'https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?fm=jpg&q=70&w=600&auto=format&fit=crop' };
 const UPSELLS: Upsell[] = UPSELL_DATA.map((u) => ({ ...u, img: UPSELL_IMG[u.key] || '' }));
 
 const TIP_PRESETS = [0, 10, 15, 18] as const;

@@ -16,10 +16,10 @@ export interface Special {
 }
 
 export const SPECIALS: Special[] = [
-  { id: 'shahi-paneer', name: 'Shahi Paneer', desc: 'Tandoori paneer, green peppers, red onions, jalapeños', veg: true, img: U('1655673654158-9f7285b7d1ea'), by: 'RUSU CIPRIAN', h: 'tehnosign' },
-  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', veg: false, img: U('1604382354936-07c5d9983bd3'), by: 'Shourav Sheikh', h: 'shouravsheikh' },
+  { id: 'shahi-paneer', name: 'Shahi Paneer', desc: 'Tandoori paneer, green peppers, red onions, jalapeños', veg: true, img: 'assets/pizzas/shahi-paneer.png', by: '', h: '' },
+  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', veg: false, img: 'assets/pizzas/butter-chicken.png', by: '', h: '' },
   { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', veg: false, tag: 'Spicy', img: 'assets/pizzas/shawarma-chicken.webp', by: '', h: '' },
-  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', veg: false, img: U('1692737580547-b45bb4a02356'), by: 'David Foodphototasty', h: 'phototastyfood' },
+  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', veg: false, img: U('1628840042765-356cda07504e'), by: '', h: '' },
 ];
 
 export const DEALS: (Deal & { by: string; h: string })[] = [
@@ -48,10 +48,10 @@ export const TILES: Tile[] = [
   { id: 'specials', name: 'House specials', sub: 'Indian-fusion and classic', bg: '#D7192D', fg: '#fff', img: U('1565299624946-b28f40a0ae38'), by: 'Chad Montano', h: 'briewilly', target: 'bestsellers' },
   { id: 'meat', name: 'Meat favourites', sub: 'Pepperoni, bacon, sausage', bg: '#C2511F', fg: '#fff', img: U('1611915365928-565c527a0590'), by: 'Tamas Pap', h: 'tamasp' },
   { id: 'combos', name: 'Pickup combos', sub: 'From ' + money(Math.min(...Object.values(COMBOS).map((c) => c.price))), bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
-  { id: 'pasta', name: 'Pasta & momos', sub: 'Rosé, Alfredo, tomato', bg: '#F2B53A', fg: '#1A1414', img: 'assets/menu/pasta.jpg', creditText: 'Photo: Dllu, Wikimedia Commons, CC BY-SA 4.0' },
+  { id: 'pasta', name: 'Pasta & momos', sub: 'Rosé, Alfredo, tomato', bg: '#F2B53A', fg: '#1A1414', img: 'assets/menu/pasta-rose.png' },
   { id: 'wings', name: 'Wings & sides', sub: 'Wings, tandoori, salads, sides', bg: '#7A2E1D', fg: '#fff', img: 'assets/ingredients/tandoori-chicken.png' },
   { id: 'juice', name: 'Drinks', sub: 'Juice, lassi, coffee, beer', bg: '#1E6E6A', fg: '#fff', img: 'assets/menu/juice-mix-red.webp', creditText: 'Photo: JIP, Wikimedia Commons, CC BY-SA 4.0' },
-  { id: 'gelato', name: 'Gelato & shakes', sub: 'Cones, cups, thick shakes', bg: '#F4C6CF', fg: '#1A1414', img: 'assets/menu/gelato.jpg', creditText: 'Photo: Rizka Budiati, Wikimedia Commons, CC BY 2.0' },
+  { id: 'gelato', name: 'Gelato & shakes', sub: 'Cones, cups, thick shakes', bg: '#F4C6CF', fg: '#1A1414', img: 'assets/menu/gelato-cup.webp' },
 ];
 
 /** Toppings already on each house special when it opens in the builder. */

@@ -36,7 +36,7 @@ function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Ph
   if (id.startsWith('dip-')) return cut('assets/combo/garlic-dip.png');
   if (/pasta-rose$/.test(id)) return cover('assets/menu/pasta-rose.png');
   if (/pasta-alfredo$/.test(id)) return cover('assets/menu/pasta-alfredo.png');
-  if (/pasta-tomato$/.test(id)) return cover('assets/menu/pasta.jpg');
+  if (/pasta-tomato$/.test(id)) return un('1598866594230-a7c12756260f');
   const map: Record<string, Photo> = {
     sugarcane: cover('assets/menu/sugarcane.webp'),
     cone: un('1497034825429-c343d7c6a68f'),
@@ -54,7 +54,6 @@ function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Ph
     hot: un('1509042239860-f550ce710b93'),
     beer: un('1600788886242-5c96aabe3757'),
     momos: un('1534422298391-e4f8c172dddb'),
-    lassi: cover('assets/menu/juice.jpg'),
     lemonade: un('1621263764928-df1444c5e859'),
     'garlic-bread': un('1573140401552-3fab0b24306f'),
   };

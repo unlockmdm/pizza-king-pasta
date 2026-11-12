@@ -174,7 +174,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
 
           {/* Fresh pasta tile */}
           <Hov as="button" onClick={h.onPasta} aria-label="Fresh pasta: rosé, Alfredo, tomato" style={{ gridArea: 'pasta', position: 'relative', minHeight: 0, padding: 0, border: 0, borderRadius: ph ? 24 : 36, overflow: 'hidden', background: '#F2F2F5', color: '#fff', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer', transition: 'transform .3s' }} hover={{ transform: 'translateY(-3px)' }}>
-            <img src="assets/menu/pasta.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: 'pkZoom 16s ease-in-out -4s infinite alternate' }} />
+            <img src="assets/menu/pasta-rose.png" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: 'pkZoom 16s ease-in-out -4s infinite alternate' }} />
             <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(14,8,8,.55),rgba(14,8,8,0) 45%)' }} />
             <span style={{ position: 'absolute', left: ph ? 16 : 24, right: ph ? 16 : 24, top: ph ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <span style={{ fontWeight: 900, fontSize: ph ? 19 : 24, lineHeight: 1.1, letterSpacing: '-.03em', whiteSpace: 'nowrap' }}>Fresh pasta</span>

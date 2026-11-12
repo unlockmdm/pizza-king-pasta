@@ -53,8 +53,8 @@ const SPICES = SPICE_LIST;
 
 const MOMOS: readonly (readonly [id: MomoId, name: string, price: number])[] = MOMO_DATA;
 
-const HERO_IMG = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?fm=jpg&q=72&w=1200&auto=format&fit=crop';
-const HERO_IMG_WIDE = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?fm=jpg&q=72&w=1400&auto=format&fit=crop';
+const HERO_IMG = 'assets/menu/pasta-rose.png';
+const HERO_IMG_WIDE = 'assets/menu/pasta-rose.png';
 const MOMOS_IMG = 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?fm=jpg&q=72&w=1000&auto=format&fit=crop';
 
 // ---------- Static styles ----------

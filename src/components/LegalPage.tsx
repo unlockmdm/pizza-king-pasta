@@ -341,9 +341,10 @@ const terms = (goOther: (e?: MouseEvent) => void): Section[] => [
         <H3>Photo credits</H3>
         <P>
           Food and stock photos from <Ext href="https://unsplash.com">Unsplash</Ext>, used under the{' '}
-          <Ext href="https://unsplash.com/license">Unsplash License</Ext>. Pasta photo by Dllu and juice photo by JIP, both licensed under{' '}
-          <Ext href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</Ext>; gelato photo by Rizka Budiati, licensed under{' '}
-          <Ext href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</Ext>; all via{' '}
+          <Ext href="https://unsplash.com/license">Unsplash License</Ext>. Juice photo by JIP and Napoli pizza photo by Robot8A, both licensed under{' '}
+          <Ext href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</Ext>; tandoori pizza photo by mroach, licensed under{' '}
+          <Ext href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</Ext>; Hawaiian pizza photo by Elsie Hui and seafood pizza
+          photo by Rool Paap, both licensed under <Ext href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</Ext>; all via{' '}
           <Ext href="https://commons.wikimedia.org">Wikimedia Commons</Ext>. Some photos have been cropped or edited.
         </P>
       </>

@@ -17,26 +17,27 @@ interface MeatPizza {
   desc: string;
   /** Topping ids for the Pizza Builder (see TOPS there). */
   tops: string[];
-  /** Unsplash photo id. */
+  /** Unsplash photo id, or a local `assets/...` path. */
   pic: string;
   /** Photographer name and Unsplash handle, for the credit. */
   by: string;
   h: string;
+  creditText?: string;
   chicken?: boolean;
   cured?: boolean;
   tag?: string;
 }
 
 const PIZZA_LIST: Omit<MeatPizza, 'tops'>[] = [
-  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', pic: '1692737580547-b45bb4a02356', by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
-  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', pic: '1604382354936-07c5d9983bd3', by: 'Shourav Sheikh', h: 'shouravsheikh', chicken: true },
+  { id: 'meat-lover', name: 'Meat Lover', desc: 'Pepperoni, ham, bacon, sausage', pic: '1628840042765-356cda07504e', by: '', h: '', cured: true },
+  { id: 'butter-chicken', name: 'Butter Chicken', desc: 'Tandoori chicken, green peppers, red onions', pic: 'assets/pizzas/butter-chicken.png', by: '', h: '', chicken: true },
   { id: 'chicken-shawarma', name: 'Shawarma Chicken', desc: 'Garlic base, shawarma chicken, hot peppers, red onions', pic: 'assets/pizzas/shawarma-chicken.webp', by: '', h: '', chicken: true, tag: 'Spicy' },
-  { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', pic: '1593560708920-61dd98c46a4e', by: 'Saundarya Srinivasan', h: 'saundiii', chicken: true, cured: true },
-  { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', pic: '1611915365928-565c527a0590', by: 'Tamas Pap', h: 'tamasp', cured: true },
-  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', pic: '1565299624946-b28f40a0ae38', by: 'Chad Montano', h: 'briewilly', cured: true },
-  { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', pic: '1594007654729-407eedc4be65', by: 'Saahil Khatkhate', h: 'saahilkhatkhate', cured: true },
-  { id: 'bismark', name: 'Bismark', desc: 'Sun-dried tomatoes, grilled chicken, sausage', pic: '1655673654158-9f7285b7d1ea', by: 'RUSU CIPRIAN', h: 'tehnosign', chicken: true, cured: true },
-  { id: 'four-seasons', name: 'Four Seasons', desc: 'Ham, mushrooms, artichokes, black olives', pic: '1604382355076-af4b0eb60143', by: 'Shourav Sheikh', h: 'shouravsheikh', cured: true },
+  { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', pic: '1600628421055-4d30de868b8f', by: '', h: '', chicken: true, cured: true },
+  { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', pic: '1692737580547-b45bb4a02356', by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
+  { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', pic: 'assets/pizzas/canadian.webp', by: '', h: '', cured: true },
+  { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', pic: 'assets/pizzas/hawaiian.webp', by: '', h: '', creditText: 'Photo: Elsie Hui, Wikimedia Commons, CC BY 2.0', cured: true },
+  { id: 'bismark', name: 'Bismark', desc: 'Sun-dried tomatoes, grilled chicken, sausage', pic: 'assets/pizzas/bismark.webp', by: '', h: '', chicken: true, cured: true },
+  { id: 'four-seasons', name: 'Four Seasons', desc: 'Ham, mushrooms, artichokes, black olives', pic: '1559978137-8c560d91e9e1', by: '', h: '', cured: true },
 ];
 
 /** House toppings come from the shared pricing data (they set the included topping count). */
