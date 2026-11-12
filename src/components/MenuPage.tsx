@@ -37,6 +37,7 @@ const ROW_PIC: Record<string, string> = {
   'nv-salad': 'assets/menu/chicken-salad.webp',
   'v-salad': 'assets/menu/garden-salad.webp',
   wedges: 'https://images.unsplash.com/photo-1623238913973-21e45cced554?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  'garlic-bread': 'assets/menu/garlic-bread.webp',
   leg: 'https://images.unsplash.com/photo-1617692855027-33b14f061079?fm=jpg&q=70&w=600&auto=format&fit=crop',
   'dip-garlic': 'assets/dips/menu-garlic.png',
   'dip-ranch': 'assets/dips/menu-ranch.png',

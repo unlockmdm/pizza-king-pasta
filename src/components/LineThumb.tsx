@@ -55,7 +55,7 @@ function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Ph
     beer: un('1600788886242-5c96aabe3757'),
     momos: un('1534422298391-e4f8c172dddb'),
     lemonade: un('1621263764928-df1444c5e859'),
-    'garlic-bread': un('1573140401552-3fab0b24306f'),
+    'garlic-bread': cover('assets/menu/garlic-bread.webp'),
   };
   return map[id] || null;
 }

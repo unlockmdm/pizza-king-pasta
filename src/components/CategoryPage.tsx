@@ -59,7 +59,7 @@ const ITEM_UI: Record<string, { f?: string; tag?: string; veg?: boolean; img: st
   leg: { f: 'tandoor', img: '1617692855027-33b14f061079' },
   fish: { f: 'tandoor', img: '' },
   wedges: { f: 'sides', veg: true, img: '1623238913973-21e45cced554' },
-  'garlic-bread': { f: 'sides', veg: true, img: '' },
+  'garlic-bread': { f: 'sides', veg: true, img: 'assets/menu/garlic-bread.webp' },
   sub: { f: 'sides', img: '1509722747041-616f39b57569' },
   'nv-salad': { f: 'sides', img: 'assets/menu/chicken-salad.webp' },
   'v-salad': { f: 'sides', veg: true, img: 'assets/menu/garden-salad.webp' },
