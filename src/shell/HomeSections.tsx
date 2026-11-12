@@ -202,9 +202,16 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
                   <span style={{ fontWeight: 900, fontSize: w < 400 ? 18 : 21, lineHeight: 1.05, letterSpacing: '-.025em' }}>{t.name}</span>
                   <span style={{ fontSize: w < 400 ? 13 : 14, fontWeight: 600, opacity: 0.8, lineHeight: 1.3 }}>{t.sub}</span>
                 </div>
-                <div style={{ position: 'absolute', left: w < 400 ? '17%' : '9%', right: w < 400 ? '17%' : '9%', bottom: w < 400 ? '-10%' : '-13%', aspectRatio: '1/1', borderRadius: '50%', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,.28)' }}>
-                  <Photo src={t.img} shape="circle" credit={c.credit} creditHref={c.creditHref} />
-                </div>
+                {t.full ? (
+                  <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, aspectRatio: '1/1' }}>
+                    <img src={t.img} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '22%', background: 'linear-gradient(180deg,' + t.bg + ',' + t.bg + '00)' }} />
+                  </div>
+                ) : (
+                  <div style={{ position: 'absolute', left: w < 400 ? '17%' : '9%', right: w < 400 ? '17%' : '9%', bottom: w < 400 ? '-10%' : '-13%', aspectRatio: '1/1', borderRadius: '50%', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,.28)' }}>
+                    <Photo src={t.img} shape="circle" credit={c.credit} creditHref={c.creditHref} />
+                  </div>
+                )}
               </Hov>
             );
           })}

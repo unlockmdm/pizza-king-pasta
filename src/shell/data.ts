@@ -41,6 +41,8 @@ export interface Tile {
   h?: string;
   creditText?: string;
   target?: string;
+  /** Photo fills the bottom of the tile edge to edge (its top blends into `bg`) instead of the round photo. */
+  full?: boolean;
 }
 
 export const TILES: Tile[] = [
@@ -50,7 +52,7 @@ export const TILES: Tile[] = [
   { id: 'combos', name: 'Pickup combos', sub: 'From ' + money(Math.min(...Object.values(COMBOS).map((c) => c.price))), bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
   { id: 'pasta', name: 'Pasta & momos', sub: 'Rosé, Alfredo, tomato', bg: '#F2B53A', fg: '#1A1414', img: 'assets/menu/pasta-rose.png' },
   { id: 'wings', name: 'Wings & sides', sub: 'Wings, tandoori, salads, sides', bg: '#7A2E1D', fg: '#fff', img: 'assets/ingredients/tandoori-chicken.png' },
-  { id: 'juice', name: 'Drinks', sub: 'Juice, coffee, pop, beer', bg: '#1E6E6A', fg: '#fff', img: 'assets/menu/juice-mix-red.webp', creditText: 'Photo: JIP, Wikimedia Commons, CC BY-SA 4.0' },
+  { id: 'juice', name: 'Drinks', sub: 'Juice, coffee, pop, beer', bg: '#00332A', fg: '#fff', img: 'assets/menu/drinks-tile.webp', full: true },
   { id: 'gelato', name: 'Gelato & shakes', sub: 'Cones, cups, thick shakes', bg: '#F4C6CF', fg: '#1A1414', img: 'assets/menu/gelato-cup.webp' },
 ];
 
