@@ -178,7 +178,7 @@ export const MENU_SECTIONS: MenuSection[] = [
     ['lassi', 'Lassi', 'Mango, mint, strawberry, sweet, salty', [['', 6.8]]],
     ['espresso', 'Italian espresso', '', [['', 3.1]]],
     ['hot', 'Hot drinks', 'Indian coffee, cappuccino, hot chocolate, masala tea', [['', 3.1]]],
-    ['pop', 'Pop', 'Coke, Sprite, Canada Dry, Pepsi, Orange Crush', [['Can', 1.99], ['2 L bottle', 5]]],
+    ['pop', 'Pop', 'Coke, Sprite, Canada Dry, Pepsi, Orange Crush', [['355 mL can', 1.99], ['2 L bottle', 5]]],
     ['water', 'Water', '500 mL bottle', [['', 1.99]]],
     ['beer', 'Beer', 'Canadian, Molson, Moosehead, Miller, Corona, Heineken, Stella', [['Bottle', 5.7], ['Can', 7.5]]],
   ] },
@@ -281,9 +281,9 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
       { id: 'espresso', name: 'Italian espresso', price: 3.1, groups: [SUGAR_GROUP] },
       { id: 'hot', name: 'Hot drinks', price: 3.1, groups: [{ id: 'kind', label: 'Drink', opts: [o('coffee', 'Indian coffee'), o('cappuccino', 'Cappuccino'), o('choc', 'Hot chocolate'), o('masala', 'Masala tea')] }, SUGAR_GROUP] },
       {
-        id: 'pop', name: 'Pop', desc: 'Can or 2 L bottle',
+        id: 'pop', name: 'Pop', desc: '355 mL can or 2 L bottle',
         groups: [
-          { id: 'kind', label: 'Size', opts: [o('can', 'Can', { price: 1.99 }), o('2l', '2 L bottle', { price: 5 })] },
+          { id: 'kind', label: 'Size', opts: [o('can', '355 mL can', { price: 1.99 }), o('2l', '2 L bottle', { price: 5 })] },
           { id: 'brand', label: 'Brand', opts: ['Coke', 'Sprite', 'Canada Dry', 'Pepsi', 'Orange Crush'].map((b) => o(b.toLowerCase().replace(/\s+/g, '-'), b)) },
         ],
       },
