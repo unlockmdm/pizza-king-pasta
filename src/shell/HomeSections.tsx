@@ -100,9 +100,9 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
           {/* Hero tile */}
           <div style={{ gridArea: 'hero', position: 'relative', minHeight: 0, borderRadius: ph ? 28 : 36, overflow: 'hidden', color: '#fff', background: '#1A1414' }}>
             <img src="assets/hero-oven.webp" alt="Pizza coming out of the wood-fired oven at Pizza King & Pasta in Brampton" {...{ fetchpriority: "high" }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 35%' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(14,8,8,.94) 0%,rgba(14,8,8,.72) 38%,rgba(14,8,8,.12) 72%)' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(14,8,8,.9) 0%,rgba(14,8,8,.5) 34%,rgba(14,8,8,.08) 66%)' }} />
             <div style={{ position: 'absolute', left: 'clamp(22px,3vw,40px)', right: 'clamp(22px,3vw,40px)', bottom: 'clamp(22px,3vw,40px)', display: 'flex', flexDirection: 'column', gap: 24 }}>
-              <h1 style={{ margin: 0, fontWeight: 900, fontSize: bentoFont, lineHeight: 0.86, letterSpacing: '-.065em' }}>
+              <h1 style={{ margin: 0, fontWeight: 700, fontSize: bentoFont, lineHeight: 0.9, letterSpacing: '-.045em', textShadow: '0 2px 18px rgba(0,0,0,.45)' }}>
                 <span style={{ display: 'block', marginBottom: ph ? 12 : 16, fontSize: ph ? 12 : 14, fontWeight: 800, lineHeight: 1.3, letterSpacing: ph ? '.08em' : '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.82)', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) both' }}>{w < 440 ? 'Desi & wood-fired pizza · Brampton' : 'Indian-style & wood-fired pizza · Brampton'}</span>
                 <span style={{ display: 'block', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) both' }}>Wood-fired.</span>
                 <span style={{ display: 'block', color: '#FF4B57', animation: 'pkUp 1s cubic-bezier(.2,.8,.2,1) .12s both' }}>Made to order.</span>
