@@ -426,7 +426,7 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
             </div>
           </div>
           <div style={{ position: 'relative', borderRadius: 32, overflow: 'hidden', minHeight: 380, background: '#2A1E1A', display: ph ? 'none' : undefined }}>
-            <Photo src="assets/storefront.webp" alt="Pizza King &amp; Pasta storefront at 511 Ray Lawson Blvd, Brampton" position="45% 50%" />
+            <Photo src="assets/storefront.webp" alt="Pizza King &amp; Pasta storefront at 511 Ray Lawson Blvd, Brampton" position="30% 50%" />
           </div>
         </div>
       </section>
