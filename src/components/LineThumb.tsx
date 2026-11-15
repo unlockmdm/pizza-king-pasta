@@ -24,7 +24,6 @@ const JUICE: Record<string, Photo> = {
   mix: cut('assets/menu/juice-cup-clean.webp'),
 };
 const DIP: Record<string, string> = { 'dip-garlic': 'garlic', 'dip-ranch': 'ranch', 'dip-chipotle': 'chipotle', 'dip-jalapeno': 'jalapeno-cheddar', 'dip-marinara': 'marinara' };
-const WINGS: Record<string, string> = { hot: '1608039755401-742074f0548d', honey: '1567620832903-9fc6debc209f', 'honey-garlic': '1567620832903-9fc6debc209f', garlic: '1567620832903-9fc6debc209f', bbq: '1527477396000-e27163b481c2' };
 
 /** Photo for a menu / category item id (both pages use the same ids for most things). */
 function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Photo | null {
@@ -32,7 +31,7 @@ function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Ph
   if (id === 'pop') return opts.brand === 'water' || /\bwater\b/i.test(text) ? cover('assets/menu/water.webp') : popPhoto(opts.brand || brandIn(text) || 'coke');
   if (id === 'shake') { const f = flav || Object.keys(SHAKE).find((k) => text.toLowerCase().includes(k)) || 'mango'; return cover('assets/menu/' + (SHAKE[f] || 'mango') + '-shake.webp'); }
   if (id === 'fresh' || id === 'fruit-juice') { const f = flav || Object.keys(JUICE).find((k) => text.toLowerCase().includes(k)) || 'mix'; return JUICE[f] || JUICE.mix; }
-  if (id === 'wings') return WINGS[flav] ? un(WINGS[flav]) : cut('assets/ingredients/tandoori-chicken.png');
+  if (id === 'wings') return cover('assets/menu/wings.webp');
   if (DIP[id]) return cut('assets/dips/' + DIP[id] + '.png');
   if (id.startsWith('dip-')) return cut('assets/combo/garlic-dip.png');
   if (/pasta-rose$/.test(id)) return cover('assets/menu/pasta-rose.webp');

@@ -70,7 +70,7 @@ export const pizzaPhoto = (id: string, w = 900) => (PIZZA_PHOTOS[id] ? U(PIZZA_P
  * photo yet). The category pages, the full menu and cart thumbnails all read from here.
  */
 export const ITEM_PHOTOS: Record<string, string> = {
-  wings: '1608039755401-742074f0548d',
+  wings: 'assets/menu/wings.webp',
   leg: '1617692855027-33b14f061079',
   fish: '',
   wedges: '1623238913973-21e45cced554',

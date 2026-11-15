@@ -87,7 +87,6 @@ const CHIPS = new Set(['fresh.flav', 'hot.kind', 'pop.brand', 'beer.brand', 'con
 const CHIP_GROUPS = new Set(['sugar', 'ice', 'salt', 'flav2']);
 /** Option photos ("item.option" → Unsplash id). */
 const OPT_IMG: Record<string, string> = {
-  'wings.hot': '1608039755401-742074f0548d', 'wings.honey': '1567620832903-9fc6debc209f', 'wings.bbq': '1527477396000-e27163b481c2',
   'fresh.orange': '1600271886742-f049cd451bba', 'fresh.pineapple': '1534353473418-4cfa6c56fd38', 'fresh.mix': 'assets/menu/juice-mix-cup.webp', 'pop.water': 'assets/menu/water.webp',
   'shake.mango': 'assets/menu/mango-shake.webp', 'shake.strawberry': 'assets/menu/strawberry-shake.webp', 'shake.banana': 'assets/menu/banana-shake.webp',
   'shake.badam': 'assets/menu/badam-shake.webp', 'shake.papaya': 'assets/menu/papaya-shake.webp',
@@ -128,7 +127,7 @@ const withUi = (cat: CategoryId): Item[] =>
 
 const CATS: Record<CategoryId, Category> = {
   wings: {
-    hero: { img: '1608039755401-742074f0548d', eyebrow: CAT_MENU.wings.label, t1: 'Tandoori', t2: 'wings.', p: 'Wings from the wood oven in hot, honey garlic or BBQ. Also tandoori chicken and fish, salads and sides.' },
+    hero: { img: 'assets/menu/wings.webp', eyebrow: CAT_MENU.wings.label, t1: 'Tandoori', t2: 'wings.', p: 'Wings from the wood oven in hot, honey garlic or BBQ. Also tandoori chicken and fish, salads and sides.' },
     filters: [['all', 'All'], ['tandoor', 'Wings & tandoori'], ['sides', 'Sides & salads']],
     items: withUi('wings'),
   },
@@ -302,7 +301,7 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
     <div style={S.root}>
       <section style={S.heroSection}>
         <div style={ph ? { ...S.hero, minHeight: 300, borderRadius: 28 } : S.hero}>
-          <Photo src={hero.img} alt="" credit="Photo on Unsplash" creditHref="https://unsplash.com" eager />
+          <Photo src={hero.img} alt="" credit={cat.hero.img.indexOf("assets/") === 0 ? "" : "Photo on Unsplash"} creditHref="https://unsplash.com" eager />
           <div style={S.heroShade} />
           <div style={ph ? { ...S.heroBody, gap: 28 } : S.heroBody}>
             <Hov as="button" type="button" onClick={ev(onBack)} style={S.back} hover={S.backHover}>
