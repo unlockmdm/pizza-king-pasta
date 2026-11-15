@@ -87,7 +87,7 @@ export const ITEM_PHOTOS: Record<string, string> = {
   hot: 'assets/menu/hot-drinks-dark.webp',
   pop: 'assets/menu/cold-drinks.webp',
   beer: 'assets/menu/beer.webp',
-  cone: '1497034825429-c343d7c6a68f',
+  cone: 'assets/menu/gelato-cone.webp',
   cup: 'assets/menu/gelato-cup.webp',
   shake: 'assets/menu/mango-shake.webp',
   momos: '1534422298391-e4f8c172dddb',
