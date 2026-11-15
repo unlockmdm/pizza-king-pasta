@@ -49,7 +49,7 @@ export { canOrderAsap as isShopOpen } from './hours';
 export const PIZZA_PHOTOS: Record<string, string> = {
   byo: '1593560708920-61dd98c46a4e',
   napoli: 'assets/pizzas/napoli.webp',
-  'four-seasons': '1559978137-8c560d91e9e1',
+  'four-seasons': 'assets/pizzas/four-seasons.webp',
   'italian-veg': '1617470702892-e01504297e84',
   'non-veg': 'assets/pizzas/non-veg.webp',
   bismark: 'assets/pizzas/bismark.webp',
