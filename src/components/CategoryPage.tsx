@@ -100,6 +100,21 @@ const JUICE_CUPS: Record<string, { src: string; tint: string; alt: string }> = {
   orange: { src: 'assets/menu/juice-cup-orange.webp', tint: '#F59A1F', alt: 'Orange juice' },
   pineapple: { src: 'assets/menu/juice-cup-pineapple.webp', tint: '#F2C230', alt: 'Pineapple juice' },
 };
+/** Drinks whose cup changes size with the size choice: cut-out photos on a soft tinted glow. */
+const SIZE_SCALE: Record<string, number> = { M: 0.76, L: 0.88, XL: 1 };
+const SIZE_NAME: Record<string, string> = { M: 'Medium', L: 'Large', XL: 'X-Large' };
+const SHAKE_TINT: Record<string, string> = { mango: '#F2A81D', strawberry: '#E8667D', banana: '#E9CF7A', badam: '#C9A27A', papaya: '#F08A4B' };
+type Stage = { src: string; tint: string; alt: string; size: string; h: string; bottom: string; shadowW: string; blend?: boolean };
+function drinkStage(id: string, groups: Group[], chosen: { id: string; label: string }[]): Stage | null {
+  const val = (g: string) => { const i = groups.findIndex((x) => x.id === g); return i >= 0 ? chosen[i].id : ''; };
+  const size = val('size');
+  const cupBox = { h: '72%', bottom: '12.5%', shadowW: '30%' };
+  if (id === 'fresh') { const c = JUICE_CUPS[val('flav')]; return c ? { ...c, size, ...cupBox } : null; }
+  if (id === 'sugarcane') return { src: 'assets/menu/sugarcane-cup-cut.webp', tint: '#8DBE2A', alt: 'Sugarcane juice', size, ...cupBox };
+  if (id === 'lemonade') return { src: 'assets/menu/lemonade-cut.webp', tint: '#F2C230', alt: 'Lemonade', size, h: '66%', bottom: '11%', shadowW: '58%' };
+  if (id === 'shake') { const f = val('flav') || 'mango'; const g = groups.find((x) => x.id === 'flav'); const lab = g?.opts.find((o) => o.id === f)?.label || 'Mango'; return { src: 'assets/menu/' + f + '-shake.webp', tint: SHAKE_TINT[f] || '#F2A81D', alt: lab + ' shake', size, h: '92%', bottom: '1%', shadowW: '0%', blend: true }; }
+  return null;
+}
 const withUi = (cat: CategoryId): Item[] =>
   CAT_MENU[cat].items.map((it) => ({
     ...it,
@@ -382,15 +397,17 @@ function CategoryView({ category, onAdd, onBack, onMenu }: CategoryPageProps) {
         <div role="dialog" aria-modal="true" aria-label={m.it.name} style={{ ...S.dialog, alignItems: mob ? 'flex-end' : 'center', padding: mob ? '0' : '24px' }}>
           <div onClick={() => setOpen(null)} style={S.scrim} />
           <div style={{ ...S.panel, maxHeight: mob ? '92vh' : 'min(640px,90vh)', flexDirection: mob ? 'column' : 'row', borderRadius: mob ? '28px 28px 0 0' : '28px' }}>
-            <div style={{ position: 'relative', flex: mob ? 'none' : '0 0 44%', minHeight: mob ? '220px' : '0', background: '#EDEDF0', overflow: 'hidden' }}>
+            <div style={{ position: 'relative', flex: mob ? 'none' : '0 0 44%', minHeight: mob ? (drinkStage(m.it.id, m.groups, m.chosen) ? '270px' : '220px') : '0', background: '#EDEDF0', overflow: 'hidden' }}>
               {(() => {
-                const fi = m.groups.findIndex((g) => g.id === 'flav');
-                const cup = m.it.id === 'fresh' && fi >= 0 ? JUICE_CUPS[m.chosen[fi].id] : undefined;
-                if (!cup) return <Photo src={m.img} alt={m.it.name} credit={m.credit} creditHref="https://unsplash.com" />;
+                const st = drinkStage(m.it.id, m.groups, m.chosen);
+                if (!st) return <Photo src={m.img} alt={m.it.name} credit={m.credit} creditHref="https://unsplash.com" />;
+                // Cup grows and shrinks with the size, like the pizza in the builder (anchored at its base).
+                const k = SIZE_SCALE[st.size] ?? 1;
                 return (
-                  <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(60% 55% at 50% 46%, ' + cup.tint + '2E 0%, ' + cup.tint + '12 45%, #FBFBFC 78%), linear-gradient(180deg,#FFFFFF 0%,#F4F4F6 100%)' }}>
-                    <span aria-hidden="true" style={{ position: 'absolute', left: '50%', bottom: '10.5%', width: '30%', height: '3.2%', transform: 'translateX(-50%)', borderRadius: '50%', background: 'rgba(30,20,20,.26)', filter: 'blur(8px)' }} />
-                    <img src={cup.src} alt={cup.alt} decoding="async" style={{ position: 'absolute', left: 0, right: 0, top: '9%', width: '100%', height: '79%', objectFit: 'contain', filter: 'drop-shadow(0 22px 26px ' + cup.tint + '33)' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(60% 55% at 50% 46%, ' + st.tint + '2E 0%, ' + st.tint + '12 45%, #FBFBFC 78%), linear-gradient(180deg,#FFFFFF 0%,#F4F4F6 100%)' }}>
+                    <span aria-hidden="true" style={{ position: 'absolute', left: '50%', bottom: '10.5%', width: st.shadowW, height: '3.2%', transform: 'translateX(-50%) scaleX(' + k + ')', borderRadius: '50%', background: 'rgba(30,20,20,.26)', filter: 'blur(8px)', transition: 'transform .5s cubic-bezier(.3,.8,.3,1)' }} />
+                    <img src={st.src} alt={st.alt} decoding="async" style={{ position: 'absolute', left: 0, right: 0, bottom: st.bottom, width: '100%', height: st.h, objectFit: 'contain', objectPosition: '50% 100%', transformOrigin: '50% 100%', transform: 'scale(' + k + ')', transition: 'transform .5s cubic-bezier(.3,.8,.3,1)', ...(st.blend ? { mixBlendMode: 'multiply' } : { filter: 'drop-shadow(0 22px 26px ' + st.tint + '33)' }) }} />
+                    {st.size ? <span style={{ position: 'absolute', left: '50%', bottom: '3.5%', transform: 'translateX(-50%)', fontSize: 12, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#8E8E93' }}>{SIZE_NAME[st.size]}</span> : null}
                   </div>
                 );
               })()}
