@@ -70,7 +70,7 @@ function guessImg(t: string) {
   t = t.toLowerCase();
   if (/juice|lemonade|sugarcane|coconut/.test(t)) return 'assets/menu/juice-mix.png';
   if (/gelato|shake|scoop|cone/.test(t)) return 'assets/menu/gelato-cup.webp';
-  if (/pasta|penne|spaghetti|alfredo|ros[eé]|momo/.test(t)) return 'assets/menu/pasta-rose.png';
+  if (/pasta|penne|spaghetti|alfredo|ros[eé]|momo/.test(t)) return 'assets/menu/pasta-rose.webp';
   if (/pizza|combo|crust|small|medium|large|paneer|pepperoni|meat|veg/.test(t)) return 'assets/pizza-base.webp';
   return '';
 }

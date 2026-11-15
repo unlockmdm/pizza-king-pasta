@@ -35,7 +35,7 @@ function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Ph
   if (id === 'wings') return WINGS[flav] ? un(WINGS[flav]) : cut('assets/ingredients/tandoori-chicken.png');
   if (DIP[id]) return cut('assets/dips/' + DIP[id] + '.png');
   if (id.startsWith('dip-')) return cut('assets/combo/garlic-dip.png');
-  if (/pasta-rose$/.test(id)) return cover('assets/menu/pasta-rose.png');
+  if (/pasta-rose$/.test(id)) return cover('assets/menu/pasta-rose.webp');
   if (/pasta-alfredo$/.test(id)) return cover('assets/menu/pasta-alfredo.png');
   if (/pasta-tomato$/.test(id)) return un('1598866594230-a7c12756260f');
   // Same photo as the item's card on the category pages and the full menu.

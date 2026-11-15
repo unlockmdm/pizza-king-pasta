@@ -17,7 +17,7 @@ type BaseId = 'classic' | 'veggie' | 'chicken';
 /** [id, name, description, Unsplash photo id] */
 type Sauce = readonly [id: SauceId, name: string, desc: string, photo: string];
 const SAUCE_UI: Record<SauceId, [desc: string, photo: string]> = {
-  rose: ['Tomato, cream, parmesan', 'assets/menu/pasta-rose.png'],
+  rose: ['Tomato, cream, parmesan', 'assets/menu/pasta-rose.webp'],
   alfredo: ['Cream, parmesan', 'assets/menu/pasta-alfredo.png'],
   tomato: ['Tomato sauce', '1598866594230-a7c12756260f'],
 };
@@ -38,8 +38,8 @@ type MomoId = 'veg' | 'nonveg';
 
 const MOMOS: readonly (readonly [id: MomoId, name: string, price: number])[] = MOMO_DATA;
 
-const HERO_IMG = 'assets/menu/pasta-rose.png';
-const HERO_IMG_WIDE = 'assets/menu/pasta-rose.png';
+const HERO_IMG = 'assets/menu/pasta-rose.webp';
+const HERO_IMG_WIDE = 'assets/menu/pasta-rose.webp';
 const MOMOS_IMG = itemPhoto('momos', 1000);
 
 // ---------- Static styles ----------
