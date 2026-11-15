@@ -18,7 +18,7 @@ type BaseId = 'classic' | 'veggie' | 'chicken';
 type Sauce = readonly [id: SauceId, name: string, desc: string, photo: string];
 const SAUCE_UI: Record<SauceId, [desc: string, photo: string]> = {
   rose: ['Tomato, cream, parmesan', 'assets/menu/pasta-rose.webp'],
-  alfredo: ['Cream, parmesan', 'assets/menu/pasta-alfredo.png'],
+  alfredo: ['Cream, parmesan', 'assets/menu/pasta-alfredo.webp'],
   tomato: ['Tomato sauce', 'assets/menu/pasta-tomato.webp'],
 };
 // Names and prices come from the shared pricing module.

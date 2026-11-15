@@ -36,7 +36,7 @@ function itemPhoto(id: string, opts: Record<string, string> = {}, text = ''): Ph
   if (DIP[id]) return cut('assets/dips/' + DIP[id] + '.png');
   if (id.startsWith('dip-')) return cut('assets/combo/garlic-dip.png');
   if (/pasta-rose$/.test(id)) return cover('assets/menu/pasta-rose.webp');
-  if (/pasta-alfredo$/.test(id)) return cover('assets/menu/pasta-alfredo.png');
+  if (/pasta-alfredo$/.test(id)) return cover('assets/menu/pasta-alfredo.webp');
   if (/pasta-tomato$/.test(id)) return cover('assets/menu/pasta-tomato.webp');
   // Same photo as the item's card on the category pages and the full menu.
   const shared = ITEM_PHOTOS[id === 'gelato-cone' ? 'cone' : id];
