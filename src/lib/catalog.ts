@@ -89,7 +89,7 @@ export const ITEM_PHOTOS: Record<string, string> = {
   beer: 'assets/menu/beer.webp',
   cone: 'assets/menu/gelato-cone.webp',
   cup: 'assets/menu/gelato-cup.webp',
-  shake: 'assets/menu/mango-shake.webp',
+  shake: 'assets/menu/shakes-trio.webp',
   momos: '1534422298391-e4f8c172dddb',
 };
 /** Photo URL for an item id at width `w` (local assets pass through). */
