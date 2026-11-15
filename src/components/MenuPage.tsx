@@ -285,7 +285,7 @@ export default function MenuPage({ onAdd, onDeal }: MenuPageProps) {
 
   const byo: BuilderItem = { id: 'byo', name: 'Build Your Own', tops: [], included: 4, img: PIZZA_IMG };
   const pizzaRows: Tile[] = [
-    { key: 'byo', img: UI(PIZZA_PHOTOS.byo), name: 'Build Your Own', desc: '4 toppings included (meat counts as 2)', veg: false, priceText: 'From ' + money(SIZE_PRICES.S), cta: 'Customize', act: () => setBuilder(byo) },
+    { key: 'byo', img: U(PIZZA_PHOTOS.byo, 600), name: 'Build Your Own', desc: '4 toppings included (meat counts as 2)', veg: false, priceText: 'From ' + money(SIZE_PRICES.S), cta: 'Customize', act: () => setBuilder(byo) },
     ...PIZZAS.map(([id, name, desc, tops, veg], i): Tile => {
       const photo = PIZZA_PHOTO[id];
       return {

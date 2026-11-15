@@ -50,7 +50,7 @@ export const PIZZA_PHOTOS: Record<string, string> = {
   byo: 'assets/pizzas/byo.webp',
   napoli: 'assets/pizzas/napoli.webp',
   'four-seasons': 'assets/pizzas/four-seasons.webp',
-  'italian-veg': '1617470702892-e01504297e84',
+  'italian-veg': 'assets/pizzas/italian-veg.webp',
   'non-veg': 'assets/pizzas/non-veg.webp',
   bismark: 'assets/pizzas/bismark.webp',
   'chicken-shawarma': 'assets/pizzas/shawarma.webp',
