@@ -40,6 +40,30 @@ const EMPTY_FORM: Form = { name: '', phone: '', email: '', street: '', unit: '',
 
 type Done = Confirmation;
 
+/** The last placed order is kept on this device so a refresh (or reopening the tab) brings the order screen back. */
+const LAST_ORDER_KEY = 'pkp-v2-last-order';
+/** How long a placed order's screen comes back after a refresh. */
+const LAST_ORDER_MS = 12 * 60 * 60 * 1000;
+function readLastOrder(): Done | null {
+  try {
+    const raw = localStorage.getItem(LAST_ORDER_KEY);
+    if (!raw) return null;
+    const v = JSON.parse(raw) as { at: number; done: Done };
+    if (!v || !v.done || !v.done.orderId || Date.now() - v.at > LAST_ORDER_MS) { localStorage.removeItem(LAST_ORDER_KEY); return null; }
+    return v.done;
+  } catch {
+    return null;
+  }
+}
+function saveLastOrder(d: Done | null) {
+  try {
+    if (d && d.orderId) localStorage.setItem(LAST_ORDER_KEY, JSON.stringify({ at: Date.now(), done: d }));
+    else if (!d) localStorage.removeItem(LAST_ORDER_KEY);
+  } catch {
+    /* storage unavailable (private mode): the order screen just won't survive a refresh */
+  }
+}
+
 // ---------- Shared styles ----------
 const FONT = "'Figtree',system-ui,sans-serif";
 const h2: CSSProperties = { margin: '0 0 14px 2px', fontWeight: 900, fontSize: 22, letterSpacing: '-.03em', color: '#1A1414' };
@@ -128,7 +152,8 @@ export default function CartCheckout(p: CartCheckoutProps) {
   const cardSt = useRef<Record<string, SqCardState>>({});
   const cardForce = useRef(false);
   const [cardErr, setCardErr] = useState('');
-  const [done, setDone] = useState<Done | null>(null);
+  const [done, setDoneState] = useState<Done | null>(readLastOrder);
+  const setDone = (d: Done | null) => { saveLastOrder(d); setDoneState(d); };
   // Square (live checkout) state
   const [busy, setBusy] = useState(false);
   const [payErr, setPayErr] = useState('');
