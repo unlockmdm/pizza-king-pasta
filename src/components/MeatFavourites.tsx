@@ -35,7 +35,7 @@ const PIZZA_LIST: Omit<MeatPizza, 'tops'>[] = [
   { id: 'non-veg', name: 'Non-Vegetarian', desc: 'Grilled chicken, sausage, hot salami, ham', pic: PIZZA_PHOTOS['non-veg'], by: '', h: '', chicken: true, cured: true },
   { id: 'pepperoni', name: 'Pepperoni', desc: 'Pepperoni and mozzarella', pic: PIZZA_PHOTOS['pepperoni'], by: 'David Foodphototasty', h: 'phototastyfood', cured: true },
   { id: 'canadian', name: 'Canadian', desc: 'Pepperoni, mushrooms, bacon', pic: PIZZA_PHOTOS['canadian'], by: '', h: '', cured: true },
-  { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', pic: PIZZA_PHOTOS['hawaiian'], by: '', h: '', creditText: 'Photo: Elsie Hui, Wikimedia Commons, CC BY 2.0', cured: true },
+  { id: 'hawaiian', name: 'Hawaiian', desc: 'Pineapple, bacon, ham', pic: PIZZA_PHOTOS['hawaiian'], by: '', h: '', cured: true },
   { id: 'bismark', name: 'Bismark', desc: 'Sun-dried tomatoes, grilled chicken, sausage', pic: PIZZA_PHOTOS['bismark'], by: '', h: '', chicken: true, cured: true },
   { id: 'four-seasons', name: 'Four Seasons', desc: 'Ham, mushrooms, artichokes, black olives', pic: PIZZA_PHOTOS['four-seasons'], by: '', h: '', cured: true },
 ];
@@ -56,7 +56,8 @@ const DEFAULT_SIZE: SizeKey = 'L';
 const ADDED_MS = 1400;
 
 const HERO_IMG = U('1611915365928-565c527a0590', 2000);
-const BYO_IMG = U(PIZZA_PHOTOS.byo, 800);
+// Meat Favourites: a build-your-own pizza with meat on it (the veggie BYO photo is used elsewhere).
+const BYO_IMG = 'assets/pizzas/byo-meat.webp';
 
 const tagStyle = { position: 'absolute', left: 14, top: 14, height: 30, padding: '0 12px', borderRadius: 999, background: '#fff', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', boxShadow: '0 4px 14px rgba(0,0,0,.12)' } as const;
 
