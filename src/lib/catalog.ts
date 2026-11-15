@@ -58,7 +58,7 @@ export const PIZZA_PHOTOS: Record<string, string> = {
   'shahi-paneer': 'assets/pizzas/shahi-paneer.webp',
   hawaiian: 'assets/pizzas/hawaiian.webp',
   'meat-lover': 'assets/pizzas/meat-lover.webp',
-  canadian: 'assets/pizzas/canadian-photo.webp',
+  canadian: 'assets/pizzas/canadian.webp',
   'tandoori-fish': 'assets/pizzas/tandoori-fish.webp',
   pepperoni: '1692737580547-b45bb4a02356',
 };
