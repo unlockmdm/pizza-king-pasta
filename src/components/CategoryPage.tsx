@@ -139,7 +139,7 @@ const CATS: Record<CategoryId, Category> = {
     items: withUi('juice'),
   },
   gelato: {
-    hero: { img: '1501443762994-82bd5dace89a', eyebrow: CAT_MENU.gelato.label, t1: 'Gelato &', t2: 'shakes.', p: 'Gelato in a cone or cup, in ten flavours, and thick shakes.' },
+    hero: { img: '1501443762994-82bd5dace89a', eyebrow: CAT_MENU.gelato.label, t1: 'Gelato &', t2: 'shakes.', p: 'Gelato in a cone or cup, in ten flavours, and shakes.' },
     noun: 'items',
     items: withUi('gelato'),
   },

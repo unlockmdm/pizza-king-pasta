@@ -62,9 +62,9 @@ export const PAGES: Record<PageId, PageMeta> = {
   },
   gelato: {
     slug: 'gelato',
-    title: 'Gelato & Thick Shakes in Brampton | Pizza King & Pasta',
-    description: 'Gelato in a cone or cup and thick shakes in mango, strawberry, banana, badam and papaya. Order with your pizza for pickup in Brampton.',
-    h1: 'Gelato and thick shakes',
+    title: 'Gelato & Shakes in Brampton | Pizza King & Pasta',
+    description: 'Gelato in a cone or cup and shakes in mango, strawberry, banana, badam and papaya. Order with your pizza for pickup in Brampton.',
+    h1: 'Gelato and shakes',
     priority: 0.7,
   },
   terms: {

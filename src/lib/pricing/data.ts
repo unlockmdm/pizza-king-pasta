@@ -171,7 +171,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   { id: 'gelato', title: 'Gelato & shakes', rows: [
     ['cone', 'Gelato cone', 'Vanilla, mango, pistachio, chocolate and more', [['', GELATO_SCOOP]]],
     ['cup', 'Gelato cup', 'Medium cup, choice of flavour', [['', GELATO_SCOOP]]],
-    ['shake', 'Shake', 'Mango, strawberry, banana, badam, papaya', SIZES3(SHAKE)],
+    ['shake', 'Shakes', 'Mango, strawberry, banana, badam, papaya', SIZES3(SHAKE)],
   ] },
   { id: 'drinks', title: 'Drinks', rows: [
     ['fruit-juice', 'Fresh fruit juice', 'Mix, orange, pineapple, orange & carrot or orange & pineapple', SIZES3(JUICE)],
@@ -313,7 +313,7 @@ export const CAT_MENU: Record<CategoryId, { label: string; items: CatItem[] }> =
       // Square calls gelato "Ice Cream": Cone $6.00, Medium Bowl $6.00 (Large Bowl has no price set yet).
       { id: 'cup', name: 'Gelato cup', desc: 'Medium cup', price: GELATO_SCOOP, groups: [{ id: 'flav', label: 'Flavour', opts: GELATO_OPTS }, GELATO_SECOND] },
       {
-        id: 'shake', name: 'Thick shake',
+        id: 'shake', name: 'Shakes',
         groups: [
           { id: 'flav', label: 'Flavour', opts: [o('mango', 'Mango'), o('strawberry', 'Strawberry'), o('banana', 'Banana'), o('badam', 'Badam'), o('papaya', 'Papaya')] },
           { id: 'size', label: 'Size', opts: CSIZES3(SHAKE) },
