@@ -32,8 +32,8 @@ const ROW_PIC: Record<string, string> = {
   'veg-pasta-alfredo': 'assets/menu/pasta-alfredo.png',
   'ch-pasta-rose': 'assets/menu/pasta-rose.webp',
   'ch-pasta-alfredo': 'assets/menu/pasta-alfredo.png',
-  'veg-pasta-tomato': 'https://images.unsplash.com/photo-1598866594230-a7c12756260f?fm=jpg&q=70&w=600&auto=format&fit=crop',
-  'ch-pasta-tomato': 'https://images.unsplash.com/photo-1598866594230-a7c12756260f?fm=jpg&q=70&w=600&auto=format&fit=crop',
+  'veg-pasta-tomato': 'assets/menu/pasta-tomato.webp',
+  'ch-pasta-tomato': 'assets/menu/pasta-tomato.webp',
 };
 
 /** Per-section colours used by the photo-card grid (the prototype's unused list-row fields are omitted). */

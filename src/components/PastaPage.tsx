@@ -19,7 +19,7 @@ type Sauce = readonly [id: SauceId, name: string, desc: string, photo: string];
 const SAUCE_UI: Record<SauceId, [desc: string, photo: string]> = {
   rose: ['Tomato, cream, parmesan', 'assets/menu/pasta-rose.webp'],
   alfredo: ['Cream, parmesan', 'assets/menu/pasta-alfredo.png'],
-  tomato: ['Tomato sauce', '1598866594230-a7c12756260f'],
+  tomato: ['Tomato sauce', 'assets/menu/pasta-tomato.webp'],
 };
 // Names and prices come from the shared pricing module.
 const SAUCES: readonly Sauce[] = PASTA_SAUCES.map(([id, name]): Sauce => [id, name, ...SAUCE_UI[id]]);
