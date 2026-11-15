@@ -64,6 +64,12 @@ export default function Footer({
             <Hov as="a" href={SHOP.mapsSearch} target="_blank" rel="noopener noreferrer" aria-label={'Open ' + SHOP.street + ' in Google Maps'} style={link} hover={linkHover}>{SHOP.street}<br />{SHOP.cityLine}</Hov>
             <span>{SHOP.hoursDays}, {SHOP.hoursText}</span>
             <Hov as="a" href={SHOP.phoneHref} style={link} hover={linkHover}>{SHOP.phoneText}</Hov>
+            <span>
+              Delivery on{' '}
+              <Hov as="a" href={SHOP.doordash} target="_blank" rel="noopener noreferrer" style={{ ...link, textDecoration: 'underline', textUnderlineOffset: 3 }} hover={linkHover}>DoorDash</Hov>
+              {' '}and{' '}
+              <Hov as="a" href={SHOP.skip} target="_blank" rel="noopener noreferrer" style={{ ...link, textDecoration: 'underline', textUnderlineOffset: 3 }} hover={linkHover}>SkipTheDishes</Hov>
+            </span>
           </div>
         </div>
         {/* Questions: compact, in the footer's style */}

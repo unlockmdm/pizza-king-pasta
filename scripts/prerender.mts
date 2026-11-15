@@ -38,7 +38,7 @@ const restaurant = {
   acceptsReservations: 'False',
   paymentAccepted: 'Credit card, Debit card, Apple Pay, Google Pay',
   currenciesAccepted: 'CAD',
-  sameAs: [SHOP.doordash],
+  sameAs: [SHOP.doordash, SHOP.skip],
   hasMap: SHOP.mapsSearch,
   keywords: 'Indian pizza, butter chicken pizza, shahi paneer pizza, tandoori pizza, wood-fired pizza, late night pizza, pizza Brampton',
   potentialAction: {
@@ -120,7 +120,7 @@ const sizePrices = (id: string) => SIZE_KEYS.map((k) => SIZE_NAMES[k] + ' ' + mo
 
 const visit =
   '<h2>Visit or order</h2><p>' + esc(SHOP.street) + ', Brampton, ON L6Y 0N2. Phone <a href="tel:+19054609494">905-460-9494</a>. ' +
-  'Open every day, ' + esc(SHOP.hoursText) + '. Order online for pickup, or get delivery through DoorDash.</p>';
+  'Open every day, ' + esc(SHOP.hoursText) + '. Order online for pickup, or get delivery through DoorDash and SkipTheDishes.</p>';
 
 function body(id: PageId): string {
   const m = PAGES[id];
@@ -132,7 +132,7 @@ function body(id: PageId): string {
       '<h2>Popular pizzas</h2>' + list(['Butter Chicken', 'Shahi Paneer', 'Shawarma Chicken', 'Tandoori Fish', 'Meat Lover', 'Hawaiian'].map((n) => esc(n) + ' pizza')) +
       '<h2>Pickup combos</h2>' + list(Object.values(COMBOS).map((c) => esc(c.name) + ' combo: ' + money(c.price))) +
       '<h2>Indian pizza in Brampton</h2><p>Looking for Indian pizza near you in Brampton? Our butter chicken pizza, shahi paneer pizza, tandoori chicken pizza and shawarma chicken pizza are made to order on fresh dough and baked in a wood-fired oven. ' +
-      'We are open late every night until 2 AM, with pickup ordering online and delivery through DoorDash.</p>' +
+      'We are open late every night until 2 AM, with pickup ordering online and delivery through DoorDash and SkipTheDishes.</p>' +
       '<h2>Questions</h2>' + FAQ.map(([q, a]) => '<h3>' + esc(q) + '</h3><p>' + esc(a) + '</p>').join('');
   } else if (id === 'menu') {
     main = '<h2>Pizzas</h2>' + list(Object.entries(PIZZAS).map(([k, p]) => '<strong>' + esc(k === 'byo' ? 'Build your own' : p.name) + '</strong>: ' + sizePrices(k))) +

@@ -100,7 +100,7 @@ const terms = (goOther: (e?: MouseEvent) => void): Section[] => [
           Orders placed on this website are for pickup at our restaurant only. We do not deliver orders placed on this website.
         </P>
         <P>
-          For delivery, the website links to our storefronts on DoorDash and Uber Eats. Those orders are placed with, paid to and delivered
+          For delivery, the website links to our storefronts on DoorDash, SkipTheDishes and Uber Eats. Those orders are placed with, paid to and delivered
           by those companies under their own terms of service and privacy policies, and their menus, prices, fees, taxes, delivery times and
           refund processes may differ from ours. Questions about a delivery order, its fees or its refund should go to the delivery company
           first. We are not responsible for their apps, websites, drivers or policies.
@@ -321,7 +321,7 @@ const terms = (goOther: (e?: MouseEvent) => void): Section[] => [
     title: 'Third-party services and links',
     body: (
       <P>
-        The website uses or links to services run by other companies, including Square (payments), DoorDash and Uber Eats (delivery), and
+        The website uses or links to services run by other companies, including Square (payments), DoorDash, SkipTheDishes and Uber Eats (delivery), and
         Google Maps (maps and directions). Those services are governed by their own terms and privacy policies. We do not control them and
         are not responsible for their content, availability or practices.
       </P>
@@ -537,7 +537,7 @@ const privacy = (goOther: (e?: MouseEvent) => void): Section[] => [
         <H3>What we do not collect</H3>
         <P>
           We do not use advertising pixels, social media trackers or analytics that follow you across websites. We do not ask for delivery addresses, because delivery
-          is handled by DoorDash and Uber Eats, and the website does not have user accounts or passwords.
+          is handled by DoorDash, SkipTheDishes and Uber Eats, and the website does not have user accounts or passwords.
         </P>
       </>
     ),
@@ -614,7 +614,7 @@ const privacy = (goOther: (e?: MouseEvent) => void): Section[] => [
           </li>
         </UL>
         <P>
-          If you choose to order delivery through DoorDash or Uber Eats, you leave our website. We do not send them your information; they
+          If you choose to order delivery through DoorDash, SkipTheDishes or Uber Eats, you leave our website. We do not send them your information; they
           collect it themselves under their own privacy policies.
         </P>
         <P>
@@ -762,7 +762,7 @@ const privacy = (goOther: (e?: MouseEvent) => void): Section[] => [
     title: 'Other websites',
     body: (
       <P>
-        Our website links to other sites, such as DoorDash, Uber Eats, Google Maps and photographers’ pages on Unsplash. This policy does not
+        Our website links to other sites, such as DoorDash, SkipTheDishes, Uber Eats, Google Maps and photographers’ pages on Unsplash. This policy does not
         apply to them. Please read their privacy policies before giving them personal information.
       </P>
     ),

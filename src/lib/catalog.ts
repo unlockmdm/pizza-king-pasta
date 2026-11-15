@@ -19,9 +19,15 @@ export const SHOP = {
   /** Uber Eats is shown greyed out as "Currently unavailable" until the owner turns it back on. */
   ubereatsAvailable: false,
   ubereats: 'https://www.ubereats.com/ca/store/pizza-king-&-pasta/j1VSW4wkX02MplHbVNOSpg',
+  /** SkipTheDishes (now branded "Skip") listing for the shop. */
+  skip: 'https://www.skipthedishes.com/pizza-king-and-pasta',
   doordashLogo: 'assets/brands/doordash.svg',
+  skipLogo: 'assets/brands/skip.svg',
   ubereatsLogo: 'assets/brands/ubereats.svg',
 } as const;
+
+/** Delivery apps the shop is live on, as words: "DoorDash and SkipTheDishes" (Uber Eats added when it's back on). */
+export const DELIVERY_APPS_TEXT = SHOP.ubereatsAvailable ? 'DoorDash, SkipTheDishes and Uber Eats' : 'DoorDash and SkipTheDishes';
 
 // Prices live in ./pricing (shared with the payment server). Re-exported here for existing imports.
 export { HST, PIZZA_PRICES, SIZE_NAMES, SIZE_PRICES, pricesFor } from './pricing';

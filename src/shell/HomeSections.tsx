@@ -1,5 +1,5 @@
 import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
-import { creditOf, pricesFor, SHOP, U } from '../lib/catalog';
+import { creditOf, DELIVERY_APPS_TEXT, pricesFor, SHOP, U } from '../lib/catalog';
 import { money } from '../lib/format';
 import { COMBOS } from '../lib/pricing';
 import { Hov, IconArrow, IconPlus, Photo } from '../lib/ui';
@@ -416,10 +416,11 @@ export default function HomeSections({ w, h }: { w: number; h: HomeHandlers }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 24, borderTop: '1px solid rgba(26,20,20,.1)' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: '#636366' }}>Delivery</span>
-                <span style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.45, textWrap: 'pretty' } as CSSProperties}>Available through {SHOP.ubereatsAvailable ? 'DoorDash and Uber Eats' : 'DoorDash'}.</span>
+                <span style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.45, textWrap: 'pretty' } as CSSProperties}>Available through {DELIVERY_APPS_TEXT}.</span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 <AppPill href={SHOP.doordash} logo={SHOP.doordashLogo} name="DoorDash" h={14} />
+                <AppPill href={SHOP.skip} logo={SHOP.skipLogo} name="SkipTheDishes" h={20} />
                 <AppPill href={SHOP.ubereats} logo={SHOP.ubereatsLogo} name="Uber Eats" h={18} off={!SHOP.ubereatsAvailable} />
               </div>
               {SHOP.ubereatsAvailable ? null : <span style={{ fontSize: 13, lineHeight: 1.45, color: '#636366' }}>Ordering delivery through Uber Eats is currently unavailable.</span>}

@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { SHOP } from '../lib/catalog';
+import { DELIVERY_APPS_TEXT, SHOP } from '../lib/catalog';
 import { useEffect } from 'react';
 import { useLockBody } from '../lib/hooks';
 import { canOrderAsap, OPENS_AT, timeSlots } from '../lib/hours';
@@ -99,9 +99,10 @@ export default function StartSheet({
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: '#1A1414', textWrap: 'pretty' } as CSSProperties}>Delivery is handled by {SHOP.ubereatsAvailable ? 'DoorDash and Uber Eats' : 'DoorDash'}. You{'\u2019'}ll finish your order in their app.</p>
+              <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: '#1A1414', textWrap: 'pretty' } as CSSProperties}>Delivery is handled by {DELIVERY_APPS_TEXT}. You{'\u2019'}ll finish your order in their app.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <AppButton href={SHOP.doordash} logo={SHOP.doordashLogo} name="DoorDash" h={15} />
+                <AppButton href={SHOP.skip} logo={SHOP.skipLogo} name="SkipTheDishes" h={22} />
                 <AppButton href={SHOP.ubereats} logo={SHOP.ubereatsLogo} name="Uber Eats" h={20} off={!SHOP.ubereatsAvailable} />
               </div>
               <span style={{ fontSize: 13, lineHeight: 1.45, color: '#636366' }}>
