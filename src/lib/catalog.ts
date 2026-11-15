@@ -75,7 +75,7 @@ export const ITEM_PHOTOS: Record<string, string> = {
   fish: 'assets/menu/tandoori-fish.webp',
   wedges: 'assets/menu/wedges.webp',
   'garlic-bread': 'assets/menu/garlic-bread.webp',
-  sub: '1509722747041-616f39b57569',
+  sub: 'assets/menu/sub.webp',
   'nv-salad': 'assets/menu/chicken-salad.webp',
   'v-salad': 'assets/menu/garden-salad.webp',
   corn: 'assets/menu/sweet-corn.webp',
