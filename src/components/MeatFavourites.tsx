@@ -167,7 +167,7 @@ export default function MeatFavourites({ onAdd, onCustomize, onBack, onMenu, onB
             hover={{ transform: 'translateY(-4px)', boxShadow: '0 22px 44px rgba(215,25,45,.28)' }}
           >
             <div style={{ position: 'relative', aspectRatio: ph ? undefined : '4/3', width: ph ? '40%' : undefined, flex: ph ? 'none' : undefined, minHeight: ph ? 180 : undefined, background: '#B51424' }}>
-              <Photo src={BYO_IMG} alt="" credit="Photo by Saundarya Srinivasan on Unsplash" creditHref="https://unsplash.com/@saundiii" />
+              <Photo src={BYO_IMG} alt="" />
               {ph ? null : <span style={{ ...tagStyle, color: '#D7192D' }}>Build your own</span>}
             </div>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: ph ? 14 : 20, padding: ph ? 16 : 22 }}>

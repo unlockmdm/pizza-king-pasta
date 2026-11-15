@@ -48,7 +48,7 @@ export interface Tile {
 }
 
 export const TILES: Tile[] = [
-  { id: 'byo', name: 'Build Your Own', sub: '4 Toppings · Meat Counts as 2', bg: '#EDEDF0', fg: '#1A1414', img: pizzaPhoto('byo'), by: 'Saundarya Srinivasan', h: 'saundiii' },
+  { id: 'byo', name: 'Build Your Own', sub: '4 Toppings · Meat Counts as 2', bg: '#EDEDF0', fg: '#1A1414', img: pizzaPhoto('byo') },
   { id: 'specials', name: 'House Specials', sub: 'Indian-Fusion and Classic', bg: '#D7192D', fg: '#fff', img: U('1565299624946-b28f40a0ae38'), by: 'Chad Montano', h: 'briewilly', target: 'bestsellers' },
   { id: 'meat', name: 'Meat Favourites', sub: 'Pepperoni, Bacon, Sausage', bg: '#520000', fg: '#fff', img: 'assets/menu/meat-tile.webp', fill: true },
   { id: 'combos', name: 'Pickup Combos', sub: 'From ' + money(Math.min(...Object.values(COMBOS).map((c) => c.price))), bg: '#1A1414', fg: '#fff', img: U('1594007654729-407eedc4be65'), by: 'Saahil Khatkhate', h: 'saahilkhatkhate', target: 'deals' },
@@ -68,9 +68,9 @@ export const BASE_TOPS: Record<string, string[]> = {
   'meat-lover': ['pepperoni', 'ham', 'bacon', 'sausage'],
 };
 
-export const BYO: BuilderItem & { by: string; h: string } = {
+export const BYO: BuilderItem & { by?: string; h?: string } = {
   id: 'byo', name: 'Build Your Own', desc: '4 toppings included (meat counts as 2)', tops: [], included: 4,
-  img: pizzaPhoto('byo', 1000), by: 'Saundarya Srinivasan', h: 'saundiii',
+  img: pizzaPhoto('byo', 1000),
 };
 
 /** Build Your Own tile animation: [label, cut-out ids, piece width px]. */

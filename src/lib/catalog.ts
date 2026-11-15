@@ -47,7 +47,7 @@ export { canOrderAsap as isShopOpen } from './hours';
  * Every photo must show that pizza's actual toppings.
  */
 export const PIZZA_PHOTOS: Record<string, string> = {
-  byo: '1593560708920-61dd98c46a4e',
+  byo: 'assets/pizzas/byo.webp',
   napoli: 'assets/pizzas/napoli.webp',
   'four-seasons': 'assets/pizzas/four-seasons.webp',
   'italian-veg': '1617470702892-e01504297e84',
