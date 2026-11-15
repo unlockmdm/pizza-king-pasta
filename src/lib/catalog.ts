@@ -72,7 +72,7 @@ export const pizzaPhoto = (id: string, w = 900) => (PIZZA_PHOTOS[id] ? U(PIZZA_P
 export const ITEM_PHOTOS: Record<string, string> = {
   wings: 'assets/menu/wings.webp',
   leg: 'assets/menu/chicken-leg.webp',
-  fish: '',
+  fish: 'assets/menu/tandoori-fish.webp',
   wedges: '1623238913973-21e45cced554',
   'garlic-bread': 'assets/menu/garlic-bread.webp',
   sub: '1509722747041-616f39b57569',
