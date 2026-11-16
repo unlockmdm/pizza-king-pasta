@@ -147,8 +147,8 @@ const SCENE_ALT = ['One large pepperoni pizza', 'Two large pizzas with two dips 
 /** [key, name, price, description, combo-builder deal id] */
 const WALKINS: [string, string, number, string, string][] = ([
   ['walkin-1l', '1 large pizza with 1 topping and 1 dip, wood-fired or conventional oven', 'one-large'],
-  ['walkin-2l', '2 large pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-large'],
-  ['walkin-2m', '2 medium pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops, plus sugarcane juice or wood-oven corn', 'two-medium'],
+  ['walkin-2l', '2 large pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops', 'two-large'],
+  ['walkin-2m', '2 medium pizzas with 4 toppings each (meat counts as 2), 2 dips, 2 pops', 'two-medium'],
   ['walkin-2s', '2 small pizzas with 4 toppings each (meat counts as 2) and 2 dips', 'two-small'],
 ] as const).map(([key, desc, deal]) => [key, COMBOS[deal].name, COMBOS[deal].price, desc, deal]);
 

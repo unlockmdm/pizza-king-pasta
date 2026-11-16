@@ -110,15 +110,15 @@ export const BEER_ID_NOTICE = {
 };
 export const COMBOS: Record<string, ComboDef> = {
   'one-large': { name: 'One Large', price: 11.99, size: 'L', pizzas: 1, tops: 1, dips: 1, pops: 0, side: false },
-  'two-large': { name: 'Two Large', price: 36.0, size: 'L', pizzas: 2, tops: 4, dips: 2, pops: 2, side: true },
-  'two-medium': { name: 'Two Medium', price: 32.0, size: 'M', pizzas: 2, tops: 4, dips: 2, pops: 2, side: true },
+  'two-large': { name: 'Two Large', price: 36.0, size: 'L', pizzas: 2, tops: 4, dips: 2, pops: 2, side: false },
+  'two-medium': { name: 'Two Medium', price: 32.0, size: 'M', pizzas: 2, tops: 4, dips: 2, pops: 2, side: false },
   'two-small': { name: 'Two Small', price: 25.99, size: 'S', pizzas: 2, tops: 4, dips: 2, pops: 0, side: false },
 };
 /** Dipping sauce on its own (Square: $1.33). Combos only let you pick the included dips. */
 export const EXTRA_DIP = 1.33;
 export const COMBO_DIPS: [string, string][] = [['garlic', 'Creamy garlic'], ['ranch', 'Ranch'], ['chipotle', 'Chipotle'], ['jalapeno-cheddar', 'Jalapeño cheddar'], ['marinara', 'Marinara']];
 export const COMBO_POPS = ['Coca-Cola', 'Pepsi', 'Sprite', 'Canada Dry', 'Orange Crush'];
-/** Free side in the bigger combos: [id, name]. */
+/** Optional side for a combo (no combo includes one right now: the owner doesn't give sides away). [id, name]. */
 export const COMBO_SIDES: [string, string][] = [['sugarcane', 'Sugarcane juice'], ['corn', 'Wood-oven corn']];
 
 // ---------------------------------------------------------------------------
